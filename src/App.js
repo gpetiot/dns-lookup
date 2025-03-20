@@ -19,13 +19,16 @@ function App() {
     setError(null);
     
     try {
-      const apiKey = process.env.WHOIS_API_KEY;
+      const apiKey = process.env.REACT_APP_WHOIS_API_KEY;
+      console.log('Using API Key:', apiKey ? 'API key is present' : 'API key is missing');
       
       const response = await fetch(`https://api.apilayer.com/whois/query?domain=${domain}`, {
         method: 'GET',
         headers: {
-          'apikey': apiKey
-        }
+          'apikey': apiKey,
+          'Content-Type': 'application/json'
+        },
+        mode: 'cors'
       });
       
       if (!response.ok) {
@@ -35,6 +38,7 @@ function App() {
       const data = await response.json();
       setDomainInfo(data);
     } catch (err) {
+      console.error('Fetch error:', err);
       setError(err.message || 'An error occurred');
     } finally {
       setLoading(false);
