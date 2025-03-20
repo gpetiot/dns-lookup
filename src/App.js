@@ -6,6 +6,26 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Function to fetch with timeout
+  const fetchWithTimeout = async (url, options, timeout = 10000) => {
+    const controller = new AbortController();
+    const { signal } = controller;
+    
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+      const response = await fetch(url, { ...options, signal });
+      clearTimeout(timeoutId);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        throw new Error('Request timed out. Please try again.');
+      }
+      throw error;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -20,26 +40,60 @@ function App() {
     
     try {
       const apiKey = process.env.REACT_APP_WHOIS_API_KEY;
-      console.log('Using API Key:', apiKey ? 'API key is present' : 'API key is missing');
       
-      const response = await fetch(`https://api.apilayer.com/whois/query?domain=${domain}`, {
-        method: 'GET',
-        headers: {
-          'apikey': apiKey,
-          'Content-Type': 'application/json'
+      if (!apiKey) {
+        throw new Error('API key is missing. Please check your environment configuration.');
+      }
+      
+      console.log('Fetching data for domain:', domain);
+      
+      const response = await fetchWithTimeout(
+        `https://api.apilayer.com/whois/query?domain=${encodeURIComponent(domain)}`, 
+        {
+          method: 'GET',
+          headers: {
+            'apikey': apiKey,
+            'Content-Type': 'application/json'
+          },
+          mode: 'cors'
         },
-        mode: 'cors'
-      });
+        15000 // 15 seconds timeout
+      );
       
       if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+        if (response.status === 429) {
+          throw new Error('Rate limit exceeded. Please try again later.');
+        } else if (response.status === 401 || response.status === 403) {
+          throw new Error('API key invalid or unauthorized access.');
+        } else if (response.status === 404) {
+          throw new Error('Domain information not found.');
+        } else {
+          throw new Error(`API error: ${response.status} ${response.statusText}`);
+        }
       }
       
       const data = await response.json();
+      
+      if (!data || Object.keys(data).length === 0) {
+        throw new Error('No data returned for this domain.');
+      }
+      
+      console.log('Data received successfully');
       setDomainInfo(data);
     } catch (err) {
       console.error('Fetch error:', err);
-      setError(err.message || 'An error occurred');
+      
+      // Create user-friendly error messages
+      let errorMessage;
+      if (err.message.includes('NetworkError') || err.message.includes('Failed to fetch')) {
+        errorMessage = 'Network error. Please check your internet connection.';
+      } else if (err.message.includes('timed out')) {
+        errorMessage = 'The request timed out. The server might be busy, please try again later.';
+      } else {
+        errorMessage = err.message || 'An unexpected error occurred.';
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
