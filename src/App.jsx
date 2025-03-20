@@ -20,7 +20,7 @@ function App() {
     setError(null)
     
     try {
-      const apiKey = import.meta.env.VITE_API_KEY
+      const apiKey = import.meta.env.WHOIS_API_KEY
       
       const response = await fetch(`https://api.apilayer.com/whois/query?domain=${domain}`, {
         method: 'GET',
