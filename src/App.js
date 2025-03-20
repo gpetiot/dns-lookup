@@ -5,7 +5,7 @@ function App() {
   const [domainInfo, setDomainInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  
   // Function to fetch with timeout
   const fetchWithTimeout = async (url, options, timeout = 10000) => {
     const controller = new AbortController();
@@ -14,7 +14,10 @@ function App() {
     const timeoutId = setTimeout(() => controller.abort(), timeout);
     
     try {
-      const response = await fetch(url, { ...options, signal });
+      const response = await fetch(url, { 
+        ...options, 
+        signal 
+      });
       clearTimeout(timeoutId);
       return response;
     } catch (error) {
@@ -39,7 +42,8 @@ function App() {
     setError(null);
     
     try {
-      const apiKey = process.env.REACT_APP_WHOIS_API_KEY;
+      // Get API key from environment variables
+      const apiKey = process.env.REACT_APP_API_KEY;
       
       if (!apiKey) {
         throw new Error('API key is missing. Please check your environment configuration.');
@@ -47,16 +51,21 @@ function App() {
       
       console.log('Fetching data for domain:', domain);
       
+      // Create headers as specified
+      const myHeaders = new Headers();
+      myHeaders.append("apikey", apiKey);
+      
+      // Create request options as specified
+      const requestOptions = {
+        method: 'GET',
+        redirect: 'follow',
+        headers: myHeaders
+      };
+      
+      // Use the new endpoint with the check parameter
       const response = await fetchWithTimeout(
-        `https://api.apilayer.com/whois/query?domain=${encodeURIComponent(domain)}`, 
-        {
-          method: 'GET',
-          headers: {
-            'apikey': apiKey,
-            'Content-Type': 'application/json'
-          },
-          mode: 'cors'
-        },
+        `https://api.apilayer.com/whois/check?domain=${encodeURIComponent(domain)}`,
+        requestOptions,
         15000 // 15 seconds timeout
       );
       
@@ -72,14 +81,23 @@ function App() {
         }
       }
       
-      const data = await response.json();
+      // Use text() instead of json() as per the provided code
+      const result = await response.text();
       
-      if (!data || Object.keys(data).length === 0) {
-        throw new Error('No data returned for this domain.');
+      // Parse the text if it's JSON
+      try {
+        const data = JSON.parse(result);
+        if (!data || Object.keys(data).length === 0) {
+          throw new Error('No data returned for this domain.');
+        }
+        
+        console.log('Data received successfully');
+        setDomainInfo(data);
+      } catch (jsonError) {
+        // If it's not valid JSON, just display the text
+        console.log('Received non-JSON response');
+        setDomainInfo({ response: result });
       }
-      
-      console.log('Data received successfully');
-      setDomainInfo(data);
     } catch (err) {
       console.error('Fetch error:', err);
       
