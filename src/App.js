@@ -1,46 +1,45 @@
-import { useState } from 'react'
-import './App.css'
+import React, { useState } from 'react';
 
 function App() {
-  const [domain, setDomain] = useState('')
-  const [domainInfo, setDomainInfo] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [domain, setDomain] = useState('');
+  const [domainInfo, setDomainInfo] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     
     if (!domain) {
-      setError('Please enter a domain')
-      return
+      setError('Please enter a domain');
+      return;
     }
     
-    setLoading(true)
-    setDomainInfo(null)
-    setError(null)
+    setLoading(true);
+    setDomainInfo(null);
+    setError(null);
     
     try {
-      const apiKey = import.meta.env.VITE_API_KEY
+      const apiKey = process.env.REACT_APP_API_KEY;
       
       const response = await fetch(`https://api.apilayer.com/whois/query?domain=${domain}`, {
         method: 'GET',
         headers: {
           'apikey': apiKey
         }
-      })
+      });
       
       if (!response.ok) {
-        throw new Error(`API error: ${response.status}`)
+        throw new Error(`API error: ${response.status}`);
       }
       
-      const data = await response.json()
-      setDomainInfo(data)
+      const data = await response.json();
+      setDomainInfo(data);
     } catch (err) {
-      setError(err.message || 'An error occurred')
+      setError(err.message || 'An error occurred');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-blue-100 p-4 flex flex-col items-center justify-center">
@@ -88,7 +87,7 @@ function App() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App; 
