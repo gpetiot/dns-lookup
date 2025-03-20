@@ -19,7 +19,7 @@ function App() {
     setError(null);
     
     try {
-      const apiKey = process.env.REACT_APP_API_KEY;
+      const apiKey = process.env.WHOIS_API_KEY;
       
       const response = await fetch(`https://api.apilayer.com/whois/query?domain=${domain}`, {
         method: 'GET',
