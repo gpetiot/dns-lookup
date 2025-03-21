@@ -1,14 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // Domain Result component to display availability status
-const DomainResult = ({ domain, data }) => {
+const DomainResult = ({ domain, data, loading }) => {
+  if (loading) {
+    return (
+      <div className="mb-4 p-4 rounded-md bg-gray-50 border border-gray-200">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <span className="flex items-center text-gray-400 font-medium">
+              <svg className="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Checking...
+            </span>
+          </div>
+          <div className="text-lg font-bold text-gray-500">
+            {domain}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const isAvailable = data?.result === 'available';
+  const hasError = data?.error || false;
   
   return (
-    <div className={`mb-4 p-4 rounded-md ${isAvailable ? 'bg-green-50 border border-green-200' : 'bg-gray-50 border border-gray-200'}`}>
+    <div className={`mb-4 p-4 rounded-md ${
+      hasError 
+        ? 'bg-yellow-50 border border-yellow-200' 
+        : isAvailable 
+          ? 'bg-green-50 border border-green-200' 
+          : 'bg-gray-50 border border-gray-200'
+    }`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center">
-          {isAvailable ? (
+          {hasError ? (
+            <span className="flex items-center text-yellow-600 font-medium">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              Error
+            </span>
+          ) : isAvailable ? (
             <span className="flex items-center text-green-600 font-medium">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -25,7 +60,9 @@ const DomainResult = ({ domain, data }) => {
           )}
         </div>
         <div className="text-lg font-bold">
-          {isAvailable ? (
+          {hasError ? (
+            <span className="text-yellow-600">{domain}</span>
+          ) : isAvailable ? (
             <span className="text-green-600">{domain}</span>
           ) : (
             <a 
@@ -43,7 +80,12 @@ const DomainResult = ({ domain, data }) => {
           )}
         </div>
       </div>
-      {!isAvailable && data?.expiry && (
+      {hasError && (
+        <div className="mt-2 text-sm text-yellow-600">
+          {data.error}
+        </div>
+      )}
+      {!isAvailable && !hasError && data?.expiry && (
         <div className="mt-2 text-sm text-gray-500">
           Expires: {new Date(data.expiry).toLocaleDateString()}
         </div>
@@ -55,9 +97,44 @@ const DomainResult = ({ domain, data }) => {
 function App() {
   const [domain, setDomain] = useState('');
   const [processedDomain, setProcessedDomain] = useState('');
-  const [domainInfo, setDomainInfo] = useState(null);
+  const [domainVariations, setDomainVariations] = useState([]);
+  const [domainResults, setDomainResults] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [checkingProgress, setCheckingProgress] = useState({ current: 0, total: 0 });
+  
+  // Domain variations with prefixes and suffixes
+  const prefixes = [
+    'get', 'try', 'use', 'hey', 'join', 'go', 'the', 'my', 'app'
+  ];
+  
+  const suffixes = [
+    'app', 'hq', 'hub', 'studio', 'labs', 'way', 'me', 'tools', 
+    'kit', 'tech', 'cloud', 'works', 'space', 'plus', 'pro', 'base'
+  ];
+  
+  // Generate domain variations based on the base name
+  const generateDomainVariations = (baseName) => {
+    // Remove domain extension if present
+    const nameOnly = baseName.split('.')[0];
+    
+    const variations = [
+      // Original domain with .com
+      `${nameOnly}.com`
+    ];
+    
+    // Add prefix variations
+    prefixes.forEach(prefix => {
+      variations.push(`${prefix}${nameOnly}.com`);
+    });
+    
+    // Add suffix variations
+    suffixes.forEach(suffix => {
+      variations.push(`${nameOnly}${suffix}.com`);
+    });
+    
+    return variations;
+  };
   
   // Function to sanitize domain input
   const sanitizeDomain = (input) => {
@@ -80,7 +157,7 @@ function App() {
     
     return sanitized;
   };
-  
+
   // Function to fetch with timeout
   const fetchWithTimeout = async (url, options, timeout = 10000) => {
     const controller = new AbortController();
@@ -104,26 +181,8 @@ function App() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!domain) {
-      setError('Please enter a domain');
-      return;
-    }
-    
-    // Process and sanitize the domain input
-    const sanitized = sanitizeDomain(domain);
-    setProcessedDomain(sanitized);
-    
-    if (sanitized !== domain) {
-      console.log(`Domain sanitized from "${domain}" to "${sanitized}"`);
-    }
-    
-    setLoading(true);
-    setDomainInfo(null);
-    setError(null);
-    
+  // Check a single domain
+  const checkDomain = async (domainToCheck) => {
     try {
       // Get API key from environment variables
       const apiKey = process.env.REACT_APP_API_KEY;
@@ -132,7 +191,7 @@ function App() {
         throw new Error('API key is missing. Please check your environment configuration.');
       }
       
-      console.log('Fetching data for domain:', sanitized);
+      console.log('Fetching data for domain:', domainToCheck);
       
       // Create headers as specified
       const myHeaders = new Headers();
@@ -147,7 +206,7 @@ function App() {
       
       // Use the new endpoint with the check parameter
       const response = await fetchWithTimeout(
-        `https://api.apilayer.com/whois/check?domain=${encodeURIComponent(sanitized)}`,
+        `https://api.apilayer.com/whois/check?domain=${encodeURIComponent(domainToCheck)}`,
         requestOptions,
         15000 // 15 seconds timeout
       );
@@ -171,34 +230,129 @@ function App() {
       try {
         const data = JSON.parse(result);
         if (!data || Object.keys(data).length === 0) {
-          throw new Error('No data returned for this domain.');
+          return { domain: domainToCheck, data: { error: 'No data returned' } };
         }
         
-        console.log('Data received successfully');
-        setDomainInfo(data);
+        return { domain: domainToCheck, data };
       } catch (jsonError) {
-        // If it's not valid JSON, just display the text
-        console.log('Received non-JSON response');
-        const data = { response: result };
-        setDomainInfo(data);
+        // If it's not valid JSON, just return the text
+        return { domain: domainToCheck, data: { response: result } };
       }
     } catch (err) {
-      console.error('Fetch error:', err);
-      
-      // Create user-friendly error messages
-      let errorMessage;
-      if (err.message.includes('NetworkError') || err.message.includes('Failed to fetch')) {
-        errorMessage = 'Network error. Please check your internet connection.';
-      } else if (err.message.includes('timed out')) {
-        errorMessage = 'The request timed out. The server might be busy, please try again later.';
-      } else {
-        errorMessage = err.message || 'An unexpected error occurred.';
+      console.error(`Error checking ${domainToCheck}:`, err);
+      return { domain: domainToCheck, data: { error: err.message } };
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!domain) {
+      setError('Please enter a domain');
+      return;
+    }
+    
+    // Process and sanitize the domain input
+    const sanitized = sanitizeDomain(domain);
+    setProcessedDomain(sanitized);
+    
+    if (sanitized !== domain) {
+      console.log(`Domain sanitized from "${domain}" to "${sanitized}"`);
+    }
+    
+    setLoading(true);
+    setError(null);
+    
+    // Generate variations of the domain name
+    const variations = generateDomainVariations(sanitized);
+    setDomainVariations(variations);
+    
+    // Initialize all domains with loading state
+    const initialResults = {};
+    variations.forEach(variation => {
+      initialResults[variation] = { loading: true };
+    });
+    setDomainResults(initialResults);
+    
+    setCheckingProgress({ current: 0, total: variations.length });
+    
+    try {
+      // Process domains in smaller batches to avoid rate limiting
+      const batchSize = 3;
+      for (let i = 0; i < variations.length; i += batchSize) {
+        const batch = variations.slice(i, i + batchSize);
+        const batchPromises = batch.map(domainVariation => checkDomain(domainVariation));
+        
+        const batchResults = await Promise.allSettled(batchPromises);
+        
+        // Process results and update state for each domain individually
+        batchResults.forEach((result, index) => {
+          if (result.status === 'fulfilled') {
+            const { domain: checkedDomain, data } = result.value;
+            setDomainResults(prev => ({
+              ...prev,
+              [checkedDomain]: { loading: false, data }
+            }));
+          } else {
+            // Handle rejected promises
+            const checkedDomain = batch[index];
+            setDomainResults(prev => ({
+              ...prev,
+              [checkedDomain]: { 
+                loading: false, 
+                data: { error: result.reason?.message || 'Request failed' } 
+              }
+            }));
+          }
+        });
+        
+        // Update progress
+        setCheckingProgress({ current: i + batch.length, total: variations.length });
+        
+        // A small delay between batches to avoid API rate limits
+        if (i + batchSize < variations.length) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
       }
-      
-      setError(errorMessage);
+    } catch (err) {
+      console.error('Error processing domain check:', err);
+      setError('An error occurred while checking domains. Please try again later.');
     } finally {
       setLoading(false);
+      setCheckingProgress({ current: 0, total: 0 });
     }
+  };
+
+  // Function to get sorted domain variations
+  const getSortedDomainVariations = () => {
+    // If no variations yet, return empty array
+    if (domainVariations.length === 0) return [];
+    
+    // Create a copy to sort
+    return [...domainVariations].sort((a, b) => {
+      const aResult = domainResults[a];
+      const bResult = domainResults[b];
+      
+      // If either is still loading, preserve original order
+      if (aResult?.loading || bResult?.loading) return 0;
+      
+      // First, sort by availability - available domains first
+      const aAvailable = aResult?.data?.result === 'available';
+      const bAvailable = bResult?.data?.result === 'available';
+      
+      if (aAvailable && !bAvailable) return -1;
+      if (!aAvailable && bAvailable) return 1;
+      
+      // Then prioritize the original domain (without prefix/suffix)
+      const isAOriginal = a === `${processedDomain.split('.')[0]}.com`;
+      const isBOriginal = b === `${processedDomain.split('.')[0]}.com`;
+      
+      if (isAOriginal && !isBOriginal) return -1;
+      if (!isAOriginal && isBOriginal) return 1;
+      
+      // Then sort alphabetically by domain name
+      return a.localeCompare(b);
+    });
   };
 
   return (
@@ -214,13 +368,13 @@ function App() {
             <input
               type="text"
               id="domain"
-              placeholder="example.com"
+              placeholder="example"
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Spaces will be removed. If no extension is provided, ".com" will be added.
+              We'll check your domain with common prefixes and suffixes.
             </p>
           </div>
           <button
@@ -228,9 +382,23 @@ function App() {
             disabled={loading}
             className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:shadow-outline transition duration-300"
           >
-            {loading ? 'Loading...' : 'Check Domain'}
+            {loading ? 'Checking domains...' : 'Check Domain Variations'}
           </button>
         </form>
+        
+        {loading && checkingProgress.total > 0 && (
+          <div className="mb-4">
+            <div className="h-2 w-full bg-gray-200 rounded-full">
+              <div 
+                className="h-2 bg-blue-500 rounded-full transition-all duration-300"
+                style={{ width: `${(checkingProgress.current / checkingProgress.total) * 100}%` }}
+              ></div>
+            </div>
+            <p className="text-sm text-gray-600 text-center mt-1">
+              Checking {checkingProgress.current} of {checkingProgress.total} domains...
+            </p>
+          </div>
+        )}
         
         {error && (
           <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
@@ -238,12 +406,20 @@ function App() {
           </div>
         )}
         
-        {domainInfo && processedDomain && (
+        {domainVariations.length > 0 && (
           <div className="mt-6">
-            <DomainResult 
-              domain={processedDomain}
-              data={domainInfo}
-            />
+            <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
+              Domain Check Results
+            </h2>
+            
+            {getSortedDomainVariations().map((domainName) => (
+              <DomainResult 
+                key={domainName}
+                domain={domainName}
+                data={domainResults[domainName]?.data}
+                loading={domainResults[domainName]?.loading}
+              />
+            ))}
           </div>
         )}
       </div>
