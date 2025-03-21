@@ -18,18 +18,26 @@ export const generateDomainVariations = (baseName) => {
   // Remove domain extension if present
   const nameOnly = baseName.split('.')[0];
   
-  const variations = [
-    // Original domain with .com
-    `${nameOnly}.com`
-  ];
+  const variations = [];
   
-  // Add prefix variations
-  prefixes.forEach(prefix => {
+  // First: the original domain with .com (always first)
+  variations.push(`${nameOnly}.com`);
+  
+  // Second: Common TLDs for the base name
+  const commonTlds = ['.net', '.org', '.io', '.co', '.app'];
+  commonTlds.forEach(tld => {
+    variations.push(`${nameOnly}${tld}`);
+  });
+  
+  // Third: Prefixed variations (alphabetically)
+  const sortedPrefixes = [...prefixes].sort();
+  sortedPrefixes.forEach(prefix => {
     variations.push(`${prefix}${nameOnly}.com`);
   });
   
-  // Add suffix variations
-  suffixes.forEach(suffix => {
+  // Fourth: Suffixed variations (alphabetically)
+  const sortedSuffixes = [...suffixes].sort();
+  sortedSuffixes.forEach(suffix => {
     variations.push(`${nameOnly}${suffix}.com`);
   });
   

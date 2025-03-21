@@ -11,6 +11,35 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Function to retry checking a specific domain
+  const retryDomainCheck = async (domainToRetry) => {
+    // Update just this domain to loading state
+    setDomainResults(prev => ({
+      ...prev,
+      [domainToRetry]: { loading: true }
+    }));
+    
+    try {
+      // Check just this one domain
+      const result = await checkDomain(domainToRetry);
+      
+      // Update the result for this domain
+      setDomainResults(prev => ({
+        ...prev,
+        [domainToRetry]: { loading: false, data: result.data }
+      }));
+    } catch (err) {
+      console.error(`Error retrying check for ${domainToRetry}:`, err);
+      setDomainResults(prev => ({
+        ...prev,
+        [domainToRetry]: { 
+          loading: false, 
+          data: { error: err.message || 'Retry failed' } 
+        }
+      }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -89,7 +118,11 @@ function App() {
     // If no variations yet, return empty array
     if (domainVariations.length === 0) return [];
     
-    // Create a copy to sort
+    // Return the array in the original order it was generated
+    // This ensures domain cards don't move around during loading/retries
+    return domainVariations;
+    
+    /* Original sorting logic - removed to prevent cards from changing position
     return [...domainVariations].sort((a, b) => {
       const aResult = domainResults[a];
       const bResult = domainResults[b];
@@ -114,6 +147,7 @@ function App() {
       // Then sort alphabetically by domain name
       return a.localeCompare(b);
     });
+    */
   };
 
   return (
@@ -174,6 +208,7 @@ function App() {
                   domain={domainName}
                   data={domainResults[domainName]?.data}
                   loading={domainResults[domainName]?.loading}
+                  onRetry={() => retryDomainCheck(domainName)}
                 />
               ))}
             </div>
