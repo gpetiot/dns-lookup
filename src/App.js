@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import DomainResult from './components/DomainResult';
 import { prefixes, suffixes, generateDomainVariations, sanitizeDomain } from './utils/domainUtils';
-import { checkDomain } from './services/domainService';
+import { checkDomain } from './services/whoisAPILayerService';
 
 function App() {
   const [domain, setDomain] = useState('');
