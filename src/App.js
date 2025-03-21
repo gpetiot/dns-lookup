@@ -185,12 +185,6 @@ function App() {
           </div>
         )}
         
-        {processedDomain && domain !== processedDomain && !loading && !error && (
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 mb-4">
-            <p className="font-medium">Input sanitized to: <span className="font-bold">{processedDomain}</span></p>
-          </div>
-        )}
-        
         {domainInfo && (
           <div className="mt-6">
             <h2 className="text-xl font-semibold mb-3 text-gray-800">
