@@ -10,7 +10,6 @@ function App() {
   const [domainResults, setDomainResults] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [checkingProgress, setCheckingProgress] = useState({ current: 0, total: 0 });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,8 +41,6 @@ function App() {
     });
     setDomainResults(initialResults);
     
-    setCheckingProgress({ current: 0, total: variations.length });
-    
     try {
       // Process domains in smaller batches to avoid rate limiting
       const batchSize = 3;
@@ -74,9 +71,6 @@ function App() {
           }
         });
         
-        // Update progress
-        setCheckingProgress({ current: i + batch.length, total: variations.length });
-        
         // A small delay between batches to avoid API rate limits
         if (i + batchSize < variations.length) {
           await new Promise(resolve => setTimeout(resolve, 1000));
@@ -87,7 +81,6 @@ function App() {
       setError('An error occurred while checking domains. Please try again later.');
     } finally {
       setLoading(false);
-      setCheckingProgress({ current: 0, total: 0 });
     }
   };
 
@@ -158,20 +151,6 @@ function App() {
             </div>
           </div>
         </form>
-        
-        {loading && checkingProgress.total > 0 && (
-          <div className="mb-0">
-            <div className="h-2 w-full bg-gray-200 rounded-full">
-              <div 
-                className="h-2 bg-blue-500 rounded-full transition-all duration-300"
-                style={{ width: `${(checkingProgress.current / checkingProgress.total) * 100}%` }}
-              ></div>
-            </div>
-            <p className="text-sm text-gray-600 text-center mt-1">
-              Checking {checkingProgress.current} of {checkingProgress.total} domains...
-            </p>
-          </div>
-        )}
         
         {error && (
           <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
