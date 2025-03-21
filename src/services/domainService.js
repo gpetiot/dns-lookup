@@ -8,7 +8,7 @@ import { fetchWithTimeout } from '../utils/domainUtils';
 export const checkDomain = async (domainToCheck) => {
   try {
     // Get API key from environment variables
-    const apiKey = process.env.REACT_APP_API_KEY;
+    const apiKey = process.env.REACT_APP_WHOIS_API_KEY;
     
     if (!apiKey) {
       throw new Error('API key is missing. Please check your environment configuration.');
