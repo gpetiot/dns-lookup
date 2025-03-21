@@ -113,43 +113,6 @@ function App() {
     }
   };
 
-  // Function to get sorted domain variations
-  const getSortedDomainVariations = () => {
-    // If no variations yet, return empty array
-    if (domainVariations.length === 0) return [];
-    
-    // Return the array in the original order it was generated
-    // This ensures domain cards don't move around during loading/retries
-    return domainVariations;
-    
-    /* Original sorting logic - removed to prevent cards from changing position
-    return [...domainVariations].sort((a, b) => {
-      const aResult = domainResults[a];
-      const bResult = domainResults[b];
-      
-      // If either is still loading, preserve original order
-      if (aResult?.loading || bResult?.loading) return 0;
-      
-      // First, sort by availability - available domains first
-      const aAvailable = aResult?.data?.result === 'available';
-      const bAvailable = bResult?.data?.result === 'available';
-      
-      if (aAvailable && !bAvailable) return -1;
-      if (!aAvailable && bAvailable) return 1;
-      
-      // Then prioritize the original domain (without prefix/suffix)
-      const isAOriginal = a === `${processedDomain.split('.')[0]}.com`;
-      const isBOriginal = b === `${processedDomain.split('.')[0]}.com`;
-      
-      if (isAOriginal && !isBOriginal) return -1;
-      if (!isAOriginal && isBOriginal) return 1;
-      
-      // Then sort alphabetically by domain name
-      return a.localeCompare(b);
-    });
-    */
-  };
-
   return (
     <div className="min-h-screen bg-blue-100 p-4 flex flex-col items-center">
       {/* Input Card */}
@@ -202,7 +165,7 @@ function App() {
             </h2>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-              {getSortedDomainVariations().map((domainName) => (
+              {domainVariations.map((domainName) => (
                 <DomainResult 
                   key={domainName}
                   domain={domainName}
@@ -219,4 +182,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App;
