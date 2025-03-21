@@ -359,7 +359,8 @@ function App() {
 
   return (
     <div className="min-h-screen bg-blue-100 p-4 flex flex-col items-center">
-      <div className="max-w-3xl w-full bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+      {/* Input Card */}
+      <div className="max-w-3xl w-full bg-white rounded-lg shadow-lg p-6 border border-gray-200 mb-6">
         <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Domain Checker</h1>
         
         <form onSubmit={handleSubmit} className="mb-4">
@@ -393,7 +394,7 @@ function App() {
         </form>
         
         {loading && checkingProgress.total > 0 && (
-          <div className="mb-4">
+          <div className="mb-0">
             <div className="h-2 w-full bg-gray-200 rounded-full">
               <div 
                 className="h-2 bg-blue-500 rounded-full transition-all duration-300"
@@ -407,18 +408,21 @@ function App() {
         )}
         
         {error && (
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
             <p className="font-medium">{error}</p>
           </div>
         )}
-        
-        {domainVariations.length > 0 && (
-          <div className="mt-6">
+      </div>
+      
+      {/* Results Section - Full Width */}
+      {domainVariations.length > 0 && (
+        <div className="w-full max-w-7xl">
+          <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
             <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
               Domain Check Results
             </h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
               {getSortedDomainVariations().map((domainName) => (
                 <DomainResult 
                   key={domainName}
@@ -429,8 +433,8 @@ function App() {
               ))}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
