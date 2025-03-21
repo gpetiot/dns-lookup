@@ -2,9 +2,32 @@ import React, { useState } from 'react';
 
 function App() {
   const [domain, setDomain] = useState('');
+  const [processedDomain, setProcessedDomain] = useState('');
   const [domainInfo, setDomainInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  // Function to sanitize domain input
+  const sanitizeDomain = (input) => {
+    // Remove all spaces
+    let sanitized = input.trim().replace(/\s+/g, '');
+    
+    // Convert to lowercase
+    sanitized = sanitized.toLowerCase();
+    
+    // If there's no dot (extension), add .com
+    if (!sanitized.includes('.')) {
+      sanitized = `${sanitized}.com`;
+    }
+    
+    // Remove any protocol prefixes (http://, https://, etc.)
+    sanitized = sanitized.replace(/^(https?:\/\/)?(www\.)?/i, '');
+    
+    // Remove any trailing slashes or paths
+    sanitized = sanitized.split('/')[0];
+    
+    return sanitized;
+  };
   
   // Function to fetch with timeout
   const fetchWithTimeout = async (url, options, timeout = 10000) => {
@@ -37,6 +60,14 @@ function App() {
       return;
     }
     
+    // Process and sanitize the domain input
+    const sanitized = sanitizeDomain(domain);
+    setProcessedDomain(sanitized);
+    
+    if (sanitized !== domain) {
+      console.log(`Domain sanitized from "${domain}" to "${sanitized}"`);
+    }
+    
     setLoading(true);
     setDomainInfo(null);
     setError(null);
@@ -49,7 +80,7 @@ function App() {
         throw new Error('API key is missing. Please check your environment configuration.');
       }
       
-      console.log('Fetching data for domain:', domain);
+      console.log('Fetching data for domain:', sanitized);
       
       // Create headers as specified
       const myHeaders = new Headers();
@@ -64,7 +95,7 @@ function App() {
       
       // Use the new endpoint with the check parameter
       const response = await fetchWithTimeout(
-        `https://api.apilayer.com/whois/check?domain=${encodeURIComponent(domain)}`,
+        `https://api.apilayer.com/whois/check?domain=${encodeURIComponent(sanitized)}`,
         requestOptions,
         15000 // 15 seconds timeout
       );
@@ -135,6 +166,9 @@ function App() {
               onChange={(e) => setDomain(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
+            <p className="text-xs text-gray-500 mt-1">
+              Spaces will be removed. If no extension is provided, ".com" will be added.
+            </p>
           </div>
           <button
             type="submit"
@@ -151,9 +185,17 @@ function App() {
           </div>
         )}
         
+        {processedDomain && domain !== processedDomain && !loading && !error && (
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 mb-4">
+            <p className="font-medium">Input sanitized to: <span className="font-bold">{processedDomain}</span></p>
+          </div>
+        )}
+        
         {domainInfo && (
           <div className="mt-6">
-            <h2 className="text-xl font-semibold mb-3 text-gray-800">Domain Information</h2>
+            <h2 className="text-xl font-semibold mb-3 text-gray-800">
+              Domain Information: <span className="text-blue-600">{processedDomain}</span>
+            </h2>
             <div className="bg-gray-50 rounded-md border border-gray-200 p-4">
               <pre className="text-sm overflow-x-auto whitespace-pre-wrap text-gray-700">
                 {JSON.stringify(domainInfo, null, 2)}
