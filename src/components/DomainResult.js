@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { getPricing } from '../services/porkbunService';
+import { getPricing, getRenewalPrice } from '../services/porkbunService';
 
 const DomainResult = ({ domain, data, loading, onRetry }) => {
   const [price, setPrice] = useState(null);
+  const [renewalPrice, setRenewalPrice] = useState(null);
 
   useEffect(() => {
     // Get pricing when domain or data changes
     if (domain) {
       const domainPrice = getPricing(domain);
+      const domainRenewalPrice = getRenewalPrice(domain);
       setPrice(domainPrice);
+      setRenewalPrice(domainRenewalPrice);
     }
   }, [domain, data]);
 
@@ -115,8 +118,15 @@ const DomainResult = ({ domain, data, loading, onRetry }) => {
           </div>
         )}
         {isAvailable && price && (
-          <div className="text-blue-600 font-medium">
-            Registration: ${price}
+          <div className="space-y-1">
+            <div className="text-blue-600 font-medium">
+              Registration: ${price}
+            </div>
+            {renewalPrice && (
+              <div className="text-purple-600 font-medium">
+                Renewal: ${renewalPrice}
+              </div>
+            )}
           </div>
         )}
         {!isAvailable && !hasError && data?.expiry && (
