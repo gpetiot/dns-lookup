@@ -18,16 +18,17 @@ const DomainResult = ({ domain, data, loading, onRetry }) => {
   const isAvailable = data?.result === 'available';
   const hasError = data?.error || false;
   
+  // Apply neutral styling for loading state, otherwise use status-based colors
+  const bgColorClass = loading 
+    ? 'bg-gray-50 border-gray-200'
+    : hasError 
+      ? 'bg-gray-100' 
+      : isAvailable 
+        ? 'bg-green-50' 
+        : 'bg-red-50';
+  
   return (
-    <div className={`flex items-center justify-between py-2 px-3 border-b ${
-      loading 
-        ? 'bg-gray-50'
-        : hasError 
-          ? 'bg-gray-100' 
-          : isAvailable 
-            ? 'bg-green-50' 
-            : 'bg-red-50'
-    }`}>
+    <div className={`flex items-center justify-between py-2 px-3 border-b ${bgColorClass}`}>
       {/* Left Column: Status Icon + Domain */}
       <div className="flex items-center flex-grow">
         <div className="flex-shrink-0 w-8 mr-2">
@@ -52,7 +53,9 @@ const DomainResult = ({ domain, data, loading, onRetry }) => {
         </div>
         
         <div className="text-md font-medium">
-          {hasError ? (
+          {loading ? (
+            <span className="text-gray-500">{domain}</span>
+          ) : hasError ? (
             <span className="text-gray-600">{domain}</span>
           ) : isAvailable ? (
             <span className="text-green-600">{domain}</span>
@@ -75,6 +78,12 @@ const DomainResult = ({ domain, data, loading, onRetry }) => {
       
       {/* Right Column: Error/Expiry or Pricing */}
       <div className="flex items-center justify-end">
+        {loading && (
+          <div className="text-xs text-gray-500">
+            Checking...
+          </div>
+        )}
+      
         {hasError && data?.error && (
           <div className="flex items-center">
             <div className="text-xs text-gray-600 max-w-xs truncate mr-2">
