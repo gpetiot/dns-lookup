@@ -118,14 +118,18 @@ const DomainResult = ({ domain, data, loading, onRetry }) => {
           </div>
         )}
         {isAvailable && price && (
-          <div className="space-y-1">
-            <div className="text-blue-600 font-medium">
-              Registration: ${price}
-            </div>
+          <div className="flex items-center space-x-1">
+            <span className="font-semibold text-gray-700">Porkbun:</span>
+            <span className="text-blue-600">
+              ${price}
+            </span>
             {renewalPrice && (
-              <div className="text-purple-600 font-medium">
-                Renewal: ${renewalPrice}
-              </div>
+              <>
+                <span className="text-gray-500">/</span>
+                <span className="text-purple-600">
+                  ${renewalPrice} renewal
+                </span>
+              </>
             )}
           </div>
         )}
