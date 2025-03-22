@@ -1,6 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { getPricing } from '../services/porkbunService';
 
 const DomainResult = ({ domain, data, loading, onRetry }) => {
+  const [price, setPrice] = useState(null);
+
+  useEffect(() => {
+    // Get pricing when domain or data changes
+    if (domain) {
+      const domainPrice = getPricing(domain);
+      setPrice(domainPrice);
+    }
+  }, [domain, data]);
+
   if (loading) {
     return (
       <div className="p-3 rounded-md bg-gray-50 border border-gray-200 h-full flex items-center">
@@ -81,32 +92,39 @@ const DomainResult = ({ domain, data, loading, onRetry }) => {
           </a>
         )}
       </div>
-      {hasError && (
-        <div className="mt-2 text-xs text-gray-600">
-          {data.error}
-          {onRetry && (
-            <button 
-              onClick={onRetry}
-              className="mt-2 w-full px-2 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white font-medium rounded flex items-center justify-center transition duration-200"
-            >
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-3 w-3 mr-1" 
-                viewBox="0 0 20 20" 
-                fill="currentColor"
+      <div className="mt-2 text-xs space-y-1">
+        {hasError && (
+          <div className="text-gray-600">
+            {data.error}
+            {onRetry && (
+              <button 
+                onClick={onRetry}
+                className="mt-2 w-full px-2 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white font-medium rounded flex items-center justify-center transition duration-200"
               >
-                <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-              </svg>
-              Retry
-            </button>
-          )}
-        </div>
-      )}
-      {!isAvailable && !hasError && data?.expiry && (
-        <div className="mt-2 text-xs text-gray-500">
-          Expires: {new Date(data.expiry).toLocaleDateString()}
-        </div>
-      )}
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className="h-3 w-3 mr-1" 
+                  viewBox="0 0 20 20" 
+                  fill="currentColor"
+                >
+                  <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                </svg>
+                Retry
+              </button>
+            )}
+          </div>
+        )}
+        {isAvailable && price && (
+          <div className="text-blue-600 font-medium">
+            Registration: ${price}
+          </div>
+        )}
+        {!isAvailable && !hasError && data?.expiry && (
+          <div className="mt-2 text-xs text-gray-500">
+            Expires: {new Date(data.expiry).toLocaleDateString()}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
