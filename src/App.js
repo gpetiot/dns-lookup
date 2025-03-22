@@ -40,6 +40,29 @@ function App() {
     }
   };
 
+  // Function to check a single domain and update its result
+  const checkSingleDomain = async (domainToCheck) => {
+    try {
+      const result = await checkDomain(domainToCheck);
+      // Update the result for this domain
+      setDomainResults(prev => ({
+        ...prev,
+        [domainToCheck]: { loading: false, data: result.data }
+      }));
+      return result;
+    } catch (err) {
+      console.error(`Error checking ${domainToCheck}:`, err);
+      setDomainResults(prev => ({
+        ...prev,
+        [domainToCheck]: { 
+          loading: false, 
+          data: { error: err.message || 'Request failed' } 
+        }
+      }));
+      throw err;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -71,45 +94,37 @@ function App() {
     setDomainResults(initialResults);
     
     try {
-      // Process domains in smaller batches to avoid rate limiting
-      const batchSize = 3;
-      for (let i = 0; i < variations.length; i += batchSize) {
-        const batch = variations.slice(i, i + batchSize);
-        const batchPromises = batch.map(domainVariation => checkDomain(domainVariation));
-        
-        const batchResults = await Promise.allSettled(batchPromises);
-        
-        // Process results and update state for each domain individually
-        batchResults.forEach((result, index) => {
-          if (result.status === 'fulfilled') {
-            const { domain: checkedDomain, data } = result.value;
-            setDomainResults(prev => ({
-              ...prev,
-              [checkedDomain]: { loading: false, data }
-            }));
-          } else {
-            // Handle rejected promises
-            const checkedDomain = batch[index];
-            setDomainResults(prev => ({
-              ...prev,
-              [checkedDomain]: { 
-                loading: false, 
-                data: { error: result.reason?.message || 'Request failed' } 
+      // Process all domains independently with a small stagger
+      let completedCount = 0;
+      
+      // Start checking all domains with a small delay between each
+      variations.forEach((domainVariation, index) => {
+        // Stagger the requests by 300ms each to avoid rate limiting
+        setTimeout(() => {
+          checkSingleDomain(domainVariation)
+            .finally(() => {
+              completedCount++;
+              // When all domains have been checked, set loading to false
+              if (completedCount === variations.length) {
+                setLoading(false);
               }
-            }));
-          }
-        });
-        
-        // A small delay between batches to avoid API rate limits
-        if (i + batchSize < variations.length) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-      }
+            });
+        }, index * 300); // 300ms delay between each request
+      });
     } catch (err) {
       console.error('Error processing domain check:', err);
       setError('An error occurred while checking domains. Please try again later.');
-    } finally {
       setLoading(false);
+    } finally {
+      // This ensures the loading state is reset if forEach above throws an error
+      // The loading state is also handled in each individual request's finally,
+      // but this is a backup to ensure it always gets reset
+      setTimeout(() => {
+        if (loading) {
+          console.log('Backup loading state reset triggered');
+          setLoading(false);
+        }
+      }, variations.length * 300 + 5000); // Wait for all possible requests plus a buffer
     }
   };
 
