@@ -128,6 +128,43 @@ function App() {
     }
   };
 
+  // Functions to categorize domains
+  const getMainDomain = () => {
+    if (!domainVariations.length) return null;
+    // Find the original domain with .com extension
+    return domainVariations.find(domain => {
+      // Match the base domain name + .com
+      const baseDomainName = processedDomain.split('.')[0];
+      return domain === `${baseDomainName}.com`;
+    });
+  };
+
+  const getAlternativeExtensions = () => {
+    if (!domainVariations.length) return [];
+    const baseDomainName = processedDomain.split('.')[0];
+    
+    // All domains that start with the base name but aren't .com
+    return domainVariations.filter(domain => {
+      const domainParts = domain.split('.');
+      return domainParts[0] === baseDomainName && domainParts[1] !== 'com';
+    });
+  };
+
+  const getAlternativeSuggestions = () => {
+    if (!domainVariations.length) return [];
+    const baseDomainName = processedDomain.split('.')[0];
+    
+    // All .com domains that have been modified with prefixes or suffixes
+    return domainVariations.filter(domain => {
+      const domainParts = domain.split('.');
+      return domainParts[0] !== baseDomainName && domainParts[1] === 'com';
+    });
+  };
+
+  const mainDomain = getMainDomain();
+  const alternativeExtensions = getAlternativeExtensions();
+  const alternativeSuggestions = getAlternativeSuggestions();
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 flex flex-col items-center">
       <div className="w-full max-w-7xl">
@@ -174,22 +211,59 @@ function App() {
         
         {/* Results Section */}
         {domainVariations.length > 0 && (
-          <div className="w-full mb-8">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
-              Domain Check Results
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {domainVariations.map((domainName) => (
+          <div className="w-full mb-8 space-y-8">
+            {/* Original Domain */}
+            {mainDomain && (
+              <div className="w-full">
                 <DomainResult 
-                  key={domainName}
-                  domain={domainName}
-                  data={domainResults[domainName]?.data}
-                  loading={domainResults[domainName]?.loading}
-                  onRetry={() => retryDomainCheck(domainName)}
+                  key={mainDomain}
+                  domain={mainDomain}
+                  data={domainResults[mainDomain]?.data}
+                  loading={domainResults[mainDomain]?.loading}
+                  onRetry={() => retryDomainCheck(mainDomain)}
                 />
-              ))}
-            </div>
+              </div>
+            )}
+            
+            {/* Alternative Extensions */}
+            {alternativeExtensions.length > 0 && (
+              <div className="w-full">
+                <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
+                  Alternative Extensions Suggestions
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {alternativeExtensions.map((domainName) => (
+                    <DomainResult 
+                      key={domainName}
+                      domain={domainName}
+                      data={domainResults[domainName]?.data}
+                      loading={domainResults[domainName]?.loading}
+                      onRetry={() => retryDomainCheck(domainName)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Alternative .com Suggestions */}
+            {alternativeSuggestions.length > 0 && (
+              <div className="w-full">
+                <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
+                  Alternative .com Suggestions
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {alternativeSuggestions.map((domainName) => (
+                    <DomainResult 
+                      key={domainName}
+                      domain={domainName}
+                      data={domainResults[domainName]?.data}
+                      loading={domainResults[domainName]?.loading}
+                      onRetry={() => retryDomainCheck(domainName)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
