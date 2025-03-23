@@ -129,52 +129,52 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-blue-100 p-4 flex flex-col items-center">
-      {/* Input Card */}
-      <div className="max-w-3xl w-full bg-white rounded-lg shadow-lg p-6 border border-gray-200 mb-6">
-        <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Domain Checker</h1>
-        
-        <form onSubmit={handleSubmit} className="mb-4">
-          <div className="flex items-start gap-3">
-            <div className="flex-1">
-              <label htmlFor="domain" className="block text-gray-700 font-semibold mb-2">
-                Enter Domain Name
-              </label>
-              <input
-                type="text"
-                id="domain"
-                placeholder="example"
-                value={domain}
-                onChange={(e) => setDomain(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                We'll check your domain with common prefixes and suffixes.
-              </p>
+    <div className="min-h-screen bg-gray-50 p-4 flex flex-col items-center">
+      <div className="w-full max-w-7xl">
+        {/* Header and Search Form */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Domain Checker</h1>
+          
+          <form onSubmit={handleSubmit} className="w-full">
+            <div className="flex items-start gap-3">
+              <div className="flex-1">
+                <label htmlFor="domain" className="block text-gray-700 font-semibold mb-2">
+                  Enter Domain Name
+                </label>
+                <input
+                  type="text"
+                  id="domain"
+                  placeholder="example"
+                  value={domain}
+                  onChange={(e) => setDomain(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  We'll check your domain with common prefixes and suffixes.
+                </p>
+              </div>
+              <div className="pt-8">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="h-10 bg-blue-500 hover:bg-blue-600 text-white font-bold px-4 rounded-md focus:outline-none focus:shadow-outline transition duration-300 whitespace-nowrap"
+                >
+                  {loading ? 'Checking...' : 'Check'}
+                </button>
+              </div>
             </div>
-            <div className="pt-8">
-              <button
-                type="submit"
-                disabled={loading}
-                className="h-10 bg-blue-500 hover:bg-blue-600 text-white font-bold px-4 rounded-md focus:outline-none focus:shadow-outline transition duration-300 whitespace-nowrap"
-              >
-                {loading ? 'Checking...' : 'Check Domains'}
-              </button>
+          </form>
+          
+          {error && (
+            <div className="mt-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+              <p className="font-medium">{error}</p>
             </div>
-          </div>
-        </form>
+          )}
+        </div>
         
-        {error && (
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
-            <p className="font-medium">{error}</p>
-          </div>
-        )}
-      </div>
-      
-      {/* Results Section - Full Width */}
-      {domainVariations.length > 0 && (
-        <div className="w-full max-w-7xl">
-          <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+        {/* Results Section */}
+        {domainVariations.length > 0 && (
+          <div className="w-full mb-8">
             <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
               Domain Check Results
             </h2>
@@ -191,8 +191,8 @@ function App() {
               ))}
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
