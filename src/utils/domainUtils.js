@@ -108,7 +108,7 @@ export const fetchDomainPreview = async (domain) => {
   try {
     // Use a shorter timeout for preview requests to avoid blocking the UI
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
     
     // Use a CORS proxy to avoid cross-origin issues
     const corsProxyUrl = 'https://api.allorigins.win/raw?url=';
