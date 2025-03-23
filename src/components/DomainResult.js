@@ -15,6 +15,7 @@ const DomainResult = ({ domain, data, loading, onRetry }) => {
   const [preview, setPreview] = useState(null);
   const [loadingPreview, setLoadingPreview] = useState(false);
   const previewTimerRef = useRef(null);
+  const hasStartedLoadingRef = useRef(false);
 
   useEffect(() => {
     // Get pricing when domain or data changes
@@ -50,7 +51,11 @@ const DomainResult = ({ domain, data, loading, onRetry }) => {
   // Start loading the preview data, but with a slight delay
   const startPreviewLoad = () => {
     // Only load preview for registered domains that aren't already loading
-    if (!isAvailable && !hasError && !loading && !preview && !loadingPreview) {
+    // and haven't been loaded or started loading yet
+    if (!isAvailable && !hasError && !loading && !preview && !loadingPreview && !hasStartedLoadingRef.current) {
+      // Mark that we've initiated loading
+      hasStartedLoadingRef.current = true;
+      
       // Set a delay before starting to load to avoid unnecessary requests
       // for quick hover-overs
       previewTimerRef.current = setTimeout(() => {
@@ -90,6 +95,7 @@ const DomainResult = ({ domain, data, loading, onRetry }) => {
   const handleMouseOut = () => {
     setShowPreview(false);
     // Cancel pending preview load if mouse moves away quickly
+    // and hasn't completed loading yet
     if (previewTimerRef.current) {
       clearTimeout(previewTimerRef.current);
       previewTimerRef.current = null;
