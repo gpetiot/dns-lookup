@@ -175,22 +175,16 @@ function App() {
           <form onSubmit={handleSubmit} className="w-full">
             <div className="flex items-start gap-3">
               <div className="flex-1">
-                <label htmlFor="domain" className="block text-gray-700 font-semibold mb-2">
-                  Enter Domain Name
-                </label>
                 <input
                   type="text"
                   id="domain"
-                  placeholder="example"
+                  placeholder="Search for a domain name here..."
                   value={domain}
                   onChange={(e) => setDomain(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  We'll check your domain with common prefixes and suffixes.
-                </p>
               </div>
-              <div className="pt-8">
+              <div>
                 <button
                   type="submit"
                   disabled={loading}
