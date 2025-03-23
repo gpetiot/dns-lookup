@@ -98,3 +98,98 @@ export const fetchWithTimeout = async (url, options, timeout = 10000) => {
     throw error;
   }
 };
+
+/**
+ * Fetches a preview of a domain by getting the title and description
+ * @param {string} domain - The domain to fetch preview for
+ * @returns {Promise<{title: string, description: string, success: boolean}>}
+ */
+export const fetchDomainPreview = async (domain) => {
+  try {
+    // Use a shorter timeout for preview requests to avoid blocking the UI
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+    
+    // Use a CORS proxy to avoid cross-origin issues
+    const corsProxyUrl = 'https://api.allorigins.win/raw?url=';
+    const url = `${corsProxyUrl}https://${domain}`;
+    
+    const response = await fetch(url, { 
+      signal: controller.signal,
+      headers: {
+        'Accept': 'text/html'
+      }
+    });
+    
+    // Clear the timeout as we've gotten a response
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      return {
+        title: domain,
+        description: `Could not load website (Status: ${response.status})`,
+        success: false
+      };
+    }
+    
+    const html = await response.text();
+    
+    // Extract title
+    const titleMatch = html.match(/<title[^>]*>(.*?)<\/title>/i);
+    const title = titleMatch ? titleMatch[1].trim() : domain;
+    
+    // Extract description from meta tag or first paragraph
+    let description = '';
+    const metaDescMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["'](.*?)["']/i);
+    
+    if (metaDescMatch) {
+      description = metaDescMatch[1].trim();
+    } else {
+      // Try to find the first paragraph with actual content
+      const paragraphs = html.match(/<p[^>]*>(.*?)<\/p>/ig);
+      if (paragraphs && paragraphs.length > 0) {
+        // Find first paragraph with decent length
+        for (const p of paragraphs) {
+          // Strip HTML tags and get plain text
+          const text = p.replace(/<[^>]*>/g, '').trim();
+          if (text.length > 20) {  // Only use paragraphs with sufficient content
+            description = text;
+            break;
+          }
+        }
+      }
+    }
+    
+    // Fallback if we couldn't extract a description
+    if (!description) {
+      description = `Visit ${domain} to learn more`;
+    }
+    
+    // Limit description length
+    if (description.length > 200) {
+      description = description.substring(0, 197) + '...';
+    }
+    
+    return {
+      title,
+      description,
+      success: true
+    };
+  } catch (error) {
+    // Handle timeout errors specifically
+    if (error.name === 'AbortError') {
+      return {
+        title: domain,
+        description: 'Preview request timed out. The site may be slow to respond.',
+        success: false
+      };
+    }
+    
+    // Handle other errors
+    return {
+      title: domain,
+      description: `Could not load preview: ${error.message || 'Unknown error'}`,
+      success: false
+    };
+  }
+};

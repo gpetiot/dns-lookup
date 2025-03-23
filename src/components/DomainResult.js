@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { getPricing, getRenewalPrice } from '../services/porkbunService';
+import { fetchDomainPreview } from '../utils/domainUtils';
 import ExternalLinkIcon from './icons/ExternalLinkIcon';
 import LoadingIcon from './icons/LoadingIcon';
 import ErrorIcon from './icons/ErrorIcon';
@@ -10,6 +11,10 @@ import RetryIcon from './icons/RetryIcon';
 const DomainResult = ({ domain, data, loading, onRetry }) => {
   const [price, setPrice] = useState(null);
   const [renewalPrice, setRenewalPrice] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [preview, setPreview] = useState(null);
+  const [loadingPreview, setLoadingPreview] = useState(false);
+  const previewTimerRef = useRef(null);
 
   useEffect(() => {
     // Get pricing when domain or data changes
@@ -20,6 +25,15 @@ const DomainResult = ({ domain, data, loading, onRetry }) => {
       setRenewalPrice(domainRenewalPrice);
     }
   }, [domain, data]);
+
+  // Clean up any pending timeouts when the component unmounts
+  useEffect(() => {
+    return () => {
+      if (previewTimerRef.current) {
+        clearTimeout(previewTimerRef.current);
+      }
+    };
+  }, []);
 
   const isAvailable = data?.result === 'available';
   const hasError = data?.error || false;
@@ -32,9 +46,62 @@ const DomainResult = ({ domain, data, loading, onRetry }) => {
       : isAvailable 
         ? 'bg-green-50' 
         : 'bg-red-50';
+
+  // Start loading the preview data, but with a slight delay
+  const startPreviewLoad = () => {
+    // Only load preview for registered domains that aren't already loading
+    if (!isAvailable && !hasError && !loading && !preview && !loadingPreview) {
+      // Set a delay before starting to load to avoid unnecessary requests
+      // for quick hover-overs
+      previewTimerRef.current = setTimeout(() => {
+        setLoadingPreview(true);
+        
+        // Use a separate async function to avoid blocking
+        const loadPreview = async () => {
+          try {
+            const domainPreview = await fetchDomainPreview(domain);
+            // Check if component is still mounted and preview is still needed
+            setPreview(domainPreview);
+            if (showPreview) {
+              setShowPreview(true);
+            }
+          } catch (error) {
+            console.error('Failed to load preview:', error);
+          } finally {
+            setLoadingPreview(false);
+          }
+        };
+        
+        // Start the loading without waiting (non-blocking)
+        loadPreview();
+      }, 500); // Wait 500ms before loading to avoid unnecessary requests
+    } else if (preview) {
+      // If preview is already loaded, just show it immediately
+      setShowPreview(true);
+    }
+  };
+
+  const handleMouseOver = () => {
+    // Show loading state immediately
+    setShowPreview(true);
+    startPreviewLoad();
+  };
+
+  const handleMouseOut = () => {
+    setShowPreview(false);
+    // Cancel pending preview load if mouse moves away quickly
+    if (previewTimerRef.current) {
+      clearTimeout(previewTimerRef.current);
+      previewTimerRef.current = null;
+    }
+  };
   
   return (
-    <div className={`flex items-center justify-between py-2 px-3 border-b ${bgColorClass}`}>
+    <div 
+      className={`flex items-center justify-between py-2 px-3 border-b ${bgColorClass} relative`}
+      onMouseEnter={!isAvailable && !hasError && !loading ? handleMouseOver : undefined}
+      onMouseLeave={handleMouseOut}
+    >
       {/* Left Column: Status Icon + Domain */}
       <div className="flex items-center flex-grow">
         <div className="flex-shrink-0 w-8 mr-2">
@@ -124,6 +191,40 @@ const DomainResult = ({ domain, data, loading, onRetry }) => {
           </a>
         )}
       </div>
+
+      {/* Domain Preview Popup */}
+      {showPreview && (!loading && !isAvailable && !hasError) && (
+        <div className="absolute left-0 top-full z-10 mt-1 w-full max-w-md bg-white rounded shadow-lg border border-gray-300 p-3 text-sm">
+          {loadingPreview && !preview ? (
+            <div className="flex items-center justify-center p-4">
+              <LoadingIcon className="h-4 w-4 text-gray-400" />
+              <span className="ml-2 text-gray-600">Loading preview...</span>
+            </div>
+          ) : preview ? (
+            <>
+              <h3 className="font-bold text-gray-800 mb-1">{preview.title}</h3>
+              <p className="text-gray-600 text-xs">{preview.description}</p>
+              {!preview.success && (
+                <div className="mt-2 text-xs text-blue-500">
+                  <a 
+                    href={`https://${domain}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center"
+                  >
+                    Visit website
+                    <ExternalLinkIcon className="h-3 w-3 ml-1" />
+                  </a>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="flex items-center justify-center p-4">
+              <span className="text-gray-600">Hover for a moment to load preview...</span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
