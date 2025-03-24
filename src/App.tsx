@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DomainResult from './components/DomainResult';
 import DomainScore from './components/DomainScore';
+import NoResultPlaceholder from './components/NoResultPlaceholder';
 import {
   prefixes,
   suffixes,
@@ -255,7 +256,7 @@ function App() {
         </div>
 
         {/* Results Section */}
-        {domainVariations.length > 0 && (
+        {domainVariations.length > 0 ? (
           <div className="w-full mb-8 space-y-8">
             {/* Original Domain */}
             {mainDomain && (
@@ -313,6 +314,8 @@ function App() {
               </div>
             )}
           </div>
+        ) : (
+          <NoResultPlaceholder domain={domain} sanitizedDomain={sanitizedDomain} />
         )}
       </div>
     </div>
