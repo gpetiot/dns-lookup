@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { getPricing, getRenewalPrice } from '../services/porkbunService';
 import { fetchDomainPreview, inferDomainUsage, DomainParts } from '../utils/domainUtils';
 import ExternalLinkIcon from './icons/ExternalLinkIcon';
 import LoadingIcon from './icons/LoadingIcon';
@@ -23,24 +22,12 @@ const DomainResult: React.FC<DomainResultProps> = ({
   onRetry,
   preloadedPreview,
 }) => {
-  const [price, setPrice] = useState<number | null>(null);
-  const [renewalPrice, setRenewalPrice] = useState<number | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [preview, setPreview] = useState<any>(preloadedPreview || null);
   const [loadingPreview, setLoadingPreview] = useState(false);
   const [isReallyUsed, setIsReallyUsed] = useState<boolean | null>(null);
   const previewTimerRef = useRef<NodeJS.Timeout | null>(null);
   const hasStartedLoadingRef = useRef(Boolean(preloadedPreview));
-
-  useEffect(() => {
-    // Get pricing when extension or data changes
-    if (parts.ext) {
-      const domainPrice = getPricing(parts.ext);
-      const domainRenewalPrice = getRenewalPrice(parts.ext);
-      setPrice(domainPrice);
-      setRenewalPrice(domainRenewalPrice);
-    }
-  }, [parts.ext, data]);
 
   // Update if preloaded preview changes (from parent component)
   useEffect(() => {
@@ -182,7 +169,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
         </div>
       </div>
 
-      {/* Right Column: Error/Expiry or Pricing */}
+      {/* Right Column: Error/Expiry or Broker Link */}
       <div className="flex items-center justify-end">
         {loading && <div className="text-xs text-gray-500">Checking...</div>}
 
@@ -216,22 +203,15 @@ const DomainResult: React.FC<DomainResultProps> = ({
           </div>
         )}
 
-        {isAvailable && price && (
+        {isAvailable && (
           <a
             href={`https://porkbun.com/checkout/search?q=${parts.domain}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center text-xs hover:underline"
+            className="inline-flex items-center px-3 py-1 text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-full hover:bg-indigo-100 hover:border-indigo-300 transition-colors duration-200"
           >
-            <span className="font-semibold text-gray-700">Porkbun:</span>
-            <span className="text-blue-600 ml-1">${price}</span>
-            {renewalPrice && (
-              <>
-                <span className="text-gray-500 mx-1">/</span>
-                <span className="text-purple-600">${renewalPrice}</span>
-              </>
-            )}
-            <ExternalLinkIcon className="h-3 w-3 text-gray-500 ml-1" />
+            Porkbun
+            <ExternalLinkIcon className="h-3 w-3 ml-1.5 text-indigo-500" />
           </a>
         )}
       </div>
