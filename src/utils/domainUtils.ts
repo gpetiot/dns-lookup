@@ -51,14 +51,16 @@ export interface DomainParts {
   suffix?: string;
   ext: string;
   domain: string;
+  input: string; // Original user input before sanitization
 }
 
 /**
  * Generate domain variations based on a base name
  * @param {string} baseName - The base domain name
+ * @param {string} userInput - The original user input before sanitization
  * @returns {DomainParts[]} Array of domain variations
  */
-export const generateDomainVariations = (baseName: string): DomainParts[] => {
+export const generateDomainVariations = (baseName: string, userInput: string): DomainParts[] => {
   // Remove domain extension if present
   const nameOnly = baseName.split('.')[0];
 
@@ -69,6 +71,7 @@ export const generateDomainVariations = (baseName: string): DomainParts[] => {
     base: nameOnly,
     ext: 'com',
     domain: `${nameOnly}.com`,
+    input: userInput,
   });
 
   // Second: Common TLDs for the base name
@@ -77,6 +80,7 @@ export const generateDomainVariations = (baseName: string): DomainParts[] => {
       base: nameOnly,
       ext: tld.slice(1), // remove the dot
       domain: `${nameOnly}${tld}`,
+      input: userInput,
     });
   });
 
@@ -88,6 +92,7 @@ export const generateDomainVariations = (baseName: string): DomainParts[] => {
       base: nameOnly,
       ext: 'com',
       domain: `${prefix}${nameOnly}.com`,
+      input: userInput,
     });
   });
 
@@ -99,6 +104,7 @@ export const generateDomainVariations = (baseName: string): DomainParts[] => {
       suffix,
       ext: 'com',
       domain: `${nameOnly}${suffix}.com`,
+      input: userInput,
     });
   });
 

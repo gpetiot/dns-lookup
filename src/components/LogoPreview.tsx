@@ -35,16 +35,16 @@ const LogoPreview: React.FC<LogoPreviewProps> = ({ parts }) => {
       {parts.prefix ? (
         <>
           <span className={getHighlightStyle(parts.prefix)}>{parts.prefix}</span>
-          <span className={baseStyle}>{parts.base}</span>
+          <span className={baseStyle}>{parts.input}</span>
         </>
       ) : parts.suffix ? (
         <>
-          <span className={baseStyle}>{parts.base}</span>
+          <span className={baseStyle}>{parts.input}</span>
           <span className={getHighlightStyle(parts.suffix)}>{parts.suffix}</span>
         </>
       ) : (
         <>
-          <span className={baseStyle}>{parts.base}</span>
+          <span className={baseStyle}>{parts.input}</span>
           <span className={getHighlightStyle(parts.ext)}>{parts.ext}</span>
         </>
       )}

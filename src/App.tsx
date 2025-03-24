@@ -138,8 +138,8 @@ function App() {
     // Clear previous results and previews
     setDomainPreviews({});
 
-    // Generate variations of the domain name
-    const variations = generateDomainVariations(sanitizedDomain);
+    // Generate variations of the domain name using the original user input
+    const variations = generateDomainVariations(sanitizedDomain, domain);
     setDomainVariations(variations);
 
     // Initialize all domains with loading state
