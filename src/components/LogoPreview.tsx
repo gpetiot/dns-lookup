@@ -17,7 +17,7 @@ const LogoPreview: React.FC<LogoPreviewProps> = ({ parts }) => {
       ['from-pink-500 to-rose-500'],
       ['from-amber-500 to-orange-500'],
       ['from-violet-500 to-purple-500'],
-      ['from-cyan-500 to-blue-500']
+      ['from-cyan-500 to-blue-500'],
     ];
 
     // Use string to generate a consistent index
@@ -27,7 +27,7 @@ const LogoPreview: React.FC<LogoPreviewProps> = ({ parts }) => {
   };
 
   const baseStyle = "font-['Syne'] text-gray-800";
-  const getHighlightStyle = (text: string) => 
+  const getHighlightStyle = (text: string) =>
     `font-['Work_Sans'] text-white px-0.5 rounded bg-gradient-to-r ${getGradientForDomain(text)}`;
 
   return (
