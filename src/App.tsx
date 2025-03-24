@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import DomainResult from './components/DomainResult';
+import DomainScore from './components/DomainScore';
 import {
   prefixes,
   suffixes,
@@ -222,12 +223,14 @@ function App() {
               <div className="flex-1">
                 <input
                   type="text"
+                  name="domain"
                   id="domain"
                   placeholder="Search for a domain name here..."
                   value={domain}
                   onChange={e => setDomain(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
+                <DomainScore domain={domain} />
               </div>
               <div>
                 <button
