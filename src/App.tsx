@@ -8,6 +8,7 @@ import {
   generateDomainVariations,
   sanitizeDomain,
   fetchDomainPreview,
+  DomainParts,
 } from './utils/domainUtils';
 import { checkDomain } from './services/whoisAPILayerService';
 
@@ -15,11 +16,13 @@ function App() {
   const [domain, setDomain] = useState('');
   const [sanitizedDomain, setSanitizedDomain] = useState('');
   const [displayDomain, setDisplayDomain] = useState('');
-  const [domainVariations, setDomainVariations] = useState([]);
-  const [domainResults, setDomainResults] = useState({});
-  const [domainPreviews, setDomainPreviews] = useState({});
+  const [domainVariations, setDomainVariations] = useState<DomainParts[]>([]);
+  const [domainResults, setDomainResults] = useState<
+    Record<string, { loading: boolean; data?: any }>
+  >({});
+  const [domainPreviews, setDomainPreviews] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Load previews for registered domains
   useEffect(() => {
@@ -141,7 +144,7 @@ function App() {
     // Initialize all domains with loading state
     const initialResults = {};
     variations.forEach(variation => {
-      initialResults[variation] = { loading: true };
+      initialResults[variation.domain] = { loading: true };
     });
     setDomainResults(initialResults);
 
@@ -150,10 +153,10 @@ function App() {
       let completedCount = 0;
 
       // Start checking all domains with a small delay between each
-      variations.forEach((domainVariation, index) => {
+      variations.forEach((variation, index) => {
         // Stagger the requests by 300ms each to avoid rate limiting
         setTimeout(() => {
-          checkSingleDomain(domainVariation).finally(() => {
+          checkSingleDomain(variation.domain).finally(() => {
             completedCount++;
             // When all domains have been checked, set loading to false
             if (completedCount === variations.length) {
@@ -168,8 +171,6 @@ function App() {
       setLoading(false);
     } finally {
       // This ensures the loading state is reset if forEach above throws an error
-      // The loading state is also handled in each individual request's finally,
-      // but this is a backup to ensure it always gets reset
       setTimeout(
         () => {
           if (loading) {
@@ -186,38 +187,23 @@ function App() {
   const getMainDomain = () => {
     if (!domainVariations.length) return null;
     // Return the exact domain that was requested
-    return domainVariations.find(domain => domain === displayDomain);
+    return domainVariations.find(variation => variation.domain === displayDomain);
   };
 
   const getAlternativeExtensions = () => {
     if (!domainVariations.length) return [];
-    const [baseDomainName, requestedExtension] = displayDomain.split('.');
 
-    // All domains that:
-    // 1. Start with the same base name
-    // 2. Have a different extension than the requested one
-    // 3. Are not the main requested domain
-    return domainVariations.filter(domain => {
-      const domainParts = domain.split('.');
-      return (
-        domainParts[0] === baseDomainName &&
-        domainParts[1] !== requestedExtension &&
-        domain !== displayDomain
-      );
-    });
+    return domainVariations.filter(
+      variation => variation.prefix === undefined && variation.suffix === undefined
+    );
   };
 
   const getAlternativeSuggestions = () => {
     if (!domainVariations.length) return [];
-    const [baseDomainName] = displayDomain.split('.');
 
-    // All domains that:
-    // 1. Have a different base name than the requested one
-    // 2. Have .com extension
-    return domainVariations.filter(domain => {
-      const domainParts = domain.split('.');
-      return domainParts[0] !== baseDomainName && domainParts[1] === 'com';
-    });
+    return domainVariations.filter(
+      variation => variation.prefix !== undefined || variation.suffix !== undefined
+    );
   };
 
   const mainDomain = getMainDomain();
@@ -271,12 +257,12 @@ function App() {
             {mainDomain && (
               <div className="w-full">
                 <DomainResult
-                  key={mainDomain}
-                  domain={mainDomain}
-                  data={domainResults[mainDomain]?.data}
-                  loading={domainResults[mainDomain]?.loading}
-                  onRetry={() => retryDomainCheck(mainDomain)}
-                  preloadedPreview={domainPreviews[mainDomain]}
+                  key={mainDomain.domain}
+                  domain={mainDomain.domain}
+                  data={domainResults[mainDomain.domain]?.data}
+                  loading={domainResults[mainDomain.domain]?.loading}
+                  onRetry={() => retryDomainCheck(mainDomain.domain)}
+                  preloadedPreview={domainPreviews[mainDomain.domain]}
                 />
               </div>
             )}
@@ -288,14 +274,14 @@ function App() {
                   Alternative Extensions Suggestions
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {alternativeExtensions.map(domainName => (
+                  {alternativeExtensions.map(variation => (
                     <DomainResult
-                      key={domainName}
-                      domain={domainName}
-                      data={domainResults[domainName]?.data}
-                      loading={domainResults[domainName]?.loading}
-                      onRetry={() => retryDomainCheck(domainName)}
-                      preloadedPreview={domainPreviews[domainName]}
+                      key={variation.domain}
+                      domain={variation.domain}
+                      data={domainResults[variation.domain]?.data}
+                      loading={domainResults[variation.domain]?.loading}
+                      onRetry={() => retryDomainCheck(variation.domain)}
+                      preloadedPreview={domainPreviews[variation.domain]}
                     />
                   ))}
                 </div>
@@ -309,14 +295,14 @@ function App() {
                   Alternative .com Suggestions
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {alternativeSuggestions.map(domainName => (
+                  {alternativeSuggestions.map(variation => (
                     <DomainResult
-                      key={domainName}
-                      domain={domainName}
-                      data={domainResults[domainName]?.data}
-                      loading={domainResults[domainName]?.loading}
-                      onRetry={() => retryDomainCheck(domainName)}
-                      preloadedPreview={domainPreviews[domainName]}
+                      key={variation.domain}
+                      domain={variation.domain}
+                      data={domainResults[variation.domain]?.data}
+                      loading={domainResults[variation.domain]?.loading}
+                      onRetry={() => retryDomainCheck(variation.domain)}
+                      preloadedPreview={domainPreviews[variation.domain]}
                     />
                   ))}
                 </div>

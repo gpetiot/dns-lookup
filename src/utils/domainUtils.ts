@@ -45,35 +45,61 @@ export const suffixes: string[] = [
   'base',
 ];
 
+export interface DomainParts {
+  prefix?: string;
+  base: string;
+  suffix?: string;
+  ext: string;
+  domain: string;
+}
+
 /**
  * Generate domain variations based on a base name
  * @param {string} baseName - The base domain name
- * @returns {string[]} Array of domain variations
+ * @returns {DomainParts[]} Array of domain variations
  */
-export const generateDomainVariations = (baseName: string): string[] => {
+export const generateDomainVariations = (baseName: string): DomainParts[] => {
   // Remove domain extension if present
   const nameOnly = baseName.split('.')[0];
 
-  const variations: string[] = [];
+  const variations: DomainParts[] = [];
 
   // First: the original domain with .com (always first)
-  variations.push(`${nameOnly}.com`);
+  variations.push({
+    base: nameOnly,
+    ext: 'com',
+    domain: `${nameOnly}.com`,
+  });
 
   // Second: Common TLDs for the base name
   commonTlds.forEach(tld => {
-    variations.push(`${nameOnly}${tld}`);
+    variations.push({
+      base: nameOnly,
+      ext: tld.slice(1), // remove the dot
+      domain: `${nameOnly}${tld}`,
+    });
   });
 
   // Third: Prefixed variations (alphabetically)
   const sortedPrefixes = [...prefixes].sort();
   sortedPrefixes.forEach(prefix => {
-    variations.push(`${prefix}${nameOnly}.com`);
+    variations.push({
+      prefix,
+      base: nameOnly,
+      ext: 'com',
+      domain: `${prefix}${nameOnly}.com`,
+    });
   });
 
   // Fourth: Suffixed variations (alphabetically)
   const sortedSuffixes = [...suffixes].sort();
   sortedSuffixes.forEach(suffix => {
-    variations.push(`${nameOnly}${suffix}.com`);
+    variations.push({
+      base: nameOnly,
+      suffix,
+      ext: 'com',
+      domain: `${nameOnly}${suffix}.com`,
+    });
   });
 
   return variations;
