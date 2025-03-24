@@ -4,8 +4,6 @@ import DomainResult from './components/DomainResult';
 import DomainScore from './components/DomainScore';
 import NoResultPlaceholder from './components/NoResultPlaceholder';
 import {
-  prefixes,
-  suffixes,
   generateDomainVariations,
   sanitizeDomain,
   fetchDomainPreview,
