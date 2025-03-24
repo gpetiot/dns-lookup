@@ -28,6 +28,10 @@ const LogoPreview: React.FC<LogoPreviewProps> = ({ parts }) => {
 
   // Capitalize each word in a string
   const capitalizeWords = (text: string) => {
+    // Special case for .io and .ai extensions
+    if (text === 'io' || text === 'ai') {
+      return text.toUpperCase();
+    }
     return text
       .split(/([^a-zA-Z0-9])/)
       .map(word =>
