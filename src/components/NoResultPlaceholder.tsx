@@ -14,29 +14,21 @@ const NoResultPlaceholder: React.FC<NoResultPlaceholderProps> = ({ domain, sanit
             <div className="w-6 h-6 rounded-full bg-gray-200 animate-pulse" />
           </div>
           <div className="text-md font-medium text-gray-400">
-            {domain ? (
-              sanitizedDomain || 'example.com'
-            ) : (
-              'Type a domain name to check'
-            )}
+            {domain ? sanitizedDomain || 'example.com' : 'Type a domain name to check'}
           </div>
         </div>
         <div className="flex items-center">
           <div className="text-sm text-gray-400">
-            {domain ? (
-              'Click Check to see availability and suggestions →'
-            ) : (
-              'Start by entering your desired domain name above ↑'
-            )}
+            {domain
+              ? 'Click Check to see availability and suggestions →'
+              : 'Start by entering your desired domain name above ↑'}
           </div>
         </div>
       </div>
       <div className="mt-4 text-center text-gray-500 text-sm">
-        {domain ? (
-          "We'll also show you alternative domains and extensions"
-        ) : (
-          "We'll help you find the perfect domain name and show alternatives"
-        )}
+        {domain
+          ? "We'll also show you alternative domains and extensions"
+          : "We'll help you find the perfect domain name and show alternatives"}
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ interface DomainScoreProps {
 
 const DomainScore: React.FC<DomainScoreProps> = ({ domain }) => {
   const score = calculateDomainScore(domain);
-  
+
   // Determine color based on score
   const getScoreColor = (value: number) => {
     if (value >= 80) return 'text-green-500';
@@ -38,16 +38,14 @@ const DomainScore: React.FC<DomainScoreProps> = ({ domain }) => {
           {messages.length > 0 && (
             <>
               <div className="h-4 w-px bg-gray-300" />
-              <div className="text-gray-600 truncate">
-                {messages.join(' • ')}
-              </div>
+              <div className="text-gray-600 truncate">{messages.join(' • ')}</div>
             </>
           )}
         </div>
-        
+
         {/* Score progress bar */}
         <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
-          <div 
+          <div
             className={`h-full ${getBgColor(score.score)} transition-all duration-300`}
             style={{ width: `${score.score}%` }}
           />

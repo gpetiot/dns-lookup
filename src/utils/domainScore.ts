@@ -23,7 +23,7 @@ const scoringCriteria: ScoreCriterion[] = [
         return { score: 40, message: 'Acceptable length' };
       }
       return { score: 10, message: 'Too long' };
-    }
+    },
   },
   {
     id: 'characters',
@@ -50,18 +50,21 @@ const scoringCriteria: ScoreCriterion[] = [
 
       return {
         score,
-        message: messages.length ? messages.join(' • ') : 'Clean name'
+        message: messages.length ? messages.join(' • ') : 'Clean name',
       };
-    }
-  }
+    },
+  },
 ];
 
 export interface DomainScoreResult {
   score: number;
-  details: Record<string, {
-    score: number;
-    message: string;
-  }>;
+  details: Record<
+    string,
+    {
+      score: number;
+      message: string;
+    }
+  >;
 }
 
 export const calculateDomainScore = (domain: string): DomainScoreResult => {
@@ -76,7 +79,7 @@ export const calculateDomainScore = (domain: string): DomainScoreResult => {
 
   return {
     score: Math.round(totalScore),
-    details
+    details,
   };
 };
 
