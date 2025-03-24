@@ -7,7 +7,7 @@ import App from './App';
 console.log('Environment variables check at startup:');
 console.log('React environment:', process.env.NODE_ENV);
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById('root')!);
 root.render(
   <React.StrictMode>
     <App />

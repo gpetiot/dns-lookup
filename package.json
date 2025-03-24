@@ -2,14 +2,15 @@
   "name": "domain-checker",
   "version": "1.0.0",
   "description": "A simple domain WHOIS information checker",
-  "main": "src/index.js",
+  "main": "src/index.tsx",
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
-    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx}\""
+    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx}\"",
+    "tsc": "tsc --noEmit"
   },
   "dependencies": {
     "autoprefixer": "^10.4.21",
@@ -19,10 +20,14 @@
     "react-scripts": "5.0.1"
   },
   "devDependencies": {
+    "@types/node": "^22.13.13",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
     "dotenv": "^16.3.1",
     "prettier": "^3.5.3",
     "react-app-rewired": "^2.2.1",
-    "tailwindcss": "^3.3.0"
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5.8.2"
   },
   "browserslist": {
     "production": [
