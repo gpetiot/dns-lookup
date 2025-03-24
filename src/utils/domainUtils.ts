@@ -1,8 +1,32 @@
+// Common TLDs for domain variations
+export const commonTlds = [
+  '.com', // Most common, used as default
+  '.net',
+  '.org',
+  '.io',
+  '.co',
+  '.app',
+  '.dev',
+  '.ai',
+  '.me',
+  '.info',
+  '.pro',
+  '.cc',
+  '.tech',
+  '.site',
+  '.web',
+  '.xyz',
+  '.online',
+  '.store',
+  '.blog',
+  '.cloud',
+];
+
 // Prefixes for domain variations
-export const prefixes = ['get', 'try', 'use', 'hey', 'join', 'go', 'the', 'my', 'app'];
+export const prefixes: string[] = ['get', 'try', 'use', 'hey', 'join', 'go', 'the', 'my', 'app'];
 
 // Suffixes for domain variations
-export const suffixes = [
+export const suffixes: string[] = [
   'app',
   'hq',
   'hub',
@@ -24,19 +48,18 @@ export const suffixes = [
 /**
  * Generate domain variations based on a base name
  * @param {string} baseName - The base domain name
- * @returns {Array} Array of domain variations
+ * @returns {string[]} Array of domain variations
  */
-export const generateDomainVariations = baseName => {
+export const generateDomainVariations = (baseName: string): string[] => {
   // Remove domain extension if present
   const nameOnly = baseName.split('.')[0];
 
-  const variations = [];
+  const variations: string[] = [];
 
   // First: the original domain with .com (always first)
   variations.push(`${nameOnly}.com`);
 
   // Second: Common TLDs for the base name
-  const commonTlds = ['.net', '.org', '.io', '.co', '.app'];
   commonTlds.forEach(tld => {
     variations.push(`${nameOnly}${tld}`);
   });
