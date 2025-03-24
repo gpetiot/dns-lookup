@@ -27,7 +27,7 @@ const DomainResult = ({ domain, data, loading, onRetry, preloadedPreview }) => {
       setRenewalPrice(domainRenewalPrice);
     }
   }, [domain, data]);
-  
+
   // Update if preloaded preview changes (from parent component)
   useEffect(() => {
     if (preloadedPreview) {
@@ -54,14 +54,14 @@ const DomainResult = ({ domain, data, loading, onRetry, preloadedPreview }) => {
 
   const isAvailable = data?.result === 'available';
   const hasError = data?.error || false;
-  
+
   // Apply neutral styling for loading state, otherwise use status-based colors
-  const bgColorClass = loading 
+  const bgColorClass = loading
     ? 'bg-gray-50 border-gray-200'
-    : hasError 
-      ? 'bg-gray-100' 
-      : isAvailable 
-        ? 'bg-green-50' 
+    : hasError
+      ? 'bg-gray-100'
+      : isAvailable
+        ? 'bg-green-50'
         : isReallyUsed === false
           ? 'bg-yellow-50'
           : 'bg-red-50';
@@ -74,18 +74,25 @@ const DomainResult = ({ domain, data, loading, onRetry, preloadedPreview }) => {
       hasStartedLoadingRef.current = true;
       return;
     }
-    
+
     // Only load preview for registered domains that aren't already loading
     // and haven't been loaded or started loading yet
-    if (!isAvailable && !hasError && !loading && !preview && !loadingPreview && !hasStartedLoadingRef.current) {
+    if (
+      !isAvailable &&
+      !hasError &&
+      !loading &&
+      !preview &&
+      !loadingPreview &&
+      !hasStartedLoadingRef.current
+    ) {
       // Mark that we've initiated loading
       hasStartedLoadingRef.current = true;
-      
+
       // Set a delay before starting to load to avoid unnecessary requests
       // for quick hover-overs
       previewTimerRef.current = setTimeout(() => {
         setLoadingPreview(true);
-        
+
         // Use a separate async function to avoid blocking
         const loadPreview = async () => {
           try {
@@ -102,7 +109,7 @@ const DomainResult = ({ domain, data, loading, onRetry, preloadedPreview }) => {
             setLoadingPreview(false);
           }
         };
-        
+
         // Start the loading without waiting (non-blocking)
         loadPreview();
       }, 500); // Wait 500ms before loading to avoid unnecessary requests
@@ -127,13 +134,11 @@ const DomainResult = ({ domain, data, loading, onRetry, preloadedPreview }) => {
       previewTimerRef.current = null;
     }
   };
-  
+
   return (
     <div
       className={`flex items-center justify-between py-2 px-3 border-b ${bgColorClass} relative`}
-      onMouseEnter={
-        !isAvailable && !hasError && !loading ? handleMouseOver : undefined
-      }
+      onMouseEnter={!isAvailable && !hasError && !loading ? handleMouseOver : undefined}
       onMouseLeave={handleMouseOut}
     >
       {/* Left Column: Status Icon + Domain */}
@@ -177,9 +182,7 @@ const DomainResult = ({ domain, data, loading, onRetry, preloadedPreview }) => {
 
         {hasError && data?.error && (
           <div className="flex items-center">
-            <div className="text-xs text-gray-600 max-w-xs truncate mr-2">
-              {data.error}
-            </div>
+            <div className="text-xs text-gray-600 max-w-xs truncate mr-2">{data.error}</div>
             {onRetry && (
               <button
                 onClick={onRetry}
@@ -255,9 +258,7 @@ const DomainResult = ({ domain, data, loading, onRetry, preloadedPreview }) => {
             </>
           ) : (
             <div className="flex items-center justify-center p-4">
-              <span className="text-gray-600">
-                Hover for a moment to load preview...
-              </span>
+              <span className="text-gray-600">Hover for a moment to load preview...</span>
             </div>
           )}
         </div>

@@ -7,7 +7,9 @@
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
+    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx}\""
   },
   "dependencies": {
     "autoprefixer": "^10.4.21",
@@ -18,6 +20,7 @@
   },
   "devDependencies": {
     "dotenv": "^16.3.1",
+    "prettier": "^3.5.3",
     "react-app-rewired": "^2.2.1",
     "tailwindcss": "^3.3.0"
   },

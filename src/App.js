@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import DomainResult from './components/DomainResult';
-import { prefixes, suffixes, generateDomainVariations, sanitizeDomain, fetchDomainPreview } from './utils/domainUtils';
+import {
+  prefixes,
+  suffixes,
+  generateDomainVariations,
+  sanitizeDomain,
+  fetchDomainPreview,
+} from './utils/domainUtils';
 import { checkDomain } from './services/whoisAPILayerService';
 
 function App() {
@@ -18,10 +24,9 @@ function App() {
       // Find all registered domains
       const registeredDomains = Object.keys(domainResults).filter(domain => {
         const result = domainResults[domain];
-        return !result.loading && 
-               result.data && 
-               !result.data.error && 
-               result.data.result !== 'available';
+        return (
+          !result.loading && result.data && !result.data.error && result.data.result !== 'available'
+        );
       });
 
       // Preload previews for registered domains that don't have previews yet
@@ -30,10 +35,10 @@ function App() {
           try {
             console.log(`Preloading preview for ${domain}`);
             const preview = await fetchDomainPreview(domain);
-            
+
             setDomainPreviews(prev => ({
               ...prev,
-              [domain]: preview
+              [domain]: preview,
             }));
           } catch (error) {
             console.error(`Error loading preview for ${domain}:`, error);
@@ -48,105 +53,104 @@ function App() {
   }, [domainResults, domainPreviews]);
 
   // Function to retry checking a specific domain
-  const retryDomainCheck = async (domainToRetry) => {
+  const retryDomainCheck = async domainToRetry => {
     // Update just this domain to loading state
     setDomainResults(prev => ({
       ...prev,
-      [domainToRetry]: { loading: true }
+      [domainToRetry]: { loading: true },
     }));
-    
+
     try {
       // Check just this one domain
       const result = await checkDomain(domainToRetry);
-      
+
       // Update the result for this domain
       setDomainResults(prev => ({
         ...prev,
-        [domainToRetry]: { loading: false, data: result.data }
+        [domainToRetry]: { loading: false, data: result.data },
       }));
     } catch (err) {
       console.error(`Error retrying check for ${domainToRetry}:`, err);
       setDomainResults(prev => ({
         ...prev,
-        [domainToRetry]: { 
-          loading: false, 
-          data: { error: err.message || 'Retry failed' } 
-        }
+        [domainToRetry]: {
+          loading: false,
+          data: { error: err.message || 'Retry failed' },
+        },
       }));
     }
   };
 
   // Function to check a single domain and update its result
-  const checkSingleDomain = async (domainToCheck) => {
+  const checkSingleDomain = async domainToCheck => {
     try {
       const result = await checkDomain(domainToCheck);
       // Update the result for this domain
       setDomainResults(prev => ({
         ...prev,
-        [domainToCheck]: { loading: false, data: result.data }
+        [domainToCheck]: { loading: false, data: result.data },
       }));
       return result;
     } catch (err) {
       console.error(`Error checking ${domainToCheck}:`, err);
       setDomainResults(prev => ({
         ...prev,
-        [domainToCheck]: { 
-          loading: false, 
-          data: { error: err.message || 'Request failed' } 
-        }
+        [domainToCheck]: {
+          loading: false,
+          data: { error: err.message || 'Request failed' },
+        },
       }));
       throw err;
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     if (!domain) {
       setError('Please enter a domain');
       return;
     }
-    
+
     // Process and sanitize the domain input
     const sanitized = sanitizeDomain(domain);
     setProcessedDomain(sanitized);
-    
+
     if (sanitized !== domain) {
       console.log(`Domain sanitized from "${domain}" to "${sanitized}"`);
     }
-    
+
     setLoading(true);
     setError(null);
     // Clear previous results and previews
     setDomainPreviews({});
-    
+
     // Generate variations of the domain name
     const variations = generateDomainVariations(sanitized);
     setDomainVariations(variations);
-    
+
     // Initialize all domains with loading state
     const initialResults = {};
     variations.forEach(variation => {
       initialResults[variation] = { loading: true };
     });
     setDomainResults(initialResults);
-    
+
     try {
       // Process all domains independently with a small stagger
       let completedCount = 0;
-      
+
       // Start checking all domains with a small delay between each
       variations.forEach((domainVariation, index) => {
         // Stagger the requests by 300ms each to avoid rate limiting
         setTimeout(() => {
-          checkSingleDomain(domainVariation)
-            .finally(() => {
-              completedCount++;
-              // When all domains have been checked, set loading to false
-              if (completedCount === variations.length) {
-                setLoading(false);
-              }
-            });
+          checkSingleDomain(domainVariation).finally(() => {
+            completedCount++;
+            // When all domains have been checked, set loading to false
+            if (completedCount === variations.length) {
+              setLoading(false);
+            }
+          });
         }, index * 300); // 300ms delay between each request
       });
     } catch (err) {
@@ -157,12 +161,15 @@ function App() {
       // This ensures the loading state is reset if forEach above throws an error
       // The loading state is also handled in each individual request's finally,
       // but this is a backup to ensure it always gets reset
-      setTimeout(() => {
-        if (loading) {
-          console.log('Backup loading state reset triggered');
-          setLoading(false);
-        }
-      }, variations.length * 300 + 5000); // Wait for all possible requests plus a buffer
+      setTimeout(
+        () => {
+          if (loading) {
+            console.log('Backup loading state reset triggered');
+            setLoading(false);
+          }
+        },
+        variations.length * 300 + 5000
+      ); // Wait for all possible requests plus a buffer
     }
   };
 
@@ -180,7 +187,7 @@ function App() {
   const getAlternativeExtensions = () => {
     if (!domainVariations.length) return [];
     const baseDomainName = processedDomain.split('.')[0];
-    
+
     // All domains that start with the base name but aren't .com
     return domainVariations.filter(domain => {
       const domainParts = domain.split('.');
@@ -191,7 +198,7 @@ function App() {
   const getAlternativeSuggestions = () => {
     if (!domainVariations.length) return [];
     const baseDomainName = processedDomain.split('.')[0];
-    
+
     // All .com domains that have been modified with prefixes or suffixes
     return domainVariations.filter(domain => {
       const domainParts = domain.split('.');
@@ -209,7 +216,7 @@ function App() {
         {/* Header and Search Form */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Domain Checker</h1>
-          
+
           <form onSubmit={handleSubmit} className="w-full">
             <div className="flex items-start gap-3">
               <div className="flex-1">
@@ -218,7 +225,7 @@ function App() {
                   id="domain"
                   placeholder="Search for a domain name here..."
                   value={domain}
-                  onChange={(e) => setDomain(e.target.value)}
+                  onChange={e => setDomain(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
@@ -233,21 +240,21 @@ function App() {
               </div>
             </div>
           </form>
-          
+
           {error && (
             <div className="mt-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
               <p className="font-medium">{error}</p>
             </div>
           )}
         </div>
-        
+
         {/* Results Section */}
         {domainVariations.length > 0 && (
           <div className="w-full mb-8 space-y-8">
             {/* Original Domain */}
             {mainDomain && (
               <div className="w-full">
-                <DomainResult 
+                <DomainResult
                   key={mainDomain}
                   domain={mainDomain}
                   data={domainResults[mainDomain]?.data}
@@ -257,7 +264,7 @@ function App() {
                 />
               </div>
             )}
-            
+
             {/* Alternative Extensions */}
             {alternativeExtensions.length > 0 && (
               <div className="w-full">
@@ -265,8 +272,8 @@ function App() {
                   Alternative Extensions Suggestions
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {alternativeExtensions.map((domainName) => (
-                    <DomainResult 
+                  {alternativeExtensions.map(domainName => (
+                    <DomainResult
                       key={domainName}
                       domain={domainName}
                       data={domainResults[domainName]?.data}
@@ -278,7 +285,7 @@ function App() {
                 </div>
               </div>
             )}
-            
+
             {/* Alternative .com Suggestions */}
             {alternativeSuggestions.length > 0 && (
               <div className="w-full">
@@ -286,8 +293,8 @@ function App() {
                   Alternative .com Suggestions
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {alternativeSuggestions.map((domainName) => (
-                    <DomainResult 
+                  {alternativeSuggestions.map(domainName => (
+                    <DomainResult
                       key={domainName}
                       domain={domainName}
                       data={domainResults[domainName]?.data}
