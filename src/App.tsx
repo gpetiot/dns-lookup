@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './styles/fonts.css';
 import DomainResult from './components/DomainResult';
 import DomainScore from './components/DomainScore';
 import NoResultPlaceholder from './components/NoResultPlaceholder';

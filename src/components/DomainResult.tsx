@@ -6,6 +6,7 @@ import ErrorIcon from './icons/ErrorIcon';
 import AvailableIcon from './icons/AvailableIcon';
 import RegisteredIcon from './icons/RegisteredIcon';
 import RetryIcon from './icons/RetryIcon';
+import LogoPreview from './LogoPreview';
 
 interface DomainResultProps {
   parts: DomainParts;
@@ -154,7 +155,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
           ) : hasError ? (
             <span className="text-gray-600">{parts.domain}</span>
           ) : isAvailable ? (
-            <span className="text-green-600">{parts.domain}</span>
+            <LogoPreview parts={parts} />
           ) : (
             <a
               href={`https://${parts.domain}`}
