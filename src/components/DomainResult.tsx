@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { getPricing, getRenewalPrice } from '../services/porkbunService';
-import { fetchDomainPreview, inferDomainUsage } from '../utils/domainUtils';
+import { fetchDomainPreview, inferDomainUsage, DomainParts } from '../utils/domainUtils';
 import ExternalLinkIcon from './icons/ExternalLinkIcon';
 import LoadingIcon from './icons/LoadingIcon';
 import ErrorIcon from './icons/ErrorIcon';
@@ -8,25 +8,39 @@ import AvailableIcon from './icons/AvailableIcon';
 import RegisteredIcon from './icons/RegisteredIcon';
 import RetryIcon from './icons/RetryIcon';
 
-const DomainResult = ({ domain, data, loading, onRetry, preloadedPreview }) => {
-  const [price, setPrice] = useState(null);
-  const [renewalPrice, setRenewalPrice] = useState(null);
+interface DomainResultProps {
+  parts: DomainParts;
+  data: any;
+  loading: boolean;
+  onRetry: () => void;
+  preloadedPreview: any;
+}
+
+const DomainResult: React.FC<DomainResultProps> = ({
+  parts,
+  data,
+  loading,
+  onRetry,
+  preloadedPreview,
+}) => {
+  const [price, setPrice] = useState<number | null>(null);
+  const [renewalPrice, setRenewalPrice] = useState<number | null>(null);
   const [showPreview, setShowPreview] = useState(false);
-  const [preview, setPreview] = useState(preloadedPreview || null);
+  const [preview, setPreview] = useState<any>(preloadedPreview || null);
   const [loadingPreview, setLoadingPreview] = useState(false);
-  const [isReallyUsed, setIsReallyUsed] = useState(null);
-  const previewTimerRef = useRef(null);
+  const [isReallyUsed, setIsReallyUsed] = useState<boolean | null>(null);
+  const previewTimerRef = useRef<NodeJS.Timeout | null>(null);
   const hasStartedLoadingRef = useRef(Boolean(preloadedPreview));
 
   useEffect(() => {
     // Get pricing when domain or data changes
-    if (domain) {
-      const domainPrice = getPricing(domain);
-      const domainRenewalPrice = getRenewalPrice(domain);
+    if (parts.domain) {
+      const domainPrice = getPricing(parts.domain);
+      const domainRenewalPrice = getRenewalPrice(parts.domain);
       setPrice(domainPrice);
       setRenewalPrice(domainRenewalPrice);
     }
-  }, [domain, data]);
+  }, [parts.domain, data]);
 
   // Update if preloaded preview changes (from parent component)
   useEffect(() => {
@@ -76,7 +90,6 @@ const DomainResult = ({ domain, data, loading, onRetry, preloadedPreview }) => {
     }
 
     // Only load preview for registered domains that aren't already loading
-    // and haven't been loaded or started loading yet
     if (
       !isAvailable &&
       !hasError &&
@@ -85,19 +98,14 @@ const DomainResult = ({ domain, data, loading, onRetry, preloadedPreview }) => {
       !loadingPreview &&
       !hasStartedLoadingRef.current
     ) {
-      // Mark that we've initiated loading
       hasStartedLoadingRef.current = true;
 
-      // Set a delay before starting to load to avoid unnecessary requests
-      // for quick hover-overs
       previewTimerRef.current = setTimeout(() => {
         setLoadingPreview(true);
 
-        // Use a separate async function to avoid blocking
         const loadPreview = async () => {
           try {
-            const domainPreview = await fetchDomainPreview(domain);
-            // Check if component is still mounted and preview is still needed
+            const domainPreview = await fetchDomainPreview(parts.domain);
             setPreview(domainPreview);
             setIsReallyUsed(inferDomainUsage(domainPreview));
             if (showPreview) {
@@ -110,11 +118,9 @@ const DomainResult = ({ domain, data, loading, onRetry, preloadedPreview }) => {
           }
         };
 
-        // Start the loading without waiting (non-blocking)
         loadPreview();
-      }, 500); // Wait 500ms before loading to avoid unnecessary requests
+      }, 500);
     } else if (preview) {
-      // If preview is already loaded, just show it immediately
       setShowPreview(true);
     }
   };
@@ -157,19 +163,19 @@ const DomainResult = ({ domain, data, loading, onRetry, preloadedPreview }) => {
 
         <div className="text-md font-medium">
           {loading ? (
-            <span className="text-gray-500">{domain}</span>
+            <span className="text-gray-500">{parts.domain}</span>
           ) : hasError ? (
-            <span className="text-gray-600">{domain}</span>
+            <span className="text-gray-600">{parts.domain}</span>
           ) : isAvailable ? (
-            <span className="text-green-600">{domain}</span>
+            <span className="text-green-600">{parts.domain}</span>
           ) : (
             <a
-              href={`https://${domain}`}
+              href={`https://${parts.domain}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-red-600 hover:underline flex items-center"
             >
-              {domain}
+              {parts.domain}
               <ExternalLinkIcon className="h-3 w-3 ml-1 inline-block flex-shrink-0" />
             </a>
           )}
@@ -212,7 +218,7 @@ const DomainResult = ({ domain, data, loading, onRetry, preloadedPreview }) => {
 
         {isAvailable && price && (
           <a
-            href={`https://porkbun.com/checkout/search?q=${domain}`}
+            href={`https://porkbun.com/checkout/search?q=${parts.domain}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center text-xs hover:underline"
@@ -245,7 +251,7 @@ const DomainResult = ({ domain, data, loading, onRetry, preloadedPreview }) => {
               {!preview.success && (
                 <div className="mt-2 text-xs text-blue-500">
                   <a
-                    href={`https://${domain}`}
+                    href={`https://${parts.domain}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center"

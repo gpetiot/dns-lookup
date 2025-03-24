@@ -258,7 +258,7 @@ function App() {
               <div className="w-full">
                 <DomainResult
                   key={mainDomain.domain}
-                  domain={mainDomain.domain}
+                  parts={mainDomain}
                   data={domainResults[mainDomain.domain]?.data}
                   loading={domainResults[mainDomain.domain]?.loading}
                   onRetry={() => retryDomainCheck(mainDomain.domain)}
@@ -277,7 +277,7 @@ function App() {
                   {alternativeExtensions.map(variation => (
                     <DomainResult
                       key={variation.domain}
-                      domain={variation.domain}
+                      parts={variation}
                       data={domainResults[variation.domain]?.data}
                       loading={domainResults[variation.domain]?.loading}
                       onRetry={() => retryDomainCheck(variation.domain)}
@@ -298,7 +298,7 @@ function App() {
                   {alternativeSuggestions.map(variation => (
                     <DomainResult
                       key={variation.domain}
-                      domain={variation.domain}
+                      parts={variation}
                       data={domainResults[variation.domain]?.data}
                       loading={domainResults[variation.domain]?.loading}
                       onRetry={() => retryDomainCheck(variation.domain)}
