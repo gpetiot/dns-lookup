@@ -185,30 +185,35 @@ function App() {
   // Functions to categorize domains
   const getMainDomain = () => {
     if (!domainVariations.length) return null;
-    // Find the original domain with .com extension
-    return domainVariations.find(domain => {
-      // Match the base domain name + .com
-      const baseDomainName = displayDomain.split('.')[0];
-      return domain === `${baseDomainName}.com`;
-    });
+    // Return the exact domain that was requested
+    return domainVariations.find(domain => domain === displayDomain);
   };
 
   const getAlternativeExtensions = () => {
     if (!domainVariations.length) return [];
-    const baseDomainName = displayDomain.split('.')[0];
+    const [baseDomainName, requestedExtension] = displayDomain.split('.');
 
-    // All domains that start with the base name but aren't .com
+    // All domains that:
+    // 1. Start with the same base name
+    // 2. Have a different extension than the requested one
+    // 3. Are not the main requested domain
     return domainVariations.filter(domain => {
       const domainParts = domain.split('.');
-      return domainParts[0] === baseDomainName && domainParts[1] !== 'com';
+      return (
+        domainParts[0] === baseDomainName &&
+        domainParts[1] !== requestedExtension &&
+        domain !== displayDomain
+      );
     });
   };
 
   const getAlternativeSuggestions = () => {
     if (!domainVariations.length) return [];
-    const baseDomainName = displayDomain.split('.')[0];
+    const [baseDomainName] = displayDomain.split('.');
 
-    // All .com domains that have been modified with prefixes or suffixes
+    // All domains that:
+    // 1. Have a different base name than the requested one
+    // 2. Have .com extension
     return domainVariations.filter(domain => {
       const domainParts = domain.split('.');
       return domainParts[0] !== baseDomainName && domainParts[1] === 'com';
