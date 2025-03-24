@@ -31,7 +31,7 @@ const LogoPreview: React.FC<LogoPreviewProps> = ({ parts }) => {
     `font-['Work_Sans'] text-white px-0.5 rounded bg-gradient-to-r ${getGradientForDomain(text)}`;
 
   return (
-    <div className="font-medium bg-white px-1 py-0.5 rounded-lg inline-flex items-center gap-0.5">
+    <div className="font-medium bg-white px-1 py-0.5 rounded-lg inline-flex items-center gap-1.5 transition-all duration-200 hover:scale-105 hover:shadow-lg cursor-pointer">
       {parts.prefix ? (
         <>
           <span className={getHighlightStyle(parts.prefix)}>{parts.prefix}</span>
