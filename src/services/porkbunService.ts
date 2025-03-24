@@ -8,34 +8,31 @@ const priceCache = {
 
 /**
  * Get registration price for a specific TLD from PorkBun
- * @param {string} domain - Domain name to check (e.g., "example.com")
- * @returns {string|null} - Registration price or null if TLD not found
+ * @param {string} ext - Extension to check (e.g., "com")
+ * @returns {string|null} - Registration price or null if extension not found
  */
-export const getPricing = domain => {
+export const getPricing = (ext: string) => {
   try {
-    if (!domain) return null;
+    if (!ext) return null;
 
-    // Extract the TLD from the domain
-    const tld = domain.split('.').slice(1).join('.');
-
-    // Check if this TLD is already in the cache
-    if (priceCache.registration[tld] !== undefined) {
-      return priceCache.registration[tld];
+    // Check if this extension is already in the cache
+    if (priceCache.registration[ext] !== undefined) {
+      return priceCache.registration[ext];
     }
 
     // If not in cache, look up the price
     if (
       porkbunPricing.status === 'SUCCESS' &&
       porkbunPricing.pricing &&
-      porkbunPricing.pricing[tld]
+      porkbunPricing.pricing[ext]
     ) {
       // Store in cache
-      priceCache.registration[tld] = porkbunPricing.pricing[tld].registration;
-      return priceCache.registration[tld];
+      priceCache.registration[ext] = porkbunPricing.pricing[ext].registration;
+      return priceCache.registration[ext];
     }
 
-    // Store null in cache for TLDs without pricing
-    priceCache.registration[tld] = null;
+    // Store null in cache for extensions without pricing
+    priceCache.registration[ext] = null;
     return null;
   } catch (error) {
     console.error('Error getting PorkBun pricing:', error);
@@ -45,34 +42,31 @@ export const getPricing = domain => {
 
 /**
  * Get renewal price for a specific TLD from PorkBun
- * @param {string} domain - Domain name to check (e.g., "example.com")
- * @returns {string|null} - Renewal price or null if TLD not found
+ * @param {string} ext - Extension to check (e.g., "com")
+ * @returns {string|null} - Renewal price or null if extension not found
  */
-export const getRenewalPrice = domain => {
+export const getRenewalPrice = (ext: string) => {
   try {
-    if (!domain) return null;
+    if (!ext) return null;
 
-    // Extract the TLD from the domain
-    const tld = domain.split('.').slice(1).join('.');
-
-    // Check if this TLD is already in the cache
-    if (priceCache.renewal[tld] !== undefined) {
-      return priceCache.renewal[tld];
+    // Check if this extension is already in the cache
+    if (priceCache.renewal[ext] !== undefined) {
+      return priceCache.renewal[ext];
     }
 
-    // Check if pricing exists for this TLD
+    // Check if pricing exists for this extension
     if (
       porkbunPricing.status === 'SUCCESS' &&
       porkbunPricing.pricing &&
-      porkbunPricing.pricing[tld]
+      porkbunPricing.pricing[ext]
     ) {
       // Store in cache
-      priceCache.renewal[tld] = porkbunPricing.pricing[tld].renewal;
-      return priceCache.renewal[tld];
+      priceCache.renewal[ext] = porkbunPricing.pricing[ext].renewal;
+      return priceCache.renewal[ext];
     }
 
-    // Store null in cache for TLDs without pricing
-    priceCache.renewal[tld] = null;
+    // Store null in cache for extensions without pricing
+    priceCache.renewal[ext] = null;
     return null;
   } catch (error) {
     console.error('Error getting PorkBun pricing:', error);

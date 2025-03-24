@@ -33,14 +33,14 @@ const DomainResult: React.FC<DomainResultProps> = ({
   const hasStartedLoadingRef = useRef(Boolean(preloadedPreview));
 
   useEffect(() => {
-    // Get pricing when domain or data changes
-    if (parts.domain) {
-      const domainPrice = getPricing(parts.domain);
-      const domainRenewalPrice = getRenewalPrice(parts.domain);
+    // Get pricing when extension or data changes
+    if (parts.ext) {
+      const domainPrice = getPricing(parts.ext);
+      const domainRenewalPrice = getRenewalPrice(parts.ext);
       setPrice(domainPrice);
       setRenewalPrice(domainRenewalPrice);
     }
-  }, [parts.domain, data]);
+  }, [parts.ext, data]);
 
   // Update if preloaded preview changes (from parent component)
   useEffect(() => {
