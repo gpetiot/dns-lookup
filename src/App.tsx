@@ -14,6 +14,7 @@ import { checkDomain } from './services/whoisAPILayerService';
 function App() {
   const [domain, setDomain] = useState('');
   const [sanitizedDomain, setSanitizedDomain] = useState('');
+  const [displayDomain, setDisplayDomain] = useState('');
   const [domainVariations, setDomainVariations] = useState([]);
   const [domainResults, setDomainResults] = useState({});
   const [domainPreviews, setDomainPreviews] = useState({});
@@ -120,6 +121,9 @@ function App() {
       return;
     }
 
+    // Update the display domain when submitting
+    setDisplayDomain(sanitizedDomain);
+
     // Use the already sanitized domain from state
     if (sanitizedDomain !== domain) {
       console.log(`Domain sanitized from "${domain}" to "${sanitizedDomain}"`);
@@ -184,14 +188,14 @@ function App() {
     // Find the original domain with .com extension
     return domainVariations.find(domain => {
       // Match the base domain name + .com
-      const baseDomainName = sanitizedDomain.split('.')[0];
+      const baseDomainName = displayDomain.split('.')[0];
       return domain === `${baseDomainName}.com`;
     });
   };
 
   const getAlternativeExtensions = () => {
     if (!domainVariations.length) return [];
-    const baseDomainName = sanitizedDomain.split('.')[0];
+    const baseDomainName = displayDomain.split('.')[0];
 
     // All domains that start with the base name but aren't .com
     return domainVariations.filter(domain => {
@@ -202,7 +206,7 @@ function App() {
 
   const getAlternativeSuggestions = () => {
     if (!domainVariations.length) return [];
-    const baseDomainName = sanitizedDomain.split('.')[0];
+    const baseDomainName = displayDomain.split('.')[0];
 
     // All .com domains that have been modified with prefixes or suffixes
     return domainVariations.filter(domain => {
