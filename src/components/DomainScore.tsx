@@ -1,55 +1,54 @@
 import React from 'react';
-import { calculateDomainScore, getCriteriaMessages } from '../utils/domainScore';
+import { checkDomainCriteria, criteria } from '../utils/domainScore';
 
 interface DomainScoreProps {
   domain: string;
 }
 
 const DomainScore: React.FC<DomainScoreProps> = ({ domain }) => {
-  const score = calculateDomainScore(domain);
-
-  // Determine color based on score
-  const getScoreColor = (value: number) => {
-    if (value >= 80) return 'text-green-500';
-    if (value >= 60) return 'text-yellow-500';
-    return 'text-red-500';
-  };
-
-  // Get background color variant
-  const getBgColor = (value: number) => {
-    if (value >= 80) return 'bg-green-500';
-    if (value >= 60) return 'bg-yellow-500';
-    return 'bg-red-500';
-  };
+  const { details } = checkDomainCriteria(domain);
 
   // Only show if there's a domain
   if (!domain) return null;
 
-  // Get all non-clean messages
-  const messages = getCriteriaMessages(score.details);
+  const getStatusIcon = (passed: boolean) => {
+    if (passed) {
+      return (
+        <svg
+          className="w-3 h-3 text-green-500"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+      );
+    }
+    return (
+      <svg className="w-3 h-3 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+    );
+  };
+
+  const getTextColor = (passed: boolean) => {
+    return passed ? 'text-green-600' : 'text-red-600';
+  };
 
   return (
-    <div className="mt-2 text-sm flex justify-center">
-      <div className="max-w-[50%] bg-white shadow-sm rounded-lg p-3">
-        <div className="flex items-center space-x-2 mb-3">
-          <div className={`font-semibold ${getScoreColor(score.score)}`}>
-            Score: {score.score}/100
+    <div className="mt-1 text-xs pl-2">
+      <div className="space-y-1">
+        {criteria.map(criterion => (
+          <div key={criterion.id} className="flex items-center space-x-1.5">
+            {getStatusIcon(details[criterion.id].passed)}
+            <span className={getTextColor(details[criterion.id].passed)}>{criterion.name}</span>
           </div>
-          {messages.length > 0 && (
-            <>
-              <div className="h-4 w-px bg-gray-300" />
-              <div className="text-gray-600 truncate">{messages.join(' • ')}</div>
-            </>
-          )}
-        </div>
-
-        {/* Score progress bar */}
-        <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
-          <div
-            className={`h-full ${getBgColor(score.score)} transition-all duration-300`}
-            style={{ width: `${score.score}%` }}
-          />
-        </div>
+        ))}
       </div>
     </div>
   );

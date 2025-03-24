@@ -1,91 +1,70 @@
-interface ScoreCriterion {
+interface DomainCriterion {
   id: string;
   name: string;
-  weight: number;
   evaluate: (domain: string) => {
-    score: number;
+    passed: boolean;
     message: string;
   };
 }
 
-const scoringCriteria: ScoreCriterion[] = [
+const domainCriteria: DomainCriterion[] = [
   {
     id: 'length',
-    name: 'Length',
-    weight: 0.5, // 50% of total score
+    name: '< 10 characters',
     evaluate: (domain: string) => {
       const nameOnly = domain.split('.')[0];
-      if (nameOnly.length <= 5) {
-        return { score: 100, message: 'Perfect length' };
-      } else if (nameOnly.length <= 8) {
-        return { score: 70, message: 'Good length' };
-      } else if (nameOnly.length <= 10) {
-        return { score: 40, message: 'Acceptable length' };
-      }
-      return { score: 10, message: 'Too long' };
+      const passed = nameOnly.length <= 10;
+      return {
+        passed,
+        message: passed ? 'Good length' : 'Too long',
+      };
     },
   },
   {
-    id: 'characters',
-    name: 'Characters',
-    weight: 0.5, // 50% of total score
+    id: 'noHyphens',
+    name: 'no hyphens',
     evaluate: (domain: string) => {
       const nameOnly = domain.split('.')[0];
-      let score = 100;
-      let messages: string[] = [];
-
-      // Check for hyphens
-      const hyphenCount = (nameOnly.match(/-/g) || []).length;
-      if (hyphenCount > 0) {
-        score -= 50;
-        messages.push('Avoid hyphens');
-      }
-
-      // Check for numbers
-      const numberCount = (nameOnly.match(/\d/g) || []).length;
-      if (numberCount > 0) {
-        score -= 50;
-        messages.push('Avoid numbers');
-      }
-
+      const passed = !(nameOnly.match(/-/g) || []).length;
       return {
-        score,
-        message: messages.length ? messages.join(' • ') : 'Clean name',
+        passed,
+        message: passed ? 'No hyphens' : 'Contains hyphens',
+      };
+    },
+  },
+  {
+    id: 'noNumbers',
+    name: 'no numbers',
+    evaluate: (domain: string) => {
+      const nameOnly = domain.split('.')[0];
+      const passed = !(nameOnly.match(/\d/g) || []).length;
+      return {
+        passed,
+        message: passed ? 'No numbers' : 'Contains numbers',
       };
     },
   },
 ];
 
-export interface DomainScoreResult {
-  score: number;
+export interface DomainCheckResult {
   details: Record<
     string,
     {
-      score: number;
+      passed: boolean;
       message: string;
     }
   >;
 }
 
-export const calculateDomainScore = (domain: string): DomainScoreResult => {
-  const details: Record<string, { score: number; message: string }> = {};
-  let totalScore = 0;
+export const checkDomainCriteria = (domain: string): DomainCheckResult => {
+  const details: Record<string, { passed: boolean; message: string }> = {};
 
-  scoringCriteria.forEach(criterion => {
-    const result = criterion.evaluate(domain);
-    details[criterion.id] = result;
-    totalScore += result.score * criterion.weight;
+  domainCriteria.forEach(criterion => {
+    details[criterion.id] = criterion.evaluate(domain);
   });
 
-  return {
-    score: Math.round(totalScore),
-    details,
-  };
+  return { details };
 };
 
-// Helper to get all criteria messages
-export const getCriteriaMessages = (details: DomainScoreResult['details']): string[] => {
-  return Object.entries(details)
-    .map(([_, detail]) => detail.message)
-    .filter(msg => msg !== 'Clean name');
-};
+// Export criteria for use in components
+export const criteria = domainCriteria;
