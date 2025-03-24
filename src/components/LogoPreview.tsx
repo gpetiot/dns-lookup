@@ -6,46 +6,55 @@ interface LogoPreviewProps {
 }
 
 const LogoPreview: React.FC<LogoPreviewProps> = ({ parts }) => {
-  // Generate a consistent random gradient for a given domain
-  const getGradientForDomain = (domain: string) => {
-    // List of tailwind gradient color pairs that work well together
-    const gradientPairs = [
-      ['from-indigo-500 to-purple-500'],
-      ['from-blue-500 to-teal-500'],
-      ['from-purple-500 to-pink-500'],
-      ['from-green-500 to-teal-500'],
-      ['from-pink-500 to-rose-500'],
-      ['from-amber-500 to-orange-500'],
-      ['from-violet-500 to-purple-500'],
-      ['from-cyan-500 to-blue-500'],
+  // Generate a consistent color for a given text
+  const getColorForText = (text: string) => {
+    // List of tailwind text colors that work well together
+    const colors = [
+      'text-indigo-500',
+      'text-blue-500',
+      'text-purple-500',
+      'text-green-500',
+      'text-pink-500',
+      'text-amber-500',
+      'text-violet-500',
+      'text-cyan-500',
     ];
 
     // Use string to generate a consistent index
-    const charSum = domain.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
-    const index = charSum % gradientPairs.length;
-    return gradientPairs[index][0];
+    const charSum = text.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+    const index = charSum % colors.length;
+    return colors[index];
+  };
+
+  // Capitalize each word in a string
+  const capitalizeWords = (text: string) => {
+    return text
+      .split(/([^a-zA-Z0-9])/)
+      .map(word =>
+        word.match(/[a-zA-Z0-9]/) ? word.charAt(0).toUpperCase() + word.slice(1) : word
+      )
+      .join('');
   };
 
   const baseStyle = "font-['Syne'] text-gray-800";
-  const getHighlightStyle = (text: string) =>
-    `font-['Work_Sans'] text-white px-0.5 rounded bg-gradient-to-r ${getGradientForDomain(text)}`;
+  const getHighlightStyle = (text: string) => `font-['Work_Sans'] ${getColorForText(text)}`;
 
   return (
     <div className="font-medium bg-white px-1 py-0.5 rounded-lg inline-flex items-center gap-1.5 transition-all duration-200 hover:scale-105 hover:shadow-lg cursor-pointer">
       {parts.prefix ? (
         <>
-          <span className={getHighlightStyle(parts.prefix)}>{parts.prefix}</span>
-          <span className={baseStyle}>{parts.input}</span>
+          <span className={getHighlightStyle(parts.prefix)}>{capitalizeWords(parts.prefix)}</span>
+          <span className={baseStyle}>{capitalizeWords(parts.input)}</span>
         </>
       ) : parts.suffix ? (
         <>
-          <span className={baseStyle}>{parts.input}</span>
-          <span className={getHighlightStyle(parts.suffix)}>{parts.suffix}</span>
+          <span className={baseStyle}>{capitalizeWords(parts.input)}</span>
+          <span className={getHighlightStyle(parts.suffix)}>{capitalizeWords(parts.suffix)}</span>
         </>
       ) : (
         <>
-          <span className={baseStyle}>{parts.input}</span>
-          <span className={getHighlightStyle(parts.ext)}>{parts.ext}</span>
+          <span className={baseStyle}>{capitalizeWords(parts.input)}</span>
+          <span className={getHighlightStyle(parts.ext)}>{capitalizeWords(parts.ext)}</span>
         </>
       )}
     </div>
