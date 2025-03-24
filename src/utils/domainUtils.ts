@@ -14,7 +14,6 @@ export const commonTlds = [
   '.cc',
   '.tech',
   '.site',
-  '.web',
   '.xyz',
   '.online',
   '.store',
@@ -23,7 +22,7 @@ export const commonTlds = [
 ];
 
 // Prefixes for domain variations
-export const prefixes: string[] = ['get', 'try', 'use', 'hey', 'join', 'go', 'the', 'my', 'app'];
+export const prefixes: string[] = ['get', 'try', 'use', 'hey', 'join', 'go', 'the', 'my'];
 
 // Suffixes for domain variations
 export const suffixes: string[] = [
