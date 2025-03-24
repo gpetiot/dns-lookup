@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DomainResult from './components/DomainResult';
-import { prefixes, suffixes, generateDomainVariations, sanitizeDomain } from './utils/domainUtils';
+import { prefixes, suffixes, generateDomainVariations, sanitizeDomain, fetchDomainPreview } from './utils/domainUtils';
 import { checkDomain } from './services/whoisAPILayerService';
 
 function App() {
@@ -8,8 +8,44 @@ function App() {
   const [processedDomain, setProcessedDomain] = useState('');
   const [domainVariations, setDomainVariations] = useState([]);
   const [domainResults, setDomainResults] = useState({});
+  const [domainPreviews, setDomainPreviews] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Load previews for registered domains
+  useEffect(() => {
+    const loadDomainPreviews = async () => {
+      // Find all registered domains
+      const registeredDomains = Object.keys(domainResults).filter(domain => {
+        const result = domainResults[domain];
+        return !result.loading && 
+               result.data && 
+               !result.data.error && 
+               result.data.result !== 'available';
+      });
+
+      // Preload previews for registered domains that don't have previews yet
+      for (const domain of registeredDomains) {
+        if (!domainPreviews[domain]) {
+          try {
+            console.log(`Preloading preview for ${domain}`);
+            const preview = await fetchDomainPreview(domain);
+            
+            setDomainPreviews(prev => ({
+              ...prev,
+              [domain]: preview
+            }));
+          } catch (error) {
+            console.error(`Error loading preview for ${domain}:`, error);
+          }
+        }
+      }
+    };
+
+    if (Object.keys(domainResults).length > 0) {
+      loadDomainPreviews();
+    }
+  }, [domainResults, domainPreviews]);
 
   // Function to retry checking a specific domain
   const retryDomainCheck = async (domainToRetry) => {
@@ -81,6 +117,8 @@ function App() {
     
     setLoading(true);
     setError(null);
+    // Clear previous results and previews
+    setDomainPreviews({});
     
     // Generate variations of the domain name
     const variations = generateDomainVariations(sanitized);
@@ -215,6 +253,7 @@ function App() {
                   data={domainResults[mainDomain]?.data}
                   loading={domainResults[mainDomain]?.loading}
                   onRetry={() => retryDomainCheck(mainDomain)}
+                  preloadedPreview={domainPreviews[mainDomain]}
                 />
               </div>
             )}
@@ -233,6 +272,7 @@ function App() {
                       data={domainResults[domainName]?.data}
                       loading={domainResults[domainName]?.loading}
                       onRetry={() => retryDomainCheck(domainName)}
+                      preloadedPreview={domainPreviews[domainName]}
                     />
                   ))}
                 </div>
@@ -253,6 +293,7 @@ function App() {
                       data={domainResults[domainName]?.data}
                       loading={domainResults[domainName]?.loading}
                       onRetry={() => retryDomainCheck(domainName)}
+                      preloadedPreview={domainPreviews[domainName]}
                     />
                   ))}
                 </div>

@@ -193,3 +193,63 @@ export const fetchDomainPreview = async (domain) => {
     };
   }
 };
+
+/**
+ * Analyzes domain preview content to determine if a domain is genuinely in use
+ * @param {Object} preview - The preview object returned by fetchDomainPreview
+ * @returns {boolean} false if domain appears unused, true otherwise
+ */
+export const inferDomainUsage = (preview) => {
+  // If the preview request failed, mark as unused
+  if (!preview.success) {
+    return false;
+  }
+  
+  const { title, description } = preview;
+  
+  // Common keywords for parked or for-sale domains
+  const forSaleKeywords = [
+    'domain for sale',
+    'buy this domain',
+    'domain is for sale',
+    'purchase this domain',
+    'acquire this domain',
+    'domain parking',
+    'parked domain',
+    'domain marketplace',
+    'this domain may be for sale',
+    'inquire about this domain',
+    'sedo',
+    'hugedomains',
+    'uniregistry',
+    'afternic',
+    'domains for sale',
+    'premium domain',
+    'this web page is parked',
+    'the domain',
+    'domainmarket',
+    'domainholder',
+    'dan.com'
+  ];
+  
+  // Check title and description for for-sale indicators
+  const contentToCheck = (title + ' ' + description).toLowerCase();
+  
+  for (const keyword of forSaleKeywords) {
+    if (contentToCheck.includes(keyword.toLowerCase())) {
+      return false;
+    }
+  }
+  
+  // Check for common domain parking services in title
+  if (
+    title.includes('Domain for sale') ||
+    title.includes('Parking') ||
+    title.includes('GoDaddy') && description.includes('hosting') ||
+    title.includes('This domain is for sale')
+  ) {
+    return false;
+  }
+  
+  return true;
+};
