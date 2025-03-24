@@ -12,7 +12,7 @@ import { checkDomain } from './services/whoisAPILayerService';
 
 function App() {
   const [domain, setDomain] = useState('');
-  const [processedDomain, setProcessedDomain] = useState('');
+  const [sanitizedDomain, setSanitizedDomain] = useState('');
   const [domainVariations, setDomainVariations] = useState([]);
   const [domainResults, setDomainResults] = useState({});
   const [domainPreviews, setDomainPreviews] = useState({});
@@ -105,6 +105,12 @@ function App() {
     }
   };
 
+  const handleDomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setDomain(value);
+    setSanitizedDomain(sanitizeDomain(value));
+  };
+
   const handleSubmit = async e => {
     e.preventDefault();
 
@@ -113,12 +119,9 @@ function App() {
       return;
     }
 
-    // Process and sanitize the domain input
-    const sanitized = sanitizeDomain(domain);
-    setProcessedDomain(sanitized);
-
-    if (sanitized !== domain) {
-      console.log(`Domain sanitized from "${domain}" to "${sanitized}"`);
+    // Use the already sanitized domain from state
+    if (sanitizedDomain !== domain) {
+      console.log(`Domain sanitized from "${domain}" to "${sanitizedDomain}"`);
     }
 
     setLoading(true);
@@ -127,7 +130,7 @@ function App() {
     setDomainPreviews({});
 
     // Generate variations of the domain name
-    const variations = generateDomainVariations(sanitized);
+    const variations = generateDomainVariations(sanitizedDomain);
     setDomainVariations(variations);
 
     // Initialize all domains with loading state
@@ -180,14 +183,14 @@ function App() {
     // Find the original domain with .com extension
     return domainVariations.find(domain => {
       // Match the base domain name + .com
-      const baseDomainName = processedDomain.split('.')[0];
+      const baseDomainName = sanitizedDomain.split('.')[0];
       return domain === `${baseDomainName}.com`;
     });
   };
 
   const getAlternativeExtensions = () => {
     if (!domainVariations.length) return [];
-    const baseDomainName = processedDomain.split('.')[0];
+    const baseDomainName = sanitizedDomain.split('.')[0];
 
     // All domains that start with the base name but aren't .com
     return domainVariations.filter(domain => {
@@ -198,7 +201,7 @@ function App() {
 
   const getAlternativeSuggestions = () => {
     if (!domainVariations.length) return [];
-    const baseDomainName = processedDomain.split('.')[0];
+    const baseDomainName = sanitizedDomain.split('.')[0];
 
     // All .com domains that have been modified with prefixes or suffixes
     return domainVariations.filter(domain => {
@@ -227,10 +230,10 @@ function App() {
                   id="domain"
                   placeholder="Search for a domain name here..."
                   value={domain}
-                  onChange={e => setDomain(e.target.value)}
+                  onChange={handleDomainChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                <DomainScore domain={domain} />
+                <DomainScore domain={sanitizedDomain} />
               </div>
               <div>
                 <button
