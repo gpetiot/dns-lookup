@@ -27,6 +27,9 @@ const DomainResult: React.FC<DomainResultProps> = ({
   const [isReallyUsed, setIsReallyUsed] = useState<boolean | null>(null);
   const hasStartedLoadingRef = useRef(Boolean(preloadedPreview));
 
+  const isAvailable = data?.result === 'available';
+  const hasError = data?.error || false;
+
   // Update if preloaded preview changes (from parent component)
   useEffect(() => {
     if (preloadedPreview) {
@@ -34,27 +37,6 @@ const DomainResult: React.FC<DomainResultProps> = ({
       hasStartedLoadingRef.current = true;
     }
   }, [preloadedPreview]);
-
-  // Update usage status when preview data changes
-  useEffect(() => {
-    if (preview) {
-      inferDomainUsage(preview).then(setIsReallyUsed);
-    }
-  }, [preview]);
-
-  const isAvailable = data?.result === 'available';
-  const hasError = data?.error || false;
-
-  // Apply neutral styling for loading state, otherwise use status-based colors
-  const bgColorClass = loading
-    ? 'bg-gray-50 border-gray-200'
-    : hasError
-      ? 'bg-gray-100'
-      : isAvailable
-        ? 'bg-green-50'
-        : isReallyUsed === false
-          ? 'bg-yellow-50'
-          : 'bg-red-50';
 
   // Load the preview data for domain usage inference
   useEffect(() => {
@@ -75,6 +57,17 @@ const DomainResult: React.FC<DomainResultProps> = ({
 
     loadPreview();
   }, [isAvailable, hasError, loading, preview, parts.domain]);
+
+  // Apply neutral styling for loading state, otherwise use status-based colors
+  const bgColorClass = loading
+    ? 'bg-gray-50 border-gray-200'
+    : hasError
+      ? 'bg-gray-100'
+      : isAvailable
+        ? 'bg-green-50'
+        : isReallyUsed === false
+          ? 'bg-yellow-50'
+          : 'bg-red-50';
 
   return (
     <div
