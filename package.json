@@ -13,6 +13,7 @@
     "tsc": "tsc --noEmit"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.0",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.3",
     "react": "^18.2.0",
