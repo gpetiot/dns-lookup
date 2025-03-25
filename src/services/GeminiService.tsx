@@ -7,7 +7,10 @@ export class GeminiService implements AIServiceInterface {
   public static readonly DEFAULT_MODEL = 'gemini-2.0-flash';
 
   constructor(defaultModel: string = GeminiService.DEFAULT_MODEL) {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error('REACT_APP_GEMINI_API_KEY environment variable is not set');
+    }
     this.genAI = new GoogleGenerativeAI(apiKey);
     this.defaultModel = defaultModel;
   }
