@@ -66,8 +66,8 @@ const DomainResult: React.FC<DomainResultProps> = ({
       : isAvailable
         ? 'bg-green-50'
         : isReallyUsed === false
-          ? 'bg-yellow-50'
-          : 'bg-red-50';
+          ? 'bg-yellow-50/50'
+          : 'bg-red-50/50';
 
   return (
     <div
