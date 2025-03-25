@@ -64,7 +64,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
     : hasError
       ? 'bg-gray-100'
       : isAvailable
-        ? 'bg-green-50'
+        ? 'bg-green-100'
         : isReallyUsed === false
           ? 'bg-yellow-50/50'
           : 'bg-red-50/50';
