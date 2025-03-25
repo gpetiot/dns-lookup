@@ -72,7 +72,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
         </div>
       </div>
 
-      {/* Right Column: Error/Expiry or Broker Link */}
+      {/* Right Column: Error or Broker Link */}
       <div className="flex items-center justify-end">
         {loading && <div className="text-xs text-gray-500">Checking...</div>}
 
@@ -88,14 +88,6 @@ const DomainResult: React.FC<DomainResultProps> = ({
                 Retry
               </button>
             )}
-          </div>
-        )}
-
-        {!loading && !hasError && !isAvailable && data?.expiry && (
-          <div className="flex items-center space-x-2">
-            <div className="text-xs text-gray-500 whitespace-nowrap">
-              Exp: {new Date(data.expiry).toLocaleDateString()}
-            </div>
           </div>
         )}
 
