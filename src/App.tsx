@@ -5,6 +5,7 @@ import DomainScore from './components/DomainScore';
 import NoResultPlaceholder from './components/NoResultPlaceholder';
 import {
   generateDomainVariations,
+  generateAIDomainSuggestions,
   sanitizeDomain,
   fetchDomainPreview,
   DomainParts,
@@ -16,12 +17,14 @@ function App() {
   const [sanitizedDomain, setSanitizedDomain] = useState('');
   const [displayDomain, setDisplayDomain] = useState('');
   const [domainVariations, setDomainVariations] = useState<DomainParts[]>([]);
+  const [aiSuggestions, setAiSuggestions] = useState<DomainParts[]>([]);
   const [domainResults, setDomainResults] = useState<
     Record<string, { loading: boolean; data?: any }>
   >({});
   const [domainPreviews, setDomainPreviews] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
 
   // Load previews for registered domains
   useEffect(() => {
@@ -212,6 +215,47 @@ function App() {
   const alternativeExtensions = getAlternativeExtensions();
   const alternativeSuggestions = getAlternativeSuggestions();
 
+  const handleGenerateAI = async () => {
+    if (!sanitizedDomain) return;
+    
+    setIsGeneratingAI(true);
+    setError(null);
+    
+    try {
+      const suggestions = await generateAIDomainSuggestions(sanitizedDomain, aiSuggestions.length === 0);
+      
+      // Filter out any duplicates with existing suggestions
+      const existingDomains = new Set([...domainVariations, ...aiSuggestions].map(d => d.domain));
+      const newSuggestions = suggestions.filter(s => !existingDomains.has(s.domain));
+      
+      if (newSuggestions.length === 0) {
+        setError('No new unique suggestions generated. Try again for different variations.');
+        return;
+      }
+      
+      setAiSuggestions(prev => [...prev, ...newSuggestions]);
+      
+      // Initialize loading state for new suggestions
+      const newResults = {};
+      newSuggestions.forEach(suggestion => {
+        newResults[suggestion.domain] = { loading: true };
+      });
+      setDomainResults(prev => ({ ...prev, ...newResults }));
+      
+      // Check availability for new suggestions
+      newSuggestions.forEach((suggestion, index) => {
+        setTimeout(() => {
+          checkSingleDomain(suggestion.domain);
+        }, index * 300);
+      });
+    } catch (err) {
+      console.error('Error generating AI suggestions:', err);
+      setError('Failed to generate AI suggestions. Please try again.');
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 flex flex-col items-center">
       <div className="w-full max-w-7xl">
@@ -233,13 +277,21 @@ function App() {
                 />
                 {domain && <DomainScore domain={sanitizedDomain} />}
               </div>
-              <div>
+              <div className="flex gap-2">
                 <button
                   type="submit"
                   disabled={loading}
                   className="h-10 bg-blue-500 hover:bg-blue-600 text-white font-bold px-4 rounded-md focus:outline-none focus:shadow-outline transition duration-300 whitespace-nowrap"
                 >
                   {loading ? 'Checking...' : 'Check'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleGenerateAI}
+                  disabled={isGeneratingAI}
+                  className="h-10 bg-purple-500 hover:bg-purple-600 text-white font-bold px-4 rounded-md focus:outline-none focus:shadow-outline transition duration-300 whitespace-nowrap"
+                >
+                  {isGeneratingAI ? 'Generating...' : 'Generate AI Suggestions'}
                 </button>
               </div>
             </div>
@@ -268,6 +320,43 @@ function App() {
                 />
               </div>
             )}
+
+            {/* AI Suggestions */}
+            <div className="w-full">
+              <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
+                AI-Generated Suggestions
+              </h2>
+              {aiSuggestions.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {aiSuggestions.map(variation => (
+                    <DomainResult
+                      key={variation.domain}
+                      parts={variation}
+                      data={domainResults[variation.domain]?.data}
+                      loading={domainResults[variation.domain]?.loading}
+                      onRetry={() => retryDomainCheck(variation.domain)}
+                      preloadedPreview={domainPreviews[variation.domain]}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex items-center justify-between py-2 px-3 border-b bg-gray-50 border-gray-200 relative opacity-70">
+                  <div className="flex items-center flex-grow">
+                    <div className="flex-shrink-0 w-8 mr-2">
+                      <div className="w-6 h-6 rounded-full bg-gray-200 animate-pulse" />
+                    </div>
+                    <div className="text-md font-medium text-gray-400">
+                      Click "Generate AI Suggestions" to get creative domain ideas
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="text-sm text-gray-400">
+                      {isGeneratingAI ? 'Generating suggestions...' : 'Powered by AI'}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Alternative Extensions */}
             {alternativeExtensions.length > 0 && (

@@ -398,3 +398,61 @@ export const inferDomainUsage = async (preview: {
   // If both methods are unclear, assume the domain is in use
   return true;
 };
+
+/**
+ * Generate AI domain suggestions based on a base name
+ * @param {string} baseName - The base domain name
+ * @param {boolean} isFirstTime - Whether this is the first time generating suggestions
+ * @returns {Promise<DomainParts[]>} Array of AI-generated domain variations
+ */
+export const generateAIDomainSuggestions = async (baseName: string, isFirstTime: boolean): Promise<DomainParts[]> => {
+  const aiService = new AIService(DEFAULT_PROVIDER);
+  const nameOnly = baseName.split('.')[0];
+
+  const prompt = isFirstTime
+    ? `Generate 5 creative and memorable domain name variations for "${nameOnly}". Consider:
+       - Using synonyms or shorter alternatives for words in the name
+       - Adding relevant prefixes/suffixes
+       - Using alternative spellings
+       - Combining with related words
+       IMPORTANT: 
+       - All suggestions MUST end with .com
+       - Do NOT use hyphens or numbers
+       - Do NOT use "com" as a suffix (e.g., "myappcom.com" is not allowed)
+       - Each suggestion must be unique
+       - Names must be brandable and memorable
+       - Maximum 10 characters or 3 words (not counting .com)
+       Format: Return only the domain names, one per line, without any explanations or additional text.`
+    : `Generate 5 more unique and creative domain name variations for "${nameOnly}". Names must be brandable, maximum 10 characters or 3 words (not counting .com). Do not repeat any previous suggestions. Return only the domain names, one per line.`;
+
+  try {
+    const response = await aiService.generateContent(prompt);
+    const suggestions = response
+      .split('\n')
+      .filter(Boolean)
+      .map(domain => {
+        // Ensure .com extension
+        const domainWithoutExt = domain.split('.')[0];
+        return {
+          base: domainWithoutExt,
+          ext: 'com',
+          domain: `${domainWithoutExt}.com`,
+          input: `${domainWithoutExt}.com`, // Use the generated domain as input
+          isAISuggestion: true,
+        };
+      })
+      // Filter out any suggestions that end with 'com' before the extension
+      .filter(suggestion => !suggestion.base.toLowerCase().endsWith('com'))
+      // Filter out suggestions that are too long
+      .filter(suggestion => {
+        const base = suggestion.base;
+        const wordCount = base.split(/[^a-zA-Z0-9]/).filter(Boolean).length;
+        return base.length <= 10 || wordCount <= 3;
+      });
+
+    return suggestions;
+  } catch (error) {
+    console.error('Error generating AI suggestions:', error);
+    return [];
+  }
+};
