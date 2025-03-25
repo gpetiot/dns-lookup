@@ -263,7 +263,7 @@ const inferDomainUsageAI = async (preview: { title: string; description: string 
     Title: "${preview.title}"
     Description: "${preview.description}"
     
-    Respond with only "true" if the domain appears to be actively used, or "false" if it appears to be parked or for sale.`;
+    Respond with only "true" if the domain appears to be actively used, or "false" if it appears to be parked (eg. godaddy, namecheap, afternic, etc) or for sale.`;
 
     const response = await aiService.generateContent(prompt);
     const result = response.toLowerCase().trim();
