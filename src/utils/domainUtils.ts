@@ -257,7 +257,10 @@ export const fetchDomainPreview = async domain => {
   }
 };
 
-const inferDomainUsageAI = async (preview: { title: string; description: string }): Promise<boolean | null> => {
+const inferDomainUsageAI = async (preview: {
+  title: string;
+  description: string;
+}): Promise<boolean | null> => {
   try {
     const prompt = `Based on the following website title and description, determine if this domain is actively used or parked/for sale. 
     Title: "${preview.title}"
@@ -267,7 +270,7 @@ const inferDomainUsageAI = async (preview: { title: string; description: string 
 
     const response = await aiService.generateContent(prompt);
     const result = response.toLowerCase().trim();
-    
+
     if (result === 'true') return true;
     if (result === 'false') return false;
     return null; // If AI response is unclear, fall back to heuristics
@@ -325,7 +328,11 @@ const inferDomainUsageHeuristics = (preview: { title: string; description: strin
   return true;
 };
 
-export const inferDomainUsage = async (preview: { success: boolean; title: string; description: string }): Promise<boolean> => {
+export const inferDomainUsage = async (preview: {
+  success: boolean;
+  title: string;
+  description: string;
+}): Promise<boolean> => {
   // If the preview request failed, mark as unused
   if (!preview.success) {
     return false;
