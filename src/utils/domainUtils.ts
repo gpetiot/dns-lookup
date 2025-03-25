@@ -60,20 +60,10 @@ export interface DomainParts {
  * @returns {DomainParts[]} Array of domain variations
  */
 export const generateDomainVariations = (baseName: string, userInput: string): DomainParts[] => {
-  // Remove domain extension if present
+  const variations: DomainParts[] = [];
   const nameOnly = baseName.split('.')[0];
 
-  const variations: DomainParts[] = [];
-
-  // First: the original domain with .com (always first)
-  variations.push({
-    base: nameOnly,
-    ext: 'com',
-    domain: `${nameOnly}.com`,
-    input: userInput,
-  });
-
-  // Second: Common TLDs for the base name
+  // Add all TLD variations
   commonTlds.forEach(tld => {
     variations.push({
       base: nameOnly,
@@ -83,7 +73,7 @@ export const generateDomainVariations = (baseName: string, userInput: string): D
     });
   });
 
-  // Third: Prefixed variations (alphabetically)
+  // Add prefixed variations with .com
   const sortedPrefixes = [...prefixes].sort();
   sortedPrefixes.forEach(prefix => {
     variations.push({
@@ -95,7 +85,7 @@ export const generateDomainVariations = (baseName: string, userInput: string): D
     });
   });
 
-  // Fourth: Suffixed variations (alphabetically)
+  // Add suffixed variations with .com
   const sortedSuffixes = [...suffixes].sort();
   sortedSuffixes.forEach(suffix => {
     variations.push({

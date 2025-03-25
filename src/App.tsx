@@ -193,7 +193,10 @@ function App() {
     if (!domainVariations.length) return [];
 
     return domainVariations.filter(
-      variation => variation.prefix === undefined && variation.suffix === undefined
+      variation =>
+        variation.prefix === undefined &&
+        variation.suffix === undefined &&
+        variation.domain !== displayDomain
     );
   };
 
