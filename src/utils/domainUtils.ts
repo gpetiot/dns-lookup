@@ -376,18 +376,25 @@ export const inferDomainUsage = async (preview: {
   success: boolean;
   title: string;
   description: string;
+  metaRefresh?: { url: string | null } | null;
 }): Promise<boolean> => {
   // If the preview request failed, mark as unused
   if (!preview.success) {
     return false;
   }
 
-  // Try AI-based inference first
+  // Try heuristics first
+  const heuristicResult = inferDomainUsageHeuristics(preview);
+  if (heuristicResult === false) {
+    return false; // If heuristics determine it's unused, we can trust that
+  }
+
+  // If heuristics didn't find clear indicators, try AI inference
   const aiResult = await inferDomainUsageAI(preview);
   if (aiResult !== null) {
     return aiResult;
   }
 
-  // Fall back to heuristics if AI inference failed or was unclear
-  return inferDomainUsageHeuristics(preview);
+  // If both methods are unclear, assume the domain is in use
+  return true;
 };
