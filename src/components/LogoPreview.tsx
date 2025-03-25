@@ -42,22 +42,23 @@ const LogoPreview: React.FC<LogoPreviewProps> = ({ parts }) => {
 
   const baseStyle = "font-['Syne'] text-gray-800";
   const getHighlightStyle = (text: string) => `font-['Work_Sans'] ${getColorForText(text)}`;
+  const input = parts.input.split('.')[0];
 
   return (
     <div className="font-medium bg-white px-1 py-0.5 rounded-lg inline-flex items-center gap-1.5 transition-all duration-200 hover:scale-105 hover:shadow-lg cursor-pointer">
       {parts.prefix ? (
         <>
           <span className={getHighlightStyle(parts.prefix)}>{capitalizeWords(parts.prefix)}</span>
-          <span className={baseStyle}>{capitalizeWords(parts.input)}</span>
+          <span className={baseStyle}>{capitalizeWords(input)}</span>
         </>
       ) : parts.suffix ? (
         <>
-          <span className={baseStyle}>{capitalizeWords(parts.input)}</span>
+          <span className={baseStyle}>{capitalizeWords(input)}</span>
           <span className={getHighlightStyle(parts.suffix)}>{capitalizeWords(parts.suffix)}</span>
         </>
       ) : (
         <>
-          <span className={baseStyle}>{capitalizeWords(parts.input)}</span>
+          <span className={baseStyle}>{capitalizeWords(input)}</span>
           <span className={getHighlightStyle(parts.ext)}>{capitalizeWords(parts.ext)}</span>
         </>
       )}
