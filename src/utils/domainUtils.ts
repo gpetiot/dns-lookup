@@ -1,3 +1,7 @@
+import { AIService, AIProvider, DEFAULT_PROVIDER } from '../services/AIService';
+
+const aiService = new AIService(DEFAULT_PROVIDER);
+
 // Common TLDs for domain variations
 export const commonTlds = [
   '.com', // Most common, used as default
@@ -253,19 +257,27 @@ export const fetchDomainPreview = async domain => {
   }
 };
 
-/**
- * Analyzes domain preview content to determine if a domain is genuinely in use
- * @param {Object} preview - The preview object returned by fetchDomainPreview
- * @returns {boolean} false if domain appears unused, true otherwise
- */
-export const inferDomainUsage = preview => {
-  // If the preview request failed, mark as unused
-  if (!preview.success) {
-    return false;
+const inferDomainUsageAI = async (preview: { title: string; description: string }): Promise<boolean | null> => {
+  try {
+    const prompt = `Based on the following website title and description, determine if this domain is actively used or parked/for sale. 
+    Title: "${preview.title}"
+    Description: "${preview.description}"
+    
+    Respond with only "true" if the domain appears to be actively used, or "false" if it appears to be parked or for sale.`;
+
+    const response = await aiService.generateContent(prompt);
+    const result = response.toLowerCase().trim();
+    
+    if (result === 'true') return true;
+    if (result === 'false') return false;
+    return null; // If AI response is unclear, fall back to heuristics
+  } catch (error) {
+    console.error('Error in AI-based domain usage inference:', error);
+    return null; // Fall back to heuristics on error
   }
+};
 
-  const { title, description } = preview;
-
+const inferDomainUsageHeuristics = (preview: { title: string; description: string }): boolean => {
   // Common keywords for parked or for-sale domains
   const forSaleKeywords = [
     'domain for sale',
@@ -292,7 +304,7 @@ export const inferDomainUsage = preview => {
   ];
 
   // Check title and description for for-sale indicators
-  const contentToCheck = (title + ' ' + description).toLowerCase();
+  const contentToCheck = (preview.title + ' ' + preview.description).toLowerCase();
 
   for (const keyword of forSaleKeywords) {
     if (contentToCheck.includes(keyword.toLowerCase())) {
@@ -302,13 +314,29 @@ export const inferDomainUsage = preview => {
 
   // Check for common domain parking services in title
   if (
-    title.includes('Domain for sale') ||
-    title.includes('Parking') ||
-    (title.includes('GoDaddy') && description.includes('hosting')) ||
-    title.includes('This domain is for sale')
+    preview.title.includes('Domain for sale') ||
+    preview.title.includes('Parking') ||
+    (preview.title.includes('GoDaddy') && preview.description.includes('hosting')) ||
+    preview.title.includes('This domain is for sale')
   ) {
     return false;
   }
 
   return true;
+};
+
+export const inferDomainUsage = async (preview: { success: boolean; title: string; description: string }): Promise<boolean> => {
+  // If the preview request failed, mark as unused
+  if (!preview.success) {
+    return false;
+  }
+
+  // Try AI-based inference first
+  const aiResult = await inferDomainUsageAI(preview);
+  if (aiResult !== null) {
+    return aiResult;
+  }
+
+  // Fall back to heuristics if AI inference failed or was unclear
+  return inferDomainUsageHeuristics(preview);
 };

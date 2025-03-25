@@ -38,7 +38,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
   // Update usage status when preview data changes
   useEffect(() => {
     if (preview) {
-      setIsReallyUsed(inferDomainUsage(preview));
+      inferDomainUsage(preview).then(setIsReallyUsed);
     }
   }, [preview]);
 
@@ -66,7 +66,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
         try {
           const domainPreview = await fetchDomainPreview(parts.domain);
           setPreview(domainPreview);
-          setIsReallyUsed(inferDomainUsage(domainPreview));
+          inferDomainUsage(domainPreview).then(setIsReallyUsed);
         } catch (error) {
           console.error('Failed to load preview:', error);
         }
