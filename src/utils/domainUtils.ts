@@ -223,6 +223,21 @@ export const fetchDomainPreview = async domain => {
       }
     }
 
+    // Extract meta refresh information
+    let metaRefresh = null;
+    const metaRefreshMatch = html
+      .toLowerCase()
+      .match(/<meta[^>]*http-equiv=["']refresh["'][^>]*content=["']([^"']+)["']/i);
+    if (metaRefreshMatch) {
+      const content = metaRefreshMatch[1].toLowerCase();
+      const urlMatch = content.match(/url=(.+)$/i);
+      if (urlMatch) {
+        metaRefresh = {
+          url: urlMatch[1],
+        };
+      }
+    }
+
     // Fallback if we couldn't extract a description
     if (!description) {
       description = `Visit ${domain} to learn more`;
@@ -236,6 +251,7 @@ export const fetchDomainPreview = async domain => {
     return {
       title,
       description,
+      metaRefresh,
       success: true,
     };
   } catch (error) {
@@ -260,11 +276,13 @@ export const fetchDomainPreview = async domain => {
 const inferDomainUsageAI = async (preview: {
   title: string;
   description: string;
+  metaRefresh?: { url: string | null } | null;
 }): Promise<boolean | null> => {
   try {
-    const prompt = `Based on the following website title and description, determine if this domain is actively used or parked/for sale. 
+    const prompt = `Based on the following website information, determine if this domain is actively used or parked/for sale. 
     Title: "${preview.title}"
     Description: "${preview.description}"
+    ${preview.metaRefresh?.url ? `Meta Refresh: redirects to ${preview.metaRefresh.url}` : ''}
     
     Respond with only "true" if the domain appears to be actively used, or "false" if it appears to be parked (eg. godaddy, namecheap, afternic, etc) or for sale.`;
 
@@ -280,7 +298,33 @@ const inferDomainUsageAI = async (preview: {
   }
 };
 
-const inferDomainUsageHeuristics = (preview: { title: string; description: string }): boolean => {
+const inferDomainUsageHeuristics = (preview: {
+  title: string;
+  description: string;
+  metaRefresh?: { url: string | null } | null;
+}): boolean => {
+  // If there's a meta refresh, check if it points to a known reseller
+  if (preview.metaRefresh?.url) {
+    const redirectUrl = preview.metaRefresh.url.toLowerCase();
+    const resellerDomains = [
+      'sedo.com',
+      'afternic.com',
+      'godaddy.com',
+      'dan.com',
+      'hugedomains.com',
+    ];
+
+    // Check if the redirect URL contains any of the reseller domains
+    if (resellerDomains.some(domain => redirectUrl.includes(domain))) {
+      return false;
+    }
+
+    // Check for common landing page paths
+    if (redirectUrl.endsWith('/lander') || redirectUrl.endsWith('/listing')) {
+      return false;
+    }
+  }
+
   // Common keywords for parked or for-sale domains
   const forSaleKeywords = [
     'domain for sale',
