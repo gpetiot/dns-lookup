@@ -115,6 +115,11 @@ function App() {
       return;
     }
 
+    // If the domain hasn't changed and we already have results, don't trigger a new query
+    if (sanitizedDomain === displayDomain && domainVariations.length > 0) {
+      return;
+    }
+
     // Update the display domain when submitting
     setDisplayDomain(sanitizedDomain);
 
