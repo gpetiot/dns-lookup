@@ -7,17 +7,18 @@ import AvailableIcon from './icons/AvailableIcon';
 import RegisteredIcon from './icons/RegisteredIcon';
 import RetryIcon from './icons/RetryIcon';
 import LogoPreview from './LogoPreview';
+import type { WhoIsResult } from 'whois-parsed';
 
 interface DomainResultProps {
   parts: DomainParts;
-  data: any;
+  data?: WhoIsResult;
   loading: boolean;
   onRetry: () => void;
 }
 
 const DomainResult: React.FC<DomainResultProps> = ({ parts, data, loading, onRetry }) => {
-  const isAvailable = data?.result === 'available';
-  const hasError = data?.error || false;
+  const isAvailable = data?.isAvailable;
+  const hasError = data?.status;
 
   // Apply neutral styling for loading state, otherwise use status-based colors
   const bgColorClass = loading
@@ -71,9 +72,9 @@ const DomainResult: React.FC<DomainResultProps> = ({ parts, data, loading, onRet
       <div className="flex items-center justify-end">
         {loading && <div className="text-xs text-gray-500">Checking...</div>}
 
-        {hasError && data?.error && (
+        {hasError && data?.status && (
           <div className="flex items-center">
-            <div className="mr-2 max-w-xs truncate text-xs text-gray-600">{data.error}</div>
+            <div className="mr-2 max-w-xs truncate text-xs text-gray-600">{data.status}</div>
             {onRetry && (
               <button
                 onClick={onRetry}

@@ -10,7 +10,8 @@ import {
   sanitizeDomain,
   DomainParts,
 } from '@/utils/domainUtils';
-import { checkDomain } from '@/services/whoisAPILayerService';
+import { checkDomain } from '@/services/whoisService';
+import type { WhoIsResult } from 'whois-parsed';
 
 function App() {
   const [domain, setDomain] = useState('');
@@ -19,7 +20,7 @@ function App() {
   const [domainVariations, setDomainVariations] = useState<DomainParts[]>([]);
   const [aiSuggestions, setAiSuggestions] = useState<DomainParts[]>([]);
   const [domainResults, setDomainResults] = useState<
-    Record<string, { loading: boolean; data?: any }>
+    Record<string, { loading: boolean; data?: WhoIsResult }>
   >({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +49,11 @@ function App() {
         ...prev,
         [domainToRetry]: {
           loading: false,
-          data: { error: err.message || 'Retry failed' },
+          data: {
+            domainName: domainToRetry,
+            isAvailable: false,
+            status: err.message,
+          },
         },
       }));
     }
@@ -70,7 +75,11 @@ function App() {
         ...prev,
         [domainToCheck]: {
           loading: false,
-          data: { error: err.message || 'Request failed' },
+          data: {
+            domainName: domainToCheck,
+            isAvailable: false,
+            status: err.message,
+          },
         },
       }));
       throw err;
@@ -279,7 +288,7 @@ function App() {
                 <DomainResult
                   key={mainDomain.domain}
                   parts={mainDomain}
-                  data={domainResults[mainDomain.domain]?.data}
+                  data={domainResults[mainDomain.domain].data}
                   loading={domainResults[mainDomain.domain]?.loading}
                   onRetry={() => retryDomainCheck(mainDomain.domain)}
                 />

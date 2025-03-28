@@ -15,15 +15,19 @@
     "@heroicons/react": "^2.1.1",
     "axios": "^1.6.7",
     "clsx": "^2.1.0",
+    "net": "^1.0.2",
     "next": "14.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "tailwind-merge": "^2.2.1"
+    "tailwind-merge": "^2.2.1",
+    "whois-parsed": "^1.0.14",
+    "whois-parser": "^1.0.3"
   },
   "devDependencies": {
     "@types/node": "^20.11.19",
     "@types/react": "^18.2.57",
     "@types/react-dom": "^18.2.19",
+    "@types/whois-parsed": "^1.0.3",
     "autoprefixer": "^10.4.17",
     "postcss": "^8.4.35",
     "prettier": "^3.2.5",
