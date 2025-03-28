@@ -272,23 +272,13 @@ function App() {
                 />
                 {domain && <DomainScore domain={sanitizedDomain} />}
               </div>
-              <div className="flex gap-2">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="focus:shadow-outline h-10 whitespace-nowrap rounded-md bg-blue-500 px-4 font-bold text-white transition duration-300 hover:bg-blue-600 focus:outline-none"
-                >
-                  {loading ? 'Checking...' : 'Check'}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleGenerateAI}
-                  disabled={isGeneratingAI}
-                  className="focus:shadow-outline h-10 whitespace-nowrap rounded-md bg-purple-500 px-4 font-bold text-white transition duration-300 hover:bg-purple-600 focus:outline-none"
-                >
-                  {isGeneratingAI ? 'Generating...' : 'Generate AI Suggestions'}
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="focus:shadow-outline h-10 whitespace-nowrap rounded-md bg-blue-500 px-4 font-bold text-white transition duration-300 hover:bg-blue-600 focus:outline-none"
+              >
+                {loading ? 'Checking...' : 'Check'}
+              </button>
             </div>
           </form>
 
@@ -317,9 +307,21 @@ function App() {
 
             {/* AI Suggestions */}
             <div className="w-full">
-              <h2 className="mb-4 border-b pb-2 text-xl font-semibold text-gray-800">
-                AI-Generated Suggestions
-              </h2>
+              <div className="mb-4 flex items-center gap-3 border-b pb-2">
+                <h2 className="text-xl font-semibold text-gray-800">AI-Generated Suggestions</h2>
+                <button
+                  type="button"
+                  onClick={handleGenerateAI}
+                  disabled={isGeneratingAI}
+                  className="group relative inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-400 via-pink-500 to-purple-400 bg-[length:200%_auto] px-4 py-1.5 text-sm font-medium text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[position:right_center] hover:shadow-purple-200/50 focus:outline-none disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
+                >
+                  <span className="relative z-10">
+                    {isGeneratingAI ? 'Generating...' : 'Generate'}
+                  </span>
+                  <span className="relative z-10 animate-pulse">✨</span>
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400/20 via-pink-500/20 to-purple-400/20 blur-sm transition-all duration-300 group-hover:blur-md" />
+                </button>
+              </div>
               {aiSuggestions.length > 0 ? (
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   {aiSuggestions.map(variation => (
