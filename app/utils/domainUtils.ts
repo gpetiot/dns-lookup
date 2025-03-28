@@ -109,7 +109,7 @@ export const generateDomainVariations = (baseName: string, userInput: string): D
  * @param {string} input - Raw domain input
  * @returns {string} Sanitized domain
  */
-export const sanitizeDomain = input => {
+export const sanitizeDomain = (input: string) => {
   // Remove all spaces
   let sanitized = input.trim().replace(/\s+/g, '');
 
@@ -137,7 +137,7 @@ export const sanitizeDomain = input => {
  * @param {number} timeout - Timeout in milliseconds
  * @returns {Promise} Fetch promise with timeout
  */
-export const fetchWithTimeout = async (url, options, timeout = 10000) => {
+export const fetchWithTimeout = async (url: string, options: any, timeout = 10000) => {
   const controller = new AbortController();
   const { signal } = controller;
 
@@ -150,7 +150,7 @@ export const fetchWithTimeout = async (url, options, timeout = 10000) => {
     });
     clearTimeout(timeoutId);
     return response;
-  } catch (error) {
+  } catch (error: any) {
     clearTimeout(timeoutId);
     if (error.name === 'AbortError') {
       throw new Error('Request timed out. Please try again.');
@@ -164,7 +164,7 @@ export const fetchWithTimeout = async (url, options, timeout = 10000) => {
  * @param {string} domain - The domain to fetch preview for
  * @returns {Promise<{title: string, description: string, success: boolean}>}
  */
-export const fetchDomainPreview = async domain => {
+export const fetchDomainPreview = async (domain: string) => {
   try {
     // Use a shorter timeout for preview requests to avoid blocking the UI
     const controller = new AbortController();
@@ -254,7 +254,7 @@ export const fetchDomainPreview = async domain => {
       metaRefresh,
       success: true,
     };
-  } catch (error) {
+  } catch (error: any) {
     // Handle timeout errors specifically
     if (error.name === 'AbortError') {
       return {
@@ -405,7 +405,10 @@ export const inferDomainUsage = async (preview: {
  * @param {boolean} isFirstTime - Whether this is the first time generating suggestions
  * @returns {Promise<DomainParts[]>} Array of AI-generated domain variations
  */
-export const generateAIDomainSuggestions = async (baseName: string, isFirstTime: boolean): Promise<DomainParts[]> => {
+export const generateAIDomainSuggestions = async (
+  baseName: string,
+  isFirstTime: boolean
+): Promise<DomainParts[]> => {
   const aiService = new AIService(DEFAULT_PROVIDER);
   const nameOnly = baseName.split('.')[0];
 

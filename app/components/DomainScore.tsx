@@ -1,5 +1,5 @@
 import React from 'react';
-import { checkDomainCriteria, criteria } from '../utils/domainScore';
+import { checkDomainCriteria, criteria } from '@/utils/domainScore';
 
 interface DomainScoreProps {
   domain: string;
@@ -15,7 +15,7 @@ const DomainScore: React.FC<DomainScoreProps> = ({ domain }) => {
     if (passed) {
       return (
         <svg
-          className="w-3 h-3 text-green-500"
+          className="h-3 w-3 text-green-500"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -25,7 +25,7 @@ const DomainScore: React.FC<DomainScoreProps> = ({ domain }) => {
       );
     }
     return (
-      <svg className="w-3 h-3 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="h-3 w-3 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -41,7 +41,7 @@ const DomainScore: React.FC<DomainScoreProps> = ({ domain }) => {
   };
 
   return (
-    <div className="mt-1 text-xs pl-2">
+    <div className="mt-1 pl-2 text-xs">
       <div className="space-y-1">
         {criteria.map(criterion => (
           <div key={criterion.id} className="flex items-center space-x-1.5">

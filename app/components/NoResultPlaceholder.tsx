@@ -7,11 +7,11 @@ interface NoResultPlaceholderProps {
 
 const NoResultPlaceholder: React.FC<NoResultPlaceholderProps> = ({ domain, sanitizedDomain }) => {
   return (
-    <div className="w-full mb-8">
-      <div className="flex items-center justify-between py-2 px-3 border-b bg-gray-50 border-gray-200 relative opacity-70">
-        <div className="flex items-center flex-grow">
-          <div className="flex-shrink-0 w-8 mr-2">
-            <div className="w-6 h-6 rounded-full bg-gray-200 animate-pulse" />
+    <div className="mb-8 w-full">
+      <div className="relative flex items-center justify-between border-b border-gray-200 bg-gray-50 px-3 py-2 opacity-70">
+        <div className="flex flex-grow items-center">
+          <div className="mr-2 w-8 flex-shrink-0">
+            <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200" />
           </div>
           <div className="text-md font-medium text-gray-400">
             {domain ? sanitizedDomain || 'example.com' : 'Type a domain name to check'}
@@ -25,7 +25,7 @@ const NoResultPlaceholder: React.FC<NoResultPlaceholderProps> = ({ domain, sanit
           </div>
         </div>
       </div>
-      <div className="mt-4 text-center text-gray-500 text-sm">
+      <div className="mt-4 text-center text-sm text-gray-500">
         {domain
           ? "We'll also show you alternative domains and extensions"
           : "We'll help you find the perfect domain name and show alternatives"}

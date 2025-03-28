@@ -1,14 +1,14 @@
-import { fetchWithTimeout } from '../utils/domainUtils';
+import { fetchWithTimeout } from '@/utils/domainUtils';
 
 /**
  * Check a single domain availability
  * @param {string} domainToCheck - Domain to check
  * @returns {Object} Object containing domain and data
  */
-export const checkDomain = async domainToCheck => {
+export const checkDomain = async (domainToCheck: string) => {
   try {
     // Get API key from environment variables
-    const apiKey = process.env.REACT_APP_WHOIS_API_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_WHOIS_API_KEY;
 
     if (!apiKey) {
       throw new Error('API key is missing. Please check your environment configuration.');
@@ -61,7 +61,7 @@ export const checkDomain = async domainToCheck => {
       // If it's not valid JSON, just return the text
       return { domain: domainToCheck, data: { response: result } };
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error(`Error checking ${domainToCheck}:`, err);
     return { domain: domainToCheck, data: { error: err.message } };
   }

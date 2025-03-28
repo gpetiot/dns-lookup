@@ -1,5 +1,5 @@
 import React from 'react';
-import { DomainParts } from '../utils/domainUtils';
+import { DomainParts } from '@/utils/domainUtils';
 import ExternalLinkIcon from './icons/ExternalLinkIcon';
 import LoadingIcon from './icons/LoadingIcon';
 import ErrorIcon from './icons/ErrorIcon';
@@ -15,12 +15,7 @@ interface DomainResultProps {
   onRetry: () => void;
 }
 
-const DomainResult: React.FC<DomainResultProps> = ({
-  parts,
-  data,
-  loading,
-  onRetry,
-}) => {
+const DomainResult: React.FC<DomainResultProps> = ({ parts, data, loading, onRetry }) => {
   const isAvailable = data?.result === 'available';
   const hasError = data?.error || false;
 
@@ -35,11 +30,11 @@ const DomainResult: React.FC<DomainResultProps> = ({
 
   return (
     <div
-      className={`flex items-center justify-between py-2 px-3 border-b ${bgColorClass} relative`}
+      className={`flex items-center justify-between border-b px-3 py-2 ${bgColorClass} relative`}
     >
       {/* Left Column: Status Icon + Domain */}
-      <div className="flex items-center flex-grow">
-        <div className="flex-shrink-0 w-8 mr-2">
+      <div className="flex flex-grow items-center">
+        <div className="mr-2 w-8 flex-shrink-0">
           {loading ? (
             <LoadingIcon />
           ) : hasError ? (
@@ -63,10 +58,10 @@ const DomainResult: React.FC<DomainResultProps> = ({
               href={`https://${parts.domain}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-red-600 hover:underline flex items-center"
+              className="flex items-center text-red-600 hover:underline"
             >
               {parts.domain}
-              <ExternalLinkIcon className="h-3 w-3 ml-1 inline-block flex-shrink-0" />
+              <ExternalLinkIcon className="ml-1 inline-block h-3 w-3 flex-shrink-0" />
             </a>
           )}
         </div>
@@ -78,11 +73,11 @@ const DomainResult: React.FC<DomainResultProps> = ({
 
         {hasError && data?.error && (
           <div className="flex items-center">
-            <div className="text-xs text-gray-600 max-w-xs truncate mr-2">{data.error}</div>
+            <div className="mr-2 max-w-xs truncate text-xs text-gray-600">{data.error}</div>
             {onRetry && (
               <button
                 onClick={onRetry}
-                className="px-2 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white font-medium rounded transition duration-200"
+                className="rounded bg-blue-500 px-2 py-1 text-xs font-medium text-white transition duration-200 hover:bg-blue-600"
               >
                 <RetryIcon />
                 Retry
@@ -96,10 +91,10 @@ const DomainResult: React.FC<DomainResultProps> = ({
             href={`https://porkbun.com/checkout/search?q=${parts.domain}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center px-3 py-1 text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-full hover:bg-indigo-100 hover:border-indigo-300 transition-colors duration-200"
+            className="inline-flex items-center rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 transition-colors duration-200 hover:border-indigo-300 hover:bg-indigo-100"
           >
             Porkbun
-            <ExternalLinkIcon className="h-3 w-3 ml-1.5 text-indigo-500" />
+            <ExternalLinkIcon className="ml-1.5 h-3 w-3 text-indigo-500" />
           </a>
         )}
       </div>

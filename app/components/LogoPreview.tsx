@@ -1,5 +1,5 @@
 import React from 'react';
-import { DomainParts } from '../utils/domainUtils';
+import { DomainParts } from '@/utils/domainUtils';
 
 interface LogoPreviewProps {
   parts: DomainParts;
@@ -45,7 +45,7 @@ const LogoPreview: React.FC<LogoPreviewProps> = ({ parts }) => {
   const input = parts.input.split('.')[0];
 
   return (
-    <div className="font-medium bg-white px-1 py-0.5 rounded-lg inline-flex items-center gap-1.5">
+    <div className="inline-flex items-center gap-1.5 rounded-lg bg-white px-1 py-0.5 font-medium">
       {parts.prefix ? (
         <>
           <span className={getHighlightStyle(parts.prefix)}>{capitalizeWords(parts.prefix)}</span>
