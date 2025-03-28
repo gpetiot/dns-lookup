@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DomainResult from './DomainResult';
 import DomainScore from './DomainScore';
 import NoResultPlaceholder from './NoResultPlaceholder';
@@ -25,6 +25,21 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+
+  // Effect to debounce domain changes
+  useEffect(() => {
+    if (!sanitizedDomain) return;
+
+    const timer = setTimeout(() => {
+      // Only trigger if we have a domain and it's different from the display domain
+      if (sanitizedDomain && sanitizedDomain !== displayDomain) {
+        setDisplayDomain(sanitizedDomain);
+        handleSubmit(new Event('submit') as any);
+      }
+    }, 200); // 0.2 seconds debounce
+
+    return () => clearTimeout(timer);
+  }, [sanitizedDomain, displayDomain]);
 
   // Function to retry checking a specific domain
   const retryDomainCheck = async (domainToRetry: string) => {
