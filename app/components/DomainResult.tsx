@@ -17,16 +17,16 @@ interface DomainResultProps {
 }
 
 const DomainResult: React.FC<DomainResultProps> = ({ parts, data, loading, onRetry }) => {
+  const hasError = false;
   const isAvailable = data?.isAvailable;
-  const hasError = data?.status;
 
   // Apply neutral styling for loading state, otherwise use status-based colors
   const bgColorClass = loading
     ? 'bg-gray-50 border-gray-200'
-    : hasError
-      ? 'bg-gray-100'
-      : isAvailable
-        ? 'bg-green-100'
+    : isAvailable
+      ? 'bg-green-100'
+      : hasError
+        ? 'bg-gray-100'
         : 'bg-red-50/50';
 
   return (
