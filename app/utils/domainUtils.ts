@@ -14,15 +14,15 @@ export const commonTlds = [
   '.ai',
   '.me',
   '.info',
-  '.pro',
+  // '.pro',  // Temporarily disabled
   '.cc',
   '.tech',
   '.site',
   '.xyz',
   '.online',
-  '.store',
+  // '.store',  // Temporarily disabled
   '.blog',
-  '.cloud',
+  // '.cloud',  // Temporarily disabled
 ];
 
 // Prefixes for domain variations
