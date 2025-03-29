@@ -268,27 +268,25 @@ function App() {
           </h1>
 
           <form onSubmit={handleSubmit} className="w-full">
-            <div className="flex items-start gap-3">
-              <div className="flex-1">
-                <input
-                  type="text"
-                  name="domain"
-                  id="domain"
-                  placeholder="Search for a domain name here..."
-                  value={domain}
-                  onChange={handleDomainChange}
-                  className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                {domain && <DomainScore domain={sanitizedDomain} />}
-              </div>
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                name="domain"
+                id="domain"
+                placeholder="Search for a domain name here..."
+                value={domain}
+                onChange={handleDomainChange}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 pr-24 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
               <button
                 type="submit"
                 disabled={loading}
-                className="focus:shadow-outline h-10 whitespace-nowrap rounded-md bg-blue-500 px-4 font-bold text-white transition duration-300 hover:bg-blue-600 focus:outline-none"
+                className="absolute right-1 h-[calc(100%-8px)] rounded-md bg-blue-500 px-6 font-bold text-white transition duration-300 hover:bg-blue-600 focus:outline-none disabled:opacity-50"
               >
                 {loading ? 'Checking...' : 'Check'}
               </button>
             </div>
+            {domain && <DomainScore domain={sanitizedDomain} />}
           </form>
 
           {error && (
