@@ -256,7 +256,16 @@ function App() {
       <div className="w-full max-w-7xl">
         {/* Header and Search Form */}
         <div className="mb-8">
-          <h1 className="mb-6 text-center text-3xl font-bold text-blue-600">Domain Checker</h1>
+          <h1 className="mb-20 mt-24 text-center text-6xl font-black tracking-tight">
+            <span className="relative inline-block bg-blue-600 bg-clip-text text-transparent">
+              <span className="absolute inset-0 -z-10 bg-orange-500/10 blur-2xl"></span>
+              Domain
+            </span>{' '}
+            <span className="relative inline-block bg-blue-600 bg-clip-text text-transparent">
+              <span className="absolute inset-0 -z-10 bg-orange-500/10 blur-2xl"></span>
+              Checker
+            </span>
+          </h1>
 
           <form onSubmit={handleSubmit} className="w-full">
             <div className="flex items-start gap-3">
