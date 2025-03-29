@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import DomainResult from './DomainResult';
 import DomainScore from './DomainScore';
 import NoResultPlaceholder from './NoResultPlaceholder';
+import LoadingIcon from './icons/LoadingIcon';
 import {
   generateDomainVariations,
   generateAIDomainSuggestions,
@@ -284,7 +285,10 @@ function App() {
                 className="absolute right-1 h-[calc(100%-8px)] rounded-md border border-blue-400/20 bg-blue-500 px-4 font-bold text-white transition duration-300 hover:bg-blue-600 focus:outline-none disabled:opacity-50"
               >
                 {loading ? (
-                  'Checking...'
+                  <span className="flex items-center gap-1.5">
+                    Checking
+                    <LoadingIcon />
+                  </span>
                 ) : (
                   <>
                     Check
