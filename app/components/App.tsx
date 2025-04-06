@@ -16,6 +16,9 @@ import {
 import { checkDomain } from '@/services/whoisService';
 import type { WhoIsResult } from 'whois-parsed';
 
+// Define filter types
+type AvailabilityFilter = 'all' | 'available';
+
 function App() {
   const [domain, setDomain] = useState('');
   const [sanitizedDomain, setSanitizedDomain] = useState('');
@@ -32,6 +35,7 @@ function App() {
   const [suffixLeft, setSuffixLeft] = useState(40);
   const textMeasureRef = useRef<HTMLSpanElement>(null);
   const [isCopied, setIsCopied] = useState(false);
+  const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>('all');
 
   // Effect to read query parameter on initial load
   useEffect(() => {
@@ -266,6 +270,28 @@ function App() {
   const alternativeExtensions = getAlternativeExtensions();
   const alternativeSuggestions = getAlternativeSuggestions();
 
+  // Helper function to check availability based on filter
+  const checkAvailability = (domainToCheck: string): boolean => {
+    const result = domainResults[domainToCheck];
+    if (availabilityFilter === 'available') {
+      // Only return true if loaded and explicitly available
+      return result && !result.loading && result.data?.isAvailable === true;
+    }
+    // 'all' includes everything (including loading/missing for initial render)
+    return true;
+  };
+
+  // Filter the domain lists based on the current filter
+  const filteredAlternativeExtensions = alternativeExtensions.filter(variation =>
+    checkAvailability(variation.domain)
+  );
+  const filteredAlternativeSuggestions = alternativeSuggestions.filter(variation =>
+    checkAvailability(variation.domain)
+  );
+  const filteredAiSuggestions = aiSuggestions.filter(variation =>
+    checkAvailability(variation.domain)
+  );
+
   const handleGenerateAI = async () => {
     if (!sanitizedDomain) return;
 
@@ -441,6 +467,27 @@ function App() {
           )}
         </div>
 
+        {/* Filter Controls */}
+        <div className="mb-6 flex items-center justify-start gap-2 border-b pb-3">
+          <span className="text-sm font-medium text-gray-600">Filter results:</span>
+          <div className="flex gap-1">
+            {(['all', 'available'] as AvailabilityFilter[]).map(filter => (
+              <button
+                key={filter}
+                type="button"
+                onClick={() => setAvailabilityFilter(filter)}
+                className={`rounded-md px-2.5 py-1 text-sm capitalize transition-colors duration-150 ${
+                  availabilityFilter === filter
+                    ? 'bg-blue-500 text-white shadow-sm'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {filter === 'all' ? 'All' : 'Available Only'}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Results Section */}
         {domainVariations.length > 0 ? (
           <div className="mb-8 w-full space-y-8">
@@ -475,17 +522,23 @@ function App() {
                 </button>
               </div>
               {aiSuggestions.length > 0 ? (
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  {aiSuggestions.map(variation => (
-                    <DomainResult
-                      key={variation.domain}
-                      parts={variation}
-                      data={domainResults[variation.domain]?.data}
-                      loading={domainResults[variation.domain]?.loading}
-                      onRetry={() => retryDomainCheck(variation.domain)}
-                    />
-                  ))}
-                </div>
+                filteredAiSuggestions.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    {filteredAiSuggestions.map(variation => (
+                      <DomainResult
+                        key={variation.domain}
+                        parts={variation}
+                        data={domainResults[variation.domain]?.data}
+                        loading={domainResults[variation.domain]?.loading}
+                        onRetry={() => retryDomainCheck(variation.domain)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center text-sm italic text-gray-500">
+                    No AI suggestions match the current filter.
+                  </div>
+                )
               ) : (
                 <div className="relative flex items-center justify-between border-b border-gray-200 bg-gray-50 px-3 py-2 opacity-70">
                   <div className="flex flex-grow items-center">
@@ -511,17 +564,23 @@ function App() {
                 <h2 className="mb-4 border-b pb-2 text-xl font-semibold text-gray-800">
                   Alternative Extensions Suggestions
                 </h2>
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  {alternativeExtensions.map(variation => (
-                    <DomainResult
-                      key={variation.domain}
-                      parts={variation}
-                      data={domainResults[variation.domain]?.data}
-                      loading={domainResults[variation.domain]?.loading}
-                      onRetry={() => retryDomainCheck(variation.domain)}
-                    />
-                  ))}
-                </div>
+                {filteredAlternativeExtensions.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    {filteredAlternativeExtensions.map(variation => (
+                      <DomainResult
+                        key={variation.domain}
+                        parts={variation}
+                        data={domainResults[variation.domain]?.data}
+                        loading={domainResults[variation.domain]?.loading}
+                        onRetry={() => retryDomainCheck(variation.domain)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center text-sm italic text-gray-500">
+                    No alternative extensions match the current filter.
+                  </div>
+                )}
               </div>
             )}
 
@@ -531,17 +590,23 @@ function App() {
                 <h2 className="mb-4 border-b pb-2 text-xl font-semibold text-gray-800">
                   Alternative .com Suggestions
                 </h2>
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  {alternativeSuggestions.map(variation => (
-                    <DomainResult
-                      key={variation.domain}
-                      parts={variation}
-                      data={domainResults[variation.domain]?.data}
-                      loading={domainResults[variation.domain]?.loading}
-                      onRetry={() => retryDomainCheck(variation.domain)}
-                    />
-                  ))}
-                </div>
+                {filteredAlternativeSuggestions.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    {filteredAlternativeSuggestions.map(variation => (
+                      <DomainResult
+                        key={variation.domain}
+                        parts={variation}
+                        data={domainResults[variation.domain]?.data}
+                        loading={domainResults[variation.domain]?.loading}
+                        onRetry={() => retryDomainCheck(variation.domain)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center text-sm italic text-gray-500">
+                    No alternative .com suggestions match the current filter.
+                  </div>
+                )}
               </div>
             )}
           </div>
