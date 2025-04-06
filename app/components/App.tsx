@@ -64,6 +64,25 @@ function App() {
     }
   }, [domain]);
 
+  // Effect to update the favicon based on main domain availability using SVG files
+  useEffect(() => {
+    const faviconLink = document.getElementById('dynamic-favicon') as HTMLLinkElement | null;
+    if (!faviconLink) return; // Exit if the link element isn't found
+
+    const mainResult = domainResults[displayDomain];
+
+    if (displayDomain && mainResult && !mainResult.loading) {
+      if (mainResult.data?.isAvailable) {
+        faviconLink.href = '/favicon-available.svg'; // Available icon file
+      } else {
+        faviconLink.href = '/favicon-unavailable.svg'; // Unavailable icon file
+      }
+    } else {
+      // Reset to default icon file
+      faviconLink.href = '/favicon-default.svg';
+    }
+  }, [displayDomain, domainResults]);
+
   // Function to retry checking a specific domain
   const retryDomainCheck = async (domainToRetry: string) => {
     // Update just this domain to loading state
