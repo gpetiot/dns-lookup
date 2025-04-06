@@ -252,6 +252,12 @@ function App() {
     }
   };
 
+  const mainDomainResult = domainResults[displayDomain];
+  const isMainDomainAvailable =
+    mainDomainResult && !mainDomainResult.loading && mainDomainResult.data?.isAvailable === true;
+  const isMainDomainUnavailable =
+    mainDomainResult && !mainDomainResult.loading && mainDomainResult.data?.isAvailable === false;
+
   return (
     <div className="flex min-h-screen flex-col items-center bg-gray-50 p-4">
       <div className="w-full max-w-7xl">
@@ -291,7 +297,9 @@ function App() {
                 placeholder="Search for a domain name here..."
                 value={domain}
                 onChange={handleDomainChange}
-                className="w-full rounded-lg border border-gray-300 py-4 pl-10 pr-24 text-lg shadow-sm transition-shadow duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-1"
+                className={`w-full rounded-lg border border-gray-300 py-4 pl-10 pr-24 text-lg shadow-sm transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-1 ${
+                  isMainDomainAvailable ? 'font-medium text-green-500 focus:text-green-600' : ''
+                } ${isMainDomainUnavailable ? 'text-red-500 line-through focus:text-red-600' : ''}`}
               />
               <button
                 type="submit"
