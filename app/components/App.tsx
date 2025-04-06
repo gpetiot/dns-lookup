@@ -5,6 +5,8 @@ import DomainResult from './DomainResult';
 import DomainScore from './DomainScore';
 import NoResultPlaceholder from './NoResultPlaceholder';
 import LoadingIcon from './icons/LoadingIcon';
+import CopyIcon from './icons/CopyIcon';
+import CheckIcon from './icons/CheckIcon';
 import {
   generateDomainVariations,
   generateAIDomainSuggestions,
@@ -29,6 +31,21 @@ function App() {
   const [showComSuffix, setShowComSuffix] = useState(false);
   const [suffixLeft, setSuffixLeft] = useState(40);
   const textMeasureRef = useRef<HTMLSpanElement>(null);
+  const [isCopied, setIsCopied] = useState(false);
+
+  // Effect to read query parameter on initial load
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryDomain = urlParams.get('q');
+    if (queryDomain) {
+      const decodedDomain = decodeURIComponent(queryDomain);
+      // Set the domain state - this should trigger the search via existing effects
+      setDomain(decodedDomain);
+      setSanitizedDomain(sanitizeDomain(decodedDomain));
+      // Ensure displayDomain is also set initially if needed for other logic
+      // setDisplayDomain(sanitizeDomain(decodedDomain)); // May not be necessary if sanitize effect handles it
+    }
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   // Effect to debounce domain changes
   useEffect(() => {
@@ -299,6 +316,21 @@ function App() {
   const isMainDomainUnavailable =
     mainDomainResult && !mainDomainResult.loading && mainDomainResult.data?.isAvailable === false;
 
+  // Helper function to handle copying the shareable URL
+  const handleShare = async () => {
+    if (!displayDomain) return; // Don't share if nothing is displayed
+
+    const shareUrl = `${window.location.origin}${window.location.pathname}?q=${encodeURIComponent(displayDomain)}`;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000); // Reset after 2 seconds
+    } catch (err) {
+      console.error('Failed to copy share URL:', err);
+      // Optionally, show an error message to the user
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col items-center bg-gray-50 p-4">
       {/* Hidden span for text measurement - match input font size */}
@@ -347,10 +379,48 @@ function App() {
                 placeholder="Search for a domain name here..."
                 value={domain}
                 onChange={handleDomainChange}
-                className={`w-full rounded-lg border border-gray-300 py-4 pl-10 pr-28 text-lg shadow-sm transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-1 ${
+                className={`w-full rounded-lg border border-gray-300 py-4 pl-10 pr-[140px] text-lg shadow-sm transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-1 ${
                   isMainDomainAvailable ? 'font-medium text-green-500 focus:text-green-600' : ''
                 } ${isMainDomainUnavailable ? 'text-red-500 line-through focus:text-red-600' : ''}`}
               />
+              {/* Button Group Wrapper */}
+              <div className="absolute right-1 top-1/2 flex h-[calc(100%-8px)] -translate-y-1/2 items-center gap-1">
+                {/* Copy Button - Always visible, uses CopyIcon */}
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  title="Copy shareable link"
+                  disabled={!displayDomain || isCopied}
+                  className={`flex h-full items-center rounded-md px-2 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50 ${
+                    isCopied
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700'
+                  }`}
+                >
+                  {isCopied ? <CheckIcon className="h-5 w-5" /> : <CopyIcon className="h-5 w-5" />}
+                </button>
+                {/* Check Button - Now part of the flex group */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex h-full items-center rounded-md border border-blue-400/20 bg-blue-500 px-4 font-bold text-white transition duration-300 hover:bg-blue-600 focus:outline-none disabled:opacity-50"
+                >
+                  {loading ? (
+                    <span className="flex items-center gap-1.5">
+                      Checking
+                      <LoadingIcon />
+                    </span>
+                  ) : (
+                    <>
+                      Check
+                      <span className="ml-1.5 inline-block rounded border border-white/30 px-1">
+                        ↵
+                      </span>
+                    </>
+                  )}
+                </button>
+              </div>
+
               {showComSuffix && (
                 <span
                   className="pointer-events-none absolute top-1/2 -translate-y-1/2 text-nowrap text-gray-400"
@@ -359,26 +429,8 @@ function App() {
                   (.com)
                 </span>
               )}
-              <button
-                type="submit"
-                disabled={loading}
-                className="absolute right-1 h-[calc(100%-8px)] rounded-md border border-blue-400/20 bg-blue-500 px-4 font-bold text-white transition duration-300 hover:bg-blue-600 focus:outline-none disabled:opacity-50"
-              >
-                {loading ? (
-                  <span className="flex items-center gap-1.5">
-                    Checking
-                    <LoadingIcon />
-                  </span>
-                ) : (
-                  <>
-                    Check
-                    <span className="ml-1.5 inline-block rounded border border-white/30 px-1">
-                      ↵
-                    </span>
-                  </>
-                )}
-              </button>
             </div>
+
             {domain && <DomainScore domain={sanitizedDomain} />}
           </form>
 
