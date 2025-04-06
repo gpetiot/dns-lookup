@@ -18,6 +18,7 @@ import type { WhoIsResult } from 'whois-parsed';
 
 // Define filter types
 type AvailabilityFilter = 'all' | 'available';
+type TldFilter = 'all' | 'com';
 
 function App() {
   const [domain, setDomain] = useState('');
@@ -36,6 +37,7 @@ function App() {
   const textMeasureRef = useRef<HTMLSpanElement>(null);
   const [isCopied, setIsCopied] = useState(false);
   const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>('all');
+  const [tldFilter, setTldFilter] = useState<TldFilter>('all');
 
   // Effect to read query parameter on initial load
   useEffect(() => {
@@ -270,26 +272,34 @@ function App() {
   const alternativeExtensions = getAlternativeExtensions();
   const alternativeSuggestions = getAlternativeSuggestions();
 
-  // Helper function to check availability based on filter
-  const checkAvailability = (domainToCheck: string): boolean => {
+  // Helper function to check if a domain passes the current filters
+  const checkDomainAgainstFilters = (domainToCheck: string): boolean => {
+    // Availability Check
     const result = domainResults[domainToCheck];
+    let isAvailableOk = true;
     if (availabilityFilter === 'available') {
-      // Only return true if loaded and explicitly available
-      return result && !result.loading && result.data?.isAvailable === true;
+      isAvailableOk = result && !result.loading && result.data?.isAvailable === true;
     }
-    // 'all' includes everything (including loading/missing for initial render)
-    return true;
+
+    // TLD Check
+    let isTldOk = true;
+    if (tldFilter === 'com') {
+      isTldOk = domainToCheck.endsWith('.com');
+    }
+
+    // Must pass both filters
+    return isAvailableOk && isTldOk;
   };
 
-  // Filter the domain lists based on the current filter
+  // Filter the domain lists based on the current filters
   const filteredAlternativeExtensions = alternativeExtensions.filter(variation =>
-    checkAvailability(variation.domain)
+    checkDomainAgainstFilters(variation.domain)
   );
   const filteredAlternativeSuggestions = alternativeSuggestions.filter(variation =>
-    checkAvailability(variation.domain)
+    checkDomainAgainstFilters(variation.domain)
   );
   const filteredAiSuggestions = aiSuggestions.filter(variation =>
-    checkAvailability(variation.domain)
+    checkDomainAgainstFilters(variation.domain)
   );
 
   const handleGenerateAI = async () => {
@@ -468,23 +478,46 @@ function App() {
         </div>
 
         {/* Filter Controls */}
-        <div className="mb-6 flex items-center justify-start gap-2 border-b pb-3">
-          <span className="text-sm font-medium text-gray-600">Filter results:</span>
-          <div className="flex gap-1">
-            {(['all', 'available'] as AvailabilityFilter[]).map(filter => (
-              <button
-                key={filter}
-                type="button"
-                onClick={() => setAvailabilityFilter(filter)}
-                className={`rounded-md px-2.5 py-1 text-sm capitalize transition-colors duration-150 ${
-                  availabilityFilter === filter
-                    ? 'bg-blue-500 text-white shadow-sm'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {filter === 'all' ? 'All' : 'Available Only'}
-              </button>
-            ))}
+        <div className="mb-6 flex flex-wrap items-center justify-start gap-x-4 gap-y-2 border-b pb-3">
+          {/* Availability Filter */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-600">Availability:</span>
+            <div className="flex gap-1">
+              {(['all', 'available'] as AvailabilityFilter[]).map(filter => (
+                <button
+                  key={filter}
+                  type="button"
+                  onClick={() => setAvailabilityFilter(filter)}
+                  className={`rounded-md px-2.5 py-1 text-sm capitalize transition-colors duration-150 ${
+                    availabilityFilter === filter
+                      ? 'bg-blue-500 text-white shadow-sm'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {filter === 'all' ? 'All' : 'Available'} {/* Shortened text */}
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* TLD Filter */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-600">TLD:</span>
+            <div className="flex gap-1">
+              {(['all', 'com'] as TldFilter[]).map(filter => (
+                <button
+                  key={filter}
+                  type="button"
+                  onClick={() => setTldFilter(filter)}
+                  className={`rounded-md px-2.5 py-1 text-sm transition-colors duration-150 ${
+                    tldFilter === filter
+                      ? 'bg-blue-500 text-white shadow-sm'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {filter === 'all' ? 'All' : '.com Only'}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
