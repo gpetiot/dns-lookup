@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DomainResult from './DomainResult';
 import DomainScore from './DomainScore';
 import NoResultPlaceholder from './NoResultPlaceholder';
@@ -26,6 +26,9 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [showComSuffix, setShowComSuffix] = useState(false);
+  const [suffixLeft, setSuffixLeft] = useState(40);
+  const textMeasureRef = useRef<HTMLSpanElement>(null);
 
   // Effect to debounce domain changes
   useEffect(() => {
@@ -41,6 +44,25 @@ function App() {
 
     return () => clearTimeout(timer);
   }, [sanitizedDomain, displayDomain]);
+
+  // Effect to show/hide the (.com) suffix and calculate its position
+  useEffect(() => {
+    const shouldShow = domain.length > 0 && !domain.includes('.');
+    setShowComSuffix(shouldShow);
+
+    if (shouldShow && textMeasureRef.current) {
+      // Ensure the hidden span has the text to measure
+      textMeasureRef.current.textContent = domain;
+      // Calculate position: pl-10 (approx 40px) + text width + gap (4px)
+      const inputPaddingLeftPx = 40; // Approximation for pl-10 (2.5rem)
+      const gapPx = 4;
+      const textWidthPx = textMeasureRef.current.offsetWidth;
+      setSuffixLeft(inputPaddingLeftPx + textWidthPx + gapPx);
+    } else if (!shouldShow) {
+      // Reset position if not shown
+      setSuffixLeft(40);
+    }
+  }, [domain]);
 
   // Function to retry checking a specific domain
   const retryDomainCheck = async (domainToRetry: string) => {
@@ -260,6 +282,15 @@ function App() {
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-gray-50 p-4">
+      {/* Hidden span for text measurement - match input font size */}
+      <span
+        ref={textMeasureRef}
+        aria-hidden="true"
+        className="invisible absolute left-0 top-0 z-[-1] h-0 overflow-hidden whitespace-pre text-lg"
+      >
+        {/* Content updated via ref */}
+      </span>
+
       <div className="w-full max-w-7xl">
         {/* Header and Search Form */}
         <div className="mb-8">
@@ -297,10 +328,18 @@ function App() {
                 placeholder="Search for a domain name here..."
                 value={domain}
                 onChange={handleDomainChange}
-                className={`w-full rounded-lg border border-gray-300 py-4 pl-10 pr-24 text-lg shadow-sm transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-1 ${
+                className={`w-full rounded-lg border border-gray-300 py-4 pl-10 pr-28 text-lg shadow-sm transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-1 ${
                   isMainDomainAvailable ? 'font-medium text-green-500 focus:text-green-600' : ''
                 } ${isMainDomainUnavailable ? 'text-red-500 line-through focus:text-red-600' : ''}`}
               />
+              {showComSuffix && (
+                <span
+                  className="pointer-events-none absolute top-1/2 -translate-y-1/2 text-nowrap text-gray-400"
+                  style={{ left: `${suffixLeft}px` }}
+                >
+                  (.com)
+                </span>
+              )}
               <button
                 type="submit"
                 disabled={loading}
