@@ -291,7 +291,7 @@ function App() {
                 placeholder="Search for a domain name here..."
                 value={domain}
                 onChange={handleDomainChange}
-                className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-24 text-base shadow-sm transition-shadow duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-1"
+                className="w-full rounded-lg border border-gray-300 py-4 pl-10 pr-24 text-lg shadow-sm transition-shadow duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-1"
               />
               <button
                 type="submit"
