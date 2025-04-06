@@ -270,6 +270,20 @@ function App() {
 
           <form onSubmit={handleSubmit} className="w-full">
             <div className="relative flex items-center">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="h-5 w-5"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </span>
               <input
                 type="text"
                 name="domain"
@@ -277,7 +291,7 @@ function App() {
                 placeholder="Search for a domain name here..."
                 value={domain}
                 onChange={handleDomainChange}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 pr-24 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-24 text-base shadow-sm transition-shadow duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-1"
               />
               <button
                 type="submit"
