@@ -5,13 +5,11 @@ import DomainResult from './DomainResult';
 import DomainScore from './DomainScore';
 import NoResultPlaceholder from './NoResultPlaceholder';
 import LoadingIcon from './icons/LoadingIcon';
-import CopyIcon from './icons/CopyIcon';
-import CheckIcon from './icons/CheckIcon';
 import SearchIcon from './icons/SearchIcon';
+import ShareButton from './ShareButton';
 import { useDomainState } from '@/hooks/useDomainState';
 import { useAISuggestions } from '@/hooks/useAISuggestions';
 import { useFilters } from '@/hooks/useFilters';
-import { useShare } from '@/hooks/useShare';
 import { useFavicon } from '@/hooks/useFavicon';
 import { categorizeResults } from '@/utils/domainHelpers';
 
@@ -23,7 +21,6 @@ function App() {
 
   const [{ aiSuggestions, isGeneratingAI }, { handleGenerateAI }] = useAISuggestions();
   const { filters, setAvailabilityFilter, setTldFilter, checkDomainAgainstFilters } = useFilters();
-  const { isCopied, handleShare } = useShare();
 
   useFavicon(displayDomain, domainResults);
 
@@ -112,21 +109,8 @@ function App() {
                   isMainDomainAvailable ? 'font-medium text-green-500 focus:text-green-600' : ''
                 } ${isMainDomainUnavailable ? 'text-red-500 line-through focus:text-red-600' : ''}`}
               />
-              {/* Button Group */}
               <div className="absolute right-1 top-1/2 flex h-[calc(100%-8px)] -translate-y-1/2 items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => handleShare(displayDomain)}
-                  title="Copy shareable link"
-                  disabled={!displayDomain || isCopied}
-                  className={`flex h-full items-center rounded-md px-2 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50 ${
-                    isCopied
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700'
-                  }`}
-                >
-                  {isCopied ? <CheckIcon className="h-5 w-5" /> : <CopyIcon className="h-5 w-5" />}
-                </button>
+                <ShareButton displayDomain={displayDomain} />
                 <button
                   type="submit"
                   disabled={loading}
