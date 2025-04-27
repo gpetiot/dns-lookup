@@ -1,72 +1,31 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import DomainResult from './DomainResult';
 import DomainScore from './DomainScore';
 import NoResultPlaceholder from './NoResultPlaceholder';
 import LoadingIcon from './icons/LoadingIcon';
 import CopyIcon from './icons/CopyIcon';
 import CheckIcon from './icons/CheckIcon';
-import {
-  generateDomainVariations,
-  generateAIDomainSuggestions,
-  sanitizeDomain,
-  DomainParts,
-} from '@/utils/domainUtils';
-import { checkDomain } from '@/services/whoisService';
-import type { WhoIsResult } from 'whois-parsed';
-
-// Define filter types
-type AvailabilityFilter = 'all' | 'available';
-type TldFilter = 'all' | 'com';
+import { useDomainState } from '@/hooks/useDomainState';
+import { useAISuggestions } from '@/hooks/useAISuggestions';
+import { useFilters } from '@/hooks/useFilters';
+import { useShare } from '@/hooks/useShare';
+import { categorizeResults } from '@/utils/domainHelpers';
 
 function App() {
-  const [domain, setDomain] = useState('');
-  const [sanitizedDomain, setSanitizedDomain] = useState('');
-  const [displayDomain, setDisplayDomain] = useState('');
-  const [domainVariations, setDomainVariations] = useState<DomainParts[]>([]);
-  const [aiSuggestions, setAiSuggestions] = useState<DomainParts[]>([]);
-  const [domainResults, setDomainResults] = useState<
-    Record<string, { loading: boolean; data?: WhoIsResult }>
-  >({});
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
-  const [showComSuffix, setShowComSuffix] = useState(false);
-  const [suffixLeft, setSuffixLeft] = useState(40);
+  const [
+    { domain, sanitizedDomain, displayDomain, domainVariations, domainResults, loading, error },
+    { setDomain, handleSubmit, retryDomainCheck, checkSingleDomain },
+  ] = useDomainState();
+
+  const [{ aiSuggestions, isGeneratingAI }, { handleGenerateAI }] = useAISuggestions();
+  const { filters, setAvailabilityFilter, setTldFilter, checkDomainAgainstFilters } = useFilters();
+  const { isCopied, handleShare } = useShare();
+
   const textMeasureRef = useRef<HTMLSpanElement>(null);
-  const [isCopied, setIsCopied] = useState(false);
-  const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>('all');
-  const [tldFilter, setTldFilter] = useState<TldFilter>('all');
-
-  // Effect to read query parameter on initial load
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const queryDomain = urlParams.get('q');
-    if (queryDomain) {
-      const decodedDomain = decodeURIComponent(queryDomain);
-      // Set the domain state - this should trigger the search via existing effects
-      setDomain(decodedDomain);
-      setSanitizedDomain(sanitizeDomain(decodedDomain));
-      // Ensure displayDomain is also set initially if needed for other logic
-      // setDisplayDomain(sanitizeDomain(decodedDomain)); // May not be necessary if sanitize effect handles it
-    }
-  }, []); // Empty dependency array ensures this runs only once on mount
-
-  // Effect to debounce domain changes
-  useEffect(() => {
-    if (!sanitizedDomain) return;
-
-    const timer = setTimeout(() => {
-      // Only trigger if we have a domain and it's different from the display domain
-      if (sanitizedDomain && sanitizedDomain !== displayDomain) {
-        setDisplayDomain(sanitizedDomain);
-        handleSubmit(new Event('submit') as any);
-      }
-    }, 200); // 0.2 seconds debounce
-
-    return () => clearTimeout(timer);
-  }, [sanitizedDomain, displayDomain]);
+  const [showComSuffix, setShowComSuffix] = React.useState(false);
+  const [suffixLeft, setSuffixLeft] = React.useState(40);
 
   // Effect to show/hide the (.com) suffix and calculate its position
   useEffect(() => {
@@ -74,277 +33,35 @@ function App() {
     setShowComSuffix(shouldShow);
 
     if (shouldShow && textMeasureRef.current) {
-      // Ensure the hidden span has the text to measure
       textMeasureRef.current.textContent = domain;
-      // Calculate position: pl-10 (approx 40px) + text width + gap (4px)
-      const inputPaddingLeftPx = 40; // Approximation for pl-10 (2.5rem)
+      const inputPaddingLeftPx = 40;
       const gapPx = 4;
       const textWidthPx = textMeasureRef.current.offsetWidth;
       setSuffixLeft(inputPaddingLeftPx + textWidthPx + gapPx);
     } else if (!shouldShow) {
-      // Reset position if not shown
       setSuffixLeft(40);
     }
   }, [domain]);
 
-  // Effect to update the favicon based on main domain availability using SVG files
-  useEffect(() => {
-    const faviconLink = document.getElementById('dynamic-favicon') as HTMLLinkElement | null;
-    if (!faviconLink) return; // Exit if the link element isn't found
-
-    const mainResult = domainResults[displayDomain];
-
-    if (displayDomain && mainResult && !mainResult.loading) {
-      if (mainResult.data?.isAvailable) {
-        faviconLink.href = '/favicon-available.svg'; // Available icon file
-      } else {
-        faviconLink.href = '/favicon-unavailable.svg'; // Unavailable icon file
-      }
-    } else {
-      // Reset to default icon file
-      faviconLink.href = '/favicon-default.svg';
-    }
-  }, [displayDomain, domainResults]);
-
-  // Function to retry checking a specific domain
-  const retryDomainCheck = async (domainToRetry: string) => {
-    // Update just this domain to loading state
-    setDomainResults(prev => ({
-      ...prev,
-      [domainToRetry]: { loading: true },
-    }));
-
-    try {
-      // Check just this one domain
-      const result = await checkDomain(domainToRetry);
-
-      // Update the result for this domain
-      setDomainResults(prev => ({
-        ...prev,
-        [domainToRetry]: { loading: false, data: result.data },
-      }));
-    } catch (err: any) {
-      console.error(`Error retrying check for ${domainToRetry}:`, err);
-      setDomainResults(prev => ({
-        ...prev,
-        [domainToRetry]: {
-          loading: false,
-          data: {
-            domainName: domainToRetry,
-            isAvailable: false,
-            status: err.message,
-          },
-        },
-      }));
-    }
-  };
-
-  // Function to check a single domain and update its result
-  const checkSingleDomain = async (domainToCheck: string) => {
-    try {
-      const result = await checkDomain(domainToCheck);
-      // Update the result for this domain
-      setDomainResults(prev => ({
-        ...prev,
-        [domainToCheck]: { loading: false, data: result.data },
-      }));
-      return result;
-    } catch (err: any) {
-      console.error(`Error checking ${domainToCheck}:`, err);
-      setDomainResults(prev => ({
-        ...prev,
-        [domainToCheck]: {
-          loading: false,
-          data: {
-            domainName: domainToCheck,
-            isAvailable: false,
-            status: err.message,
-          },
-        },
-      }));
-      throw err;
-    }
-  };
-
   const handleDomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setDomain(value);
-    setSanitizedDomain(sanitizeDomain(value));
+    setDomain(e.target.value);
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!domain) {
-      setError('Please enter a domain');
-      return;
-    }
-
-    // If the domain hasn't changed and we already have results, don't trigger a new query
-    if (sanitizedDomain === displayDomain && domainVariations.length > 0) {
-      return;
-    }
-
-    // Update the display domain when submitting
-    setDisplayDomain(sanitizedDomain);
-
-    // Use the already sanitized domain from state
-    if (sanitizedDomain !== domain) {
-      console.log(`Domain sanitized from "${domain}" to "${sanitizedDomain}"`);
-    }
-
-    setLoading(true);
-    setError(null);
-
-    // Generate variations of the domain name using the original user input
-    const variations = generateDomainVariations(sanitizedDomain, domain);
-    setDomainVariations(variations);
-
-    // Initialize all domains with loading state
-    const initialResults: Record<string, { loading: boolean }> = {};
-    variations.forEach(variation => {
-      initialResults[variation.domain] = { loading: true };
-    });
-    setDomainResults(initialResults);
-
-    try {
-      // Process all domains independently with a small stagger
-      let completedCount = 0;
-
-      // Start checking all domains with a small delay between each
-      variations.forEach((variation, index) => {
-        // Stagger the requests by 300ms each to avoid rate limiting
-        setTimeout(() => {
-          checkSingleDomain(variation.domain).finally(() => {
-            completedCount++;
-            // When all domains have been checked, set loading to false
-            if (completedCount === variations.length) {
-              setLoading(false);
-            }
-          });
-        }, index * 300); // 300ms delay between each request
-      });
-    } catch (err) {
-      console.error('Error processing domain check:', err);
-      setError('An error occurred while checking domains. Please try again later.');
-      setLoading(false);
-    } finally {
-      // This ensures the loading state is reset if forEach above throws an error
-      setTimeout(
-        () => {
-          if (loading) {
-            console.log('Backup loading state reset triggered');
-            setLoading(false);
-          }
-        },
-        variations.length * 300 + 5000
-      ); // Wait for all possible requests plus a buffer
-    }
-  };
-
-  // Functions to categorize domains
-  const getMainDomain = () => {
-    if (!domainVariations.length) return null;
-    // Return the exact domain that was requested
-    return domainVariations.find(variation => variation.domain === displayDomain);
-  };
-
-  const getAlternativeExtensions = () => {
-    if (!domainVariations.length) return [];
-
-    return domainVariations.filter(
-      variation =>
-        variation.prefix === undefined &&
-        variation.suffix === undefined &&
-        variation.domain !== displayDomain
-    );
-  };
-
-  const getAlternativeSuggestions = () => {
-    if (!domainVariations.length) return [];
-
-    return domainVariations.filter(
-      variation => variation.prefix !== undefined || variation.suffix !== undefined
-    );
-  };
-
-  const mainDomain = getMainDomain();
-  const alternativeExtensions = getAlternativeExtensions();
-  const alternativeSuggestions = getAlternativeSuggestions();
-
-  // Helper function to check if a domain passes the current filters
-  const checkDomainAgainstFilters = (domainToCheck: string): boolean => {
-    // Availability Check
-    const result = domainResults[domainToCheck];
-    let isAvailableOk = true;
-    if (availabilityFilter === 'available') {
-      isAvailableOk = result && !result.loading && result.data?.isAvailable === true;
-    }
-
-    // TLD Check
-    let isTldOk = true;
-    if (tldFilter === 'com') {
-      isTldOk = domainToCheck.endsWith('.com');
-    }
-
-    // Must pass both filters
-    return isAvailableOk && isTldOk;
-  };
+  const { mainDomain, alternativeExtensions, alternativeSuggestions } = categorizeResults(
+    domainVariations,
+    displayDomain
+  );
 
   // Filter the domain lists based on the current filters
   const filteredAlternativeExtensions = alternativeExtensions.filter(variation =>
-    checkDomainAgainstFilters(variation.domain)
+    checkDomainAgainstFilters(variation.domain, domainResults)
   );
   const filteredAlternativeSuggestions = alternativeSuggestions.filter(variation =>
-    checkDomainAgainstFilters(variation.domain)
+    checkDomainAgainstFilters(variation.domain, domainResults)
   );
   const filteredAiSuggestions = aiSuggestions.filter(variation =>
-    checkDomainAgainstFilters(variation.domain)
+    checkDomainAgainstFilters(variation.domain, domainResults)
   );
-
-  const handleGenerateAI = async () => {
-    if (!sanitizedDomain) return;
-
-    setIsGeneratingAI(true);
-    setError(null);
-
-    try {
-      const suggestions = await generateAIDomainSuggestions(
-        sanitizedDomain,
-        aiSuggestions.length === 0
-      );
-
-      // Filter out any duplicates with existing suggestions
-      const existingDomains = new Set([...domainVariations, ...aiSuggestions].map(d => d.domain));
-      const newSuggestions = suggestions.filter(s => !existingDomains.has(s.domain));
-
-      if (newSuggestions.length === 0) {
-        setError('No new unique suggestions generated. Try again for different variations.');
-        return;
-      }
-
-      setAiSuggestions(prev => [...prev, ...newSuggestions]);
-
-      // Initialize loading state for new suggestions
-      const newResults: Record<string, { loading: boolean }> = {};
-      newSuggestions.forEach(suggestion => {
-        newResults[suggestion.domain] = { loading: true };
-      });
-      setDomainResults(prev => ({ ...prev, ...newResults }));
-
-      // Check availability for new suggestions
-      newSuggestions.forEach((suggestion, index) => {
-        setTimeout(() => {
-          checkSingleDomain(suggestion.domain);
-        }, index * 300);
-      });
-    } catch (err) {
-      console.error('Error generating AI suggestions:', err);
-      setError('Failed to generate AI suggestions. Please try again.');
-    } finally {
-      setIsGeneratingAI(false);
-    }
-  };
 
   const mainDomainResult = domainResults[displayDomain];
   const isMainDomainAvailable =
@@ -352,31 +69,14 @@ function App() {
   const isMainDomainUnavailable =
     mainDomainResult && !mainDomainResult.loading && mainDomainResult.data?.isAvailable === false;
 
-  // Helper function to handle copying the shareable URL
-  const handleShare = async () => {
-    if (!displayDomain) return; // Don't share if nothing is displayed
-
-    const shareUrl = `${window.location.origin}${window.location.pathname}?q=${encodeURIComponent(displayDomain)}`;
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000); // Reset after 2 seconds
-    } catch (err) {
-      console.error('Failed to copy share URL:', err);
-      // Optionally, show an error message to the user
-    }
-  };
-
   return (
     <div className="flex min-h-screen flex-col items-center bg-gray-50 p-4">
-      {/* Hidden span for text measurement - match input font size */}
+      {/* Hidden span for text measurement */}
       <span
         ref={textMeasureRef}
         aria-hidden="true"
         className="invisible absolute left-0 top-0 z-[-1] h-0 overflow-hidden whitespace-pre text-lg"
-      >
-        {/* Content updated via ref */}
-      </span>
+      />
 
       <div className="w-full max-w-7xl">
         {/* Header and Search Form */}
@@ -419,12 +119,11 @@ function App() {
                   isMainDomainAvailable ? 'font-medium text-green-500 focus:text-green-600' : ''
                 } ${isMainDomainUnavailable ? 'text-red-500 line-through focus:text-red-600' : ''}`}
               />
-              {/* Button Group Wrapper */}
+              {/* Button Group */}
               <div className="absolute right-1 top-1/2 flex h-[calc(100%-8px)] -translate-y-1/2 items-center gap-1">
-                {/* Copy Button - Always visible, uses CopyIcon */}
                 <button
                   type="button"
-                  onClick={handleShare}
+                  onClick={() => handleShare(displayDomain)}
                   title="Copy shareable link"
                   disabled={!displayDomain || isCopied}
                   className={`flex h-full items-center rounded-md px-2 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50 ${
@@ -435,7 +134,6 @@ function App() {
                 >
                   {isCopied ? <CheckIcon className="h-5 w-5" /> : <CopyIcon className="h-5 w-5" />}
                 </button>
-                {/* Check Button - Now part of the flex group */}
                 <button
                   type="submit"
                   disabled={loading}
@@ -479,37 +177,35 @@ function App() {
 
         {/* Filter Controls */}
         <div className="mb-6 flex flex-wrap items-center justify-start gap-x-4 gap-y-2 border-b pb-3">
-          {/* Availability Filter */}
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-gray-600">Availability:</span>
             <div className="flex gap-1">
-              {(['all', 'available'] as AvailabilityFilter[]).map(filter => (
+              {(['all', 'available'] as const).map(filter => (
                 <button
                   key={filter}
                   type="button"
                   onClick={() => setAvailabilityFilter(filter)}
                   className={`rounded-md px-2.5 py-1 text-sm capitalize transition-colors duration-150 ${
-                    availabilityFilter === filter
+                    filters.availabilityFilter === filter
                       ? 'bg-blue-500 text-white shadow-sm'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  {filter === 'all' ? 'All' : 'Available'} {/* Shortened text */}
+                  {filter === 'all' ? 'All' : 'Available'}
                 </button>
               ))}
             </div>
           </div>
-          {/* TLD Filter */}
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-gray-600">TLD:</span>
             <div className="flex gap-1">
-              {(['all', 'com'] as TldFilter[]).map(filter => (
+              {(['all', 'com'] as const).map(filter => (
                 <button
                   key={filter}
                   type="button"
                   onClick={() => setTldFilter(filter)}
                   className={`rounded-md px-2.5 py-1 text-sm transition-colors duration-150 ${
-                    tldFilter === filter
+                    filters.tldFilter === filter
                       ? 'bg-blue-500 text-white shadow-sm'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
@@ -543,7 +239,7 @@ function App() {
                 <h2 className="text-xl font-semibold text-gray-800">AI-Generated Suggestions</h2>
                 <button
                   type="button"
-                  onClick={handleGenerateAI}
+                  onClick={() => handleGenerateAI(sanitizedDomain, checkSingleDomain)}
                   disabled={isGeneratingAI}
                   className="group relative inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-400 via-pink-500 to-purple-400 bg-[length:200%_auto] px-4 py-1.5 text-sm font-medium text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[position:right_center] hover:shadow-purple-200/50 focus:outline-none disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
                 >
