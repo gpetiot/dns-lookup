@@ -11,6 +11,7 @@ import { useDomainState } from '@/hooks/useDomainState';
 import { useAISuggestions } from '@/hooks/useAISuggestions';
 import { useFilters } from '@/hooks/useFilters';
 import { useShare } from '@/hooks/useShare';
+import { useFavicon } from '@/hooks/useFavicon';
 import { categorizeResults } from '@/utils/domainHelpers';
 
 function App() {
@@ -22,6 +23,8 @@ function App() {
   const [{ aiSuggestions, isGeneratingAI }, { handleGenerateAI }] = useAISuggestions();
   const { filters, setAvailabilityFilter, setTldFilter, checkDomainAgainstFilters } = useFilters();
   const { isCopied, handleShare } = useShare();
+
+  useFavicon(displayDomain, domainResults);
 
   const textMeasureRef = useRef<HTMLSpanElement>(null);
   const [showComSuffix, setShowComSuffix] = React.useState(false);
