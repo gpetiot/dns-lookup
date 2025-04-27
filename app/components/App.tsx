@@ -7,7 +7,7 @@ import NoResultPlaceholder from './NoResultPlaceholder';
 import LoadingIcon from './icons/LoadingIcon';
 import SearchIcon from './icons/SearchIcon';
 import ShareButton from './ShareButton';
-import FilterChoice from './FilterChoice';
+import FilterControls from './FilterControls';
 import { useDomainState } from '@/hooks/useDomainState';
 import { useAISuggestions } from '@/hooks/useAISuggestions';
 import { useFilters } from '@/hooks/useFilters';
@@ -164,37 +164,12 @@ function App() {
           )}
         </div>
 
-        {/* Filter Controls */}
-        <div className="mb-6 flex flex-wrap items-center justify-start gap-x-4 gap-y-2 border-b pb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-600">Availability:</span>
-            <div className="flex gap-1">
-              {availabilityChoices.map(choice => (
-                <FilterChoice
-                  key={choice.value}
-                  value={choice.value}
-                  text={choice.text}
-                  isSelected={filters.availabilityFilter === choice.value}
-                  onClick={() => setAvailabilityFilter(choice.value)}
-                />
-              ))}
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-600">TLD:</span>
-            <div className="flex gap-1">
-              {tldChoices.map(choice => (
-                <FilterChoice
-                  key={choice.value}
-                  value={choice.value}
-                  text={choice.text}
-                  isSelected={filters.tldFilter === choice.value}
-                  onClick={() => setTldFilter(choice.value)}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
+        <FilterControls
+          availabilityFilter={filters.availabilityFilter}
+          tldFilter={filters.tldFilter}
+          onAvailabilityFilterChange={setAvailabilityFilter}
+          onTldFilterChange={setTldFilter}
+        />
 
         {/* Results Section */}
         {domainVariations.length > 0 ? (
