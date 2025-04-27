@@ -16,7 +16,6 @@ import { useAISuggestions } from '@/hooks/useAISuggestions';
 import { useFilters } from '@/hooks/useFilters';
 import { useFavicon } from '@/hooks/useFavicon';
 import { categorizeResults } from '@/utils/domainHelpers';
-import type { AvailabilityFilter, TldFilter } from '@/types/domain';
 
 function App() {
   const [
@@ -54,16 +53,6 @@ function App() {
     mainDomainResult && !mainDomainResult.loading && mainDomainResult.data?.isAvailable === true;
   const isMainDomainUnavailable =
     mainDomainResult && !mainDomainResult.loading && mainDomainResult.data?.isAvailable === false;
-
-  const availabilityChoices: { value: AvailabilityFilter; text: string }[] = [
-    { value: 'all', text: 'All' },
-    { value: 'available', text: 'Available' },
-  ];
-
-  const tldChoices: { value: TldFilter; text: string }[] = [
-    { value: 'all', text: 'All' },
-    { value: 'com', text: '.com Only' },
-  ];
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-gray-50 p-4">
