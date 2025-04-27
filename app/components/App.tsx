@@ -5,11 +5,11 @@ import DomainResult from './DomainResult';
 import DomainScore from './DomainScore';
 import NoResultPlaceholder from './NoResultPlaceholder';
 import NoAISuggestionPlaceholder from './NoAISuggestionPlaceholder';
-import LoadingIcon from './icons/LoadingIcon';
 import SearchIcon from './icons/SearchIcon';
 import ShareButton from './ShareButton';
 import FilterControls from './FilterControls';
 import GenerateAIButton from './GenerateAIButton';
+import SubmitButton from './SubmitButton';
 import { useDomainState } from '@/hooks/useDomainState';
 import { useAISuggestions } from '@/hooks/useAISuggestions';
 import { useFilters } from '@/hooks/useFilters';
@@ -125,25 +125,7 @@ function App() {
               />
               <div className="absolute right-1 top-1/2 flex h-[calc(100%-8px)] -translate-y-1/2 items-center gap-1">
                 <ShareButton displayDomain={displayDomain} />
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex h-full items-center rounded-md border border-blue-400/20 bg-blue-500 px-4 font-bold text-white transition duration-300 hover:bg-blue-600 focus:outline-none disabled:opacity-50"
-                >
-                  {loading ? (
-                    <span className="flex items-center gap-1.5">
-                      Checking
-                      <LoadingIcon />
-                    </span>
-                  ) : (
-                    <>
-                      Check
-                      <span className="ml-1.5 inline-block rounded border border-white/30 px-1">
-                        ↵
-                      </span>
-                    </>
-                  )}
-                </button>
+                <SubmitButton loading={loading} />
               </div>
 
               {showComSuffix && (
