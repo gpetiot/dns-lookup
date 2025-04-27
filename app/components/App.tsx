@@ -4,6 +4,7 @@ import React, { useRef, useEffect } from 'react';
 import DomainResult from './DomainResult';
 import DomainScore from './DomainScore';
 import NoResultPlaceholder from './NoResultPlaceholder';
+import NoAISuggestionPlaceholder from './NoAISuggestionPlaceholder';
 import LoadingIcon from './icons/LoadingIcon';
 import SearchIcon from './icons/SearchIcon';
 import ShareButton from './ShareButton';
@@ -216,21 +217,7 @@ function App() {
                   </div>
                 )
               ) : (
-                <div className="relative flex items-center justify-between border-b border-gray-200 bg-gray-50 px-3 py-2 opacity-70">
-                  <div className="flex flex-grow items-center">
-                    <div className="mr-2 w-8 flex-shrink-0">
-                      <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200" />
-                    </div>
-                    <div className="text-md font-medium text-gray-400">
-                      Click "Generate AI Suggestions" to get creative domain ideas
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="text-sm text-gray-400">
-                      {isGeneratingAI ? 'Generating suggestions...' : 'Powered by AI'}
-                    </div>
-                  </div>
-                </div>
+                <NoAISuggestionPlaceholder isGenerating={isGeneratingAI} />
               )}
             </div>
 
