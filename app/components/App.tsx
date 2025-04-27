@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import DomainResult from './DomainResult';
 import DomainScore from './DomainScore';
 import NoResultPlaceholder from './NoResultPlaceholder';
@@ -10,6 +10,7 @@ import ShareButton from './ShareButton';
 import FilterControls from './FilterControls';
 import GenerateAIButton from './GenerateAIButton';
 import SubmitButton from './SubmitButton';
+import ImplicitComSuffix from './ImplicitComSuffix';
 import { useDomainState } from '@/hooks/useDomainState';
 import { useAISuggestions } from '@/hooks/useAISuggestions';
 import { useFilters } from '@/hooks/useFilters';
@@ -27,26 +28,6 @@ function App() {
   const { filters, setAvailabilityFilter, setTldFilter, checkDomainAgainstFilters } = useFilters();
 
   useFavicon(displayDomain, domainResults);
-
-  const textMeasureRef = useRef<HTMLSpanElement>(null);
-  const [showComSuffix, setShowComSuffix] = React.useState(false);
-  const [suffixLeft, setSuffixLeft] = React.useState(40);
-
-  // Effect to show/hide the (.com) suffix and calculate its position
-  useEffect(() => {
-    const shouldShow = domain.length > 0 && !domain.includes('.');
-    setShowComSuffix(shouldShow);
-
-    if (shouldShow && textMeasureRef.current) {
-      textMeasureRef.current.textContent = domain;
-      const inputPaddingLeftPx = 40;
-      const gapPx = 4;
-      const textWidthPx = textMeasureRef.current.offsetWidth;
-      setSuffixLeft(inputPaddingLeftPx + textWidthPx + gapPx);
-    } else if (!shouldShow) {
-      setSuffixLeft(40);
-    }
-  }, [domain]);
 
   const handleDomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDomain(e.target.value);
@@ -86,13 +67,6 @@ function App() {
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-gray-50 p-4">
-      {/* Hidden span for text measurement */}
-      <span
-        ref={textMeasureRef}
-        aria-hidden="true"
-        className="invisible absolute left-0 top-0 z-[-1] h-0 overflow-hidden whitespace-pre text-lg"
-      />
-
       <div className="w-full max-w-7xl">
         {/* Header and Search Form */}
         <div className="mb-8">
@@ -128,14 +102,7 @@ function App() {
                 <SubmitButton loading={loading} />
               </div>
 
-              {showComSuffix && (
-                <span
-                  className="pointer-events-none absolute top-1/2 -translate-y-1/2 text-nowrap text-gray-400"
-                  style={{ left: `${suffixLeft}px` }}
-                >
-                  (.com)
-                </span>
-              )}
+              <ImplicitComSuffix domain={domain} />
             </div>
 
             {domain && <DomainScore domain={sanitizedDomain} />}
