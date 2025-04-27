@@ -8,6 +8,7 @@ import LoadingIcon from './icons/LoadingIcon';
 import SearchIcon from './icons/SearchIcon';
 import ShareButton from './ShareButton';
 import FilterControls from './FilterControls';
+import GenerateAIButton from './GenerateAIButton';
 import { useDomainState } from '@/hooks/useDomainState';
 import { useAISuggestions } from '@/hooks/useAISuggestions';
 import { useFilters } from '@/hooks/useFilters';
@@ -191,18 +192,10 @@ function App() {
             <div className="w-full">
               <div className="mb-4 flex items-center gap-3 border-b pb-2">
                 <h2 className="text-xl font-semibold text-gray-800">AI-Generated Suggestions</h2>
-                <button
-                  type="button"
+                <GenerateAIButton
+                  isGenerating={isGeneratingAI}
                   onClick={() => handleGenerateAI(sanitizedDomain, checkSingleDomain)}
-                  disabled={isGeneratingAI}
-                  className="group relative inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-400 via-pink-500 to-purple-400 bg-[length:200%_auto] px-4 py-1.5 text-sm font-medium text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[position:right_center] hover:shadow-purple-200/50 focus:outline-none disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
-                >
-                  <span className="relative z-10">
-                    {isGeneratingAI ? 'Generating...' : 'Generate'}
-                  </span>
-                  <span className="relative z-10 animate-pulse">✨</span>
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400/20 via-pink-500/20 to-purple-400/20 blur-sm transition-all duration-300 group-hover:blur-md" />
-                </button>
+                />
               </div>
               {aiSuggestions.length > 0 ? (
                 filteredAiSuggestions.length > 0 ? (
