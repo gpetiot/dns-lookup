@@ -7,11 +7,13 @@ import NoResultPlaceholder from './NoResultPlaceholder';
 import LoadingIcon from './icons/LoadingIcon';
 import SearchIcon from './icons/SearchIcon';
 import ShareButton from './ShareButton';
+import FilterChoice from './FilterChoice';
 import { useDomainState } from '@/hooks/useDomainState';
 import { useAISuggestions } from '@/hooks/useAISuggestions';
 import { useFilters } from '@/hooks/useFilters';
 import { useFavicon } from '@/hooks/useFavicon';
 import { categorizeResults } from '@/utils/domainHelpers';
+import type { AvailabilityFilter, TldFilter } from '@/types/domain';
 
 function App() {
   const [
@@ -69,6 +71,16 @@ function App() {
     mainDomainResult && !mainDomainResult.loading && mainDomainResult.data?.isAvailable === true;
   const isMainDomainUnavailable =
     mainDomainResult && !mainDomainResult.loading && mainDomainResult.data?.isAvailable === false;
+
+  const availabilityChoices: { value: AvailabilityFilter; text: string }[] = [
+    { value: 'all', text: 'All' },
+    { value: 'available', text: 'Available' },
+  ];
+
+  const tldChoices: { value: TldFilter; text: string }[] = [
+    { value: 'all', text: 'All' },
+    { value: 'com', text: '.com Only' },
+  ];
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-gray-50 p-4">
@@ -157,38 +169,28 @@ function App() {
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-gray-600">Availability:</span>
             <div className="flex gap-1">
-              {(['all', 'available'] as const).map(filter => (
-                <button
-                  key={filter}
-                  type="button"
-                  onClick={() => setAvailabilityFilter(filter)}
-                  className={`rounded-md px-2.5 py-1 text-sm capitalize transition-colors duration-150 ${
-                    filters.availabilityFilter === filter
-                      ? 'bg-blue-500 text-white shadow-sm'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {filter === 'all' ? 'All' : 'Available'}
-                </button>
+              {availabilityChoices.map(choice => (
+                <FilterChoice
+                  key={choice.value}
+                  value={choice.value}
+                  text={choice.text}
+                  isSelected={filters.availabilityFilter === choice.value}
+                  onClick={() => setAvailabilityFilter(choice.value)}
+                />
               ))}
             </div>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-gray-600">TLD:</span>
             <div className="flex gap-1">
-              {(['all', 'com'] as const).map(filter => (
-                <button
-                  key={filter}
-                  type="button"
-                  onClick={() => setTldFilter(filter)}
-                  className={`rounded-md px-2.5 py-1 text-sm transition-colors duration-150 ${
-                    filters.tldFilter === filter
-                      ? 'bg-blue-500 text-white shadow-sm'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {filter === 'all' ? 'All' : '.com Only'}
-                </button>
+              {tldChoices.map(choice => (
+                <FilterChoice
+                  key={choice.value}
+                  value={choice.value}
+                  text={choice.text}
+                  isSelected={filters.tldFilter === choice.value}
+                  onClick={() => setTldFilter(choice.value)}
+                />
               ))}
             </div>
           </div>
