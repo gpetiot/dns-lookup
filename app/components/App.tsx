@@ -12,6 +12,7 @@ import GenerateAIButton from './GenerateAIButton';
 import SubmitButton from './SubmitButton';
 import ImplicitComSuffix from './ImplicitComSuffix';
 import AlternativeExtensionsResults from './AlternativeExtensionsResults';
+import AlternativeComResults from './AlternativeComResults';
 import { useDomainState } from '@/hooks/useDomainState';
 import { useAISuggestions } from '@/hooks/useAISuggestions';
 import { useFilters } from '@/hooks/useFilters';
@@ -169,30 +170,12 @@ function App() {
             />
 
             {/* Alternative .com Suggestions */}
-            {alternativeSuggestions.length > 0 && (
-              <div className="w-full">
-                <h2 className="mb-4 border-b pb-2 text-xl font-semibold text-gray-800">
-                  Alternative .com Suggestions
-                </h2>
-                {filteredAlternativeSuggestions.length > 0 ? (
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    {filteredAlternativeSuggestions.map(variation => (
-                      <DomainResult
-                        key={variation.domain}
-                        parts={variation}
-                        data={domainResults[variation.domain]?.data}
-                        loading={domainResults[variation.domain]?.loading}
-                        onRetry={() => retryDomainCheck(variation.domain)}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center text-sm italic text-gray-500">
-                    No alternative .com suggestions match the current filter.
-                  </div>
-                )}
-              </div>
-            )}
+            <AlternativeComResults
+              alternativeSuggestions={alternativeSuggestions}
+              filteredAlternativeSuggestions={filteredAlternativeSuggestions}
+              domainResults={domainResults}
+              retryDomainCheck={retryDomainCheck}
+            />
           </div>
         ) : (
           <NoResultPlaceholder domain={domain} sanitizedDomain={sanitizedDomain} />
