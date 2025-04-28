@@ -11,6 +11,7 @@ import FilterControls from './FilterControls';
 import GenerateAIButton from './GenerateAIButton';
 import SubmitButton from './SubmitButton';
 import ImplicitComSuffix from './ImplicitComSuffix';
+import AlternativeExtensionsResults from './AlternativeExtensionsResults';
 import { useDomainState } from '@/hooks/useDomainState';
 import { useAISuggestions } from '@/hooks/useAISuggestions';
 import { useFilters } from '@/hooks/useFilters';
@@ -160,30 +161,12 @@ function App() {
             </div>
 
             {/* Alternative Extensions */}
-            {alternativeExtensions.length > 0 && (
-              <div className="w-full">
-                <h2 className="mb-4 border-b pb-2 text-xl font-semibold text-gray-800">
-                  Alternative Extensions Suggestions
-                </h2>
-                {filteredAlternativeExtensions.length > 0 ? (
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    {filteredAlternativeExtensions.map(variation => (
-                      <DomainResult
-                        key={variation.domain}
-                        parts={variation}
-                        data={domainResults[variation.domain]?.data}
-                        loading={domainResults[variation.domain]?.loading}
-                        onRetry={() => retryDomainCheck(variation.domain)}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center text-sm italic text-gray-500">
-                    No alternative extensions match the current filter.
-                  </div>
-                )}
-              </div>
-            )}
+            <AlternativeExtensionsResults
+              alternativeExtensions={alternativeExtensions}
+              filteredAlternativeExtensions={filteredAlternativeExtensions}
+              domainResults={domainResults}
+              retryDomainCheck={retryDomainCheck}
+            />
 
             {/* Alternative .com Suggestions */}
             {alternativeSuggestions.length > 0 && (
