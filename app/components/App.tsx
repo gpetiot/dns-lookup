@@ -95,7 +95,7 @@ function App() {
                 }`}
               />
               <div className="absolute right-1 top-1/2 flex h-[calc(100%-8px)] -translate-y-1/2 items-center gap-1">
-                <ShareButton displayDomain={displayDomain} />
+                <ShareButton displayDomain={domain} />
                 <SubmitButton loading={loading} />
               </div>
 
