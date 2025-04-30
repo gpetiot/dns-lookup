@@ -56,11 +56,11 @@ function App() {
     mainDomainResult && !mainDomainResult.loading && mainDomainResult.data?.isAvailable === false;
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-background p-4">
+    <div className="flex min-h-screen flex-col items-center bg-background p-3 sm:p-4">
       <div className="w-full max-w-7xl">
         {/* Header and Search Form */}
         <div className="mb-8">
-          <h1 className="mb-8 mt-20 text-center font-display text-5xl font-semibold tracking-tight text-text">
+          <h1 className="mb-6 mt-12 text-center font-display text-4xl font-semibold tracking-tight text-text sm:mb-8 sm:mt-20 sm:text-5xl">
             <span className="relative inline-block">
               <span className="absolute inset-0 -z-10 translate-y-3 bg-primary/5 blur-2xl"></span>
               Sup'
@@ -70,7 +70,7 @@ function App() {
               Domain
             </span>
           </h1>
-          <p className="mb-8 text-center text-lg text-text-muted">
+          <p className="mb-8 text-center text-base text-text-muted sm:text-lg">
             Search domains safely. No sneaky snatching.
           </p>
 
@@ -86,7 +86,7 @@ function App() {
                 placeholder="Search for a domain name here..."
                 value={domain}
                 onChange={handleDomainChange}
-                className={`w-full rounded-lg border border-background-lighter bg-background py-3.5 pl-10 pr-[140px] text-base shadow-sm ring-1 ring-background-lighter transition-all duration-200 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary ${
+                className={`w-full rounded-lg border border-background-lighter bg-background py-3 pl-10 pr-[120px] text-base shadow-sm ring-1 ring-background-lighter transition-all duration-200 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:py-3.5 sm:pr-[140px] ${
                   isMainDomainAvailable
                     ? 'border-green-600/20 font-medium text-green-600 ring-green-600/20 focus:border-green-600 focus:ring-green-600'
                     : isMainDomainUnavailable
