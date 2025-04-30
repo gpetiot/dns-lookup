@@ -60,7 +60,7 @@ function App() {
       <div className="w-full max-w-7xl">
         {/* Header and Search Form */}
         <div className="mb-8">
-          <h1 className="mb-16 mt-20 text-center font-display text-5xl font-semibold tracking-tight text-text">
+          <h1 className="mb-8 mt-20 text-center font-display text-5xl font-semibold tracking-tight text-text">
             <span className="relative inline-block">
               <span className="absolute inset-0 -z-10 translate-y-3 bg-primary/5 blur-2xl"></span>
               Sup'
@@ -70,6 +70,9 @@ function App() {
               Domain
             </span>
           </h1>
+          <p className="mb-8 text-center text-lg text-text-muted">
+            Search domains safely. No sneaky snatching.
+          </p>
 
           <form onSubmit={handleSubmit} className="w-full">
             <div className="relative flex items-center">
@@ -84,10 +87,10 @@ function App() {
                 value={domain}
                 onChange={handleDomainChange}
                 className={`w-full rounded-lg border border-background-lighter bg-background py-3.5 pl-10 pr-[140px] text-base shadow-sm ring-1 ring-background-lighter transition-all duration-200 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary ${
-                  isMainDomainAvailable 
-                    ? 'font-medium text-green-600 border-green-600/20 ring-green-600/20 focus:border-green-600 focus:ring-green-600'
+                  isMainDomainAvailable
+                    ? 'border-green-600/20 font-medium text-green-600 ring-green-600/20 focus:border-green-600 focus:ring-green-600'
                     : isMainDomainUnavailable
-                      ? 'text-red-600 line-through border-red-600/50 ring-red-600/20 focus:border-red-600 focus:ring-red-600'
+                      ? 'border-red-600/50 text-red-600 line-through ring-red-600/20 focus:border-red-600 focus:ring-red-600'
                       : 'text-text'
                 }`}
               />
