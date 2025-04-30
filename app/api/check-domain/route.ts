@@ -12,7 +12,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
 
   try {
-    console.log('Checking domain with whois:', domain);
+    //console.log('Checking domain with whois:', domain);
 
     const result = await whois.lookup(domain);
 
