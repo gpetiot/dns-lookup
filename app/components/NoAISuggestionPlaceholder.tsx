@@ -17,7 +17,7 @@ const NoAISuggestionPlaceholder: React.FC<NoAISuggestionPlaceholderProps> = ({ i
       </div>
       <div className="flex items-center">
         <div className="text-sm text-text-muted">
-          {isGenerating ? 'Generating suggestions...' : 'Powered by AI'}
+          {isGenerating ? 'Generating suggestions...' : 'Powered by Gemini'}
         </div>
       </div>
     </div>
