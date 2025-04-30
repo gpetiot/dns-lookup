@@ -56,24 +56,24 @@ function App() {
     mainDomainResult && !mainDomainResult.loading && mainDomainResult.data?.isAvailable === false;
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-gray-50 p-4">
+    <div className="flex min-h-screen flex-col items-center bg-background p-4">
       <div className="w-full max-w-7xl">
         {/* Header and Search Form */}
         <div className="mb-8">
-          <h1 className="mb-20 mt-24 text-center text-6xl font-black tracking-tight">
-            <span className="relative inline-block bg-blue-600 bg-clip-text text-transparent">
-              <span className="absolute inset-0 -z-10 bg-orange-500/10 blur-2xl"></span>
-              Domain
+          <h1 className="mb-16 mt-20 text-center font-display text-5xl font-semibold tracking-tight text-text">
+            <span className="relative inline-block">
+              <span className="absolute inset-0 -z-10 translate-y-3 bg-primary/5 blur-2xl"></span>
+              Sup'
             </span>{' '}
-            <span className="relative inline-block bg-blue-600 bg-clip-text text-transparent">
-              <span className="absolute inset-0 -z-10 bg-orange-500/10 blur-2xl"></span>
-              Checker
+            <span className="relative inline-block bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              <span className="absolute inset-0 -z-10 translate-y-3 bg-secondary/5 blur-2xl"></span>
+              Domain
             </span>
           </h1>
 
           <form onSubmit={handleSubmit} className="w-full">
             <div className="relative flex items-center">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">
                 <SearchIcon />
               </span>
               <input
@@ -83,9 +83,9 @@ function App() {
                 placeholder="Search for a domain name here..."
                 value={domain}
                 onChange={handleDomainChange}
-                className={`w-full rounded-lg border border-gray-300 py-4 pl-10 pr-[140px] text-lg shadow-sm transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-1 ${
-                  isMainDomainAvailable ? 'font-medium text-green-500 focus:text-green-600' : ''
-                } ${isMainDomainUnavailable ? 'text-red-500 line-through focus:text-red-600' : ''}`}
+                className={`w-full rounded-lg border border-background-lighter bg-background py-3.5 pl-10 pr-[140px] text-base text-text shadow-sm ring-1 ring-background-lighter transition-all duration-200 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary ${
+                  isMainDomainAvailable ? 'font-medium text-primary focus:text-primary-dark' : ''
+                } ${isMainDomainUnavailable ? 'text-text-muted line-through focus:text-text-muted' : ''}`}
               />
               <div className="absolute right-1 top-1/2 flex h-[calc(100%-8px)] -translate-y-1/2 items-center gap-1">
                 <ShareButton displayDomain={displayDomain} />
@@ -99,7 +99,7 @@ function App() {
           </form>
 
           {error && (
-            <div className="mt-4 border-l-4 border-red-500 bg-red-100 p-4 text-red-700">
+            <div className="mt-4 rounded-lg border-l-4 border-primary bg-primary/5 p-4 text-text">
               <p className="font-medium">{error}</p>
             </div>
           )}

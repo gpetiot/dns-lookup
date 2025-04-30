@@ -7,8 +7,8 @@ import Footer from '@/components/Footer';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Domain Checker AI',
-  description: 'Check domain availability and get AI-powered suggestions',
+  title: "Sup' Domain",
+  description: 'Check domain availability and get AI-powered suggestions with a modern twist',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

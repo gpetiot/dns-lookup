@@ -22,20 +22,20 @@ const DomainResult: React.FC<DomainResultProps> = ({ parts, data, loading, onRet
 
   // Apply neutral styling for loading state, otherwise use status-based colors
   const bgColorClass = loading
-    ? 'bg-gray-50 border-gray-200'
+    ? 'bg-background border-background-lighter'
     : isAvailable
-      ? 'bg-green-100'
+      ? 'bg-primary/5 border-primary/10'
       : hasError
-        ? 'bg-gray-100'
-        : 'bg-red-50/50';
+        ? 'bg-background'
+        : 'bg-background-lighter/30';
 
   return (
     <div
-      className={`flex items-center justify-between border-b px-3 py-2 ${bgColorClass} relative`}
+      className={`flex items-center justify-between rounded-lg border px-4 py-3 ${bgColorClass} relative shadow-sm`}
     >
       {/* Left Column: Status Icon + Domain */}
       <div className="flex flex-grow items-center">
-        <div className="mr-2 w-8 flex-shrink-0">
+        <div className="mr-3 w-8 flex-shrink-0">
           {loading ? (
             <LoadingIcon />
           ) : hasError ? (
@@ -49,12 +49,12 @@ const DomainResult: React.FC<DomainResultProps> = ({ parts, data, loading, onRet
 
         <div className="text-md font-medium">
           {loading ? (
-            <span className="text-gray-500">{parts.domain}</span>
+            <span className="text-text-muted">{parts.domain}</span>
           ) : hasError ? (
-            <span className="text-gray-600">{parts.domain}</span>
+            <span className="text-text-muted">{parts.domain}</span>
           ) : isAvailable ? (
             <span className="flex items-center gap-4">
-              <span className="font-medium">{parts.domain}</span>
+              <span className="font-medium text-primary">{parts.domain}</span>
               <LogoPreview parts={parts} />
             </span>
           ) : (
@@ -62,7 +62,7 @@ const DomainResult: React.FC<DomainResultProps> = ({ parts, data, loading, onRet
               href={`https://${parts.domain}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center text-red-600 hover:underline"
+              className="flex items-center text-text-muted hover:text-text hover:underline"
             >
               {parts.domain}
               <ExternalLinkIcon className="ml-1 inline-block h-3 w-3 flex-shrink-0" />
@@ -73,15 +73,15 @@ const DomainResult: React.FC<DomainResultProps> = ({ parts, data, loading, onRet
 
       {/* Right Column: Error or Broker Link */}
       <div className="flex items-center justify-end">
-        {loading && <div className="text-xs text-gray-500">Checking...</div>}
+        {loading && <div className="text-xs text-text-muted">Checking...</div>}
 
         {hasError && data?.status && (
           <div className="flex items-center">
-            <div className="mr-2 max-w-xs truncate text-xs text-gray-600">{data.status}</div>
+            <div className="mr-2 max-w-xs truncate text-xs text-text-muted">{data.status}</div>
             {onRetry && (
               <button
                 onClick={onRetry}
-                className="rounded bg-blue-500 px-2 py-1 text-xs font-medium text-white transition duration-200 hover:bg-blue-600"
+                className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-background transition duration-200 hover:bg-primary-dark"
               >
                 <RetryIcon />
                 Retry
@@ -95,10 +95,10 @@ const DomainResult: React.FC<DomainResultProps> = ({ parts, data, loading, onRet
             href={`https://porkbun.com/checkout/search?q=${parts.domain}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 transition-colors duration-200 hover:border-indigo-300 hover:bg-indigo-100"
+            className="inline-flex items-center rounded-md border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary transition-colors duration-200 hover:border-primary/30 hover:bg-primary/10"
           >
             Porkbun
-            <ExternalLinkIcon className="ml-1.5 h-3 w-3 text-indigo-500" />
+            <ExternalLinkIcon className="ml-1.5 h-3 w-3" />
           </a>
         )}
       </div>

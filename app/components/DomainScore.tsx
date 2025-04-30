@@ -14,18 +14,18 @@ const DomainScore: React.FC<DomainScoreProps> = ({ domain }) => {
   const getStatusIcon = (passed: boolean) => {
     if (passed) {
       return (
-        <svg
-          className="h-3 w-3 text-green-500"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
+        <svg className="h-3 w-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
       );
     }
     return (
-      <svg className="h-3 w-3 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg
+        className="h-3 w-3 text-text-muted"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -37,16 +37,18 @@ const DomainScore: React.FC<DomainScoreProps> = ({ domain }) => {
   };
 
   const getTextColor = (passed: boolean) => {
-    return passed ? 'text-green-600' : 'text-red-600';
+    return passed ? 'text-primary' : 'text-text-muted';
   };
 
   return (
-    <div className="mt-1 pl-2 text-xs">
-      <div className="space-y-1">
+    <div className="mt-2 pl-2 text-xs">
+      <div className="space-y-1.5">
         {criteria.map(criterion => (
-          <div key={criterion.id} className="flex items-center space-x-1.5">
+          <div key={criterion.id} className="flex items-center space-x-2">
             {getStatusIcon(details[criterion.id].passed)}
-            <span className={getTextColor(details[criterion.id].passed)}>{criterion.name}</span>
+            <span className={`${getTextColor(details[criterion.id].passed)} font-medium`}>
+              {criterion.name}
+            </span>
           </div>
         ))}
       </div>
