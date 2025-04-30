@@ -12,7 +12,7 @@ interface ApiResponse {
  */
 export const checkDomain = async (domainToCheck: string): Promise<ApiResponse> => {
   try {
-    console.log('Checking domain via API:', domainToCheck);
+    //console.log('Checking domain via API:', domainToCheck);
 
     const response = await fetch(`/api/check-domain?domain=${encodeURIComponent(domainToCheck)}`);
 
