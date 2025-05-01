@@ -67,48 +67,53 @@ const DomainResult: React.FC<DomainResultProps> = ({
 
   return (
     <div
-      className={`flex items-center justify-between rounded-lg border px-4 py-3 ${bgColorClass} relative shadow-sm`}
+      className={`flex flex-row items-start justify-between rounded-lg border px-3 py-2 sm:px-4 sm:py-3 ${bgColorClass} relative shadow-sm`}
     >
       {/* Left Column: Status Icon + Domain */}
-      <div className="flex flex-grow items-center">
-        <div className="mr-3 w-8 flex-shrink-0">
-          {loading ? (
-            <LoadingIcon />
-          ) : hasError ? (
-            <ErrorIcon />
-          ) : isAvailable ? (
-            <AvailableIcon />
-          ) : (
-            <RegisteredIcon />
-          )}
+      <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+        <div className="flex items-center">
+          <div className="mr-2 w-6 flex-shrink-0 sm:mr-3 sm:w-8">
+            {loading ? (
+              <LoadingIcon />
+            ) : hasError ? (
+              <ErrorIcon />
+            ) : isAvailable ? (
+              <AvailableIcon />
+            ) : (
+              <RegisteredIcon />
+            )}
+          </div>
+
+          <div className="sm:text-md text-sm font-medium">
+            {loading ? (
+              <span className="text-text-muted">{parts.domain}</span>
+            ) : hasError ? (
+              <span className="text-text-muted">{parts.domain}</span>
+            ) : isAvailable ? (
+              <span className="font-medium text-primary">{parts.domain}</span>
+            ) : (
+              <a
+                href={`https://${parts.domain}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center text-text-muted hover:text-text hover:underline"
+              >
+                {parts.domain}
+                <ExternalLinkIcon className="ml-1 inline-block h-3 w-3 flex-shrink-0" />
+              </a>
+            )}
+          </div>
         </div>
 
-        <div className="text-md font-medium">
-          {loading ? (
-            <span className="text-text-muted">{parts.domain}</span>
-          ) : hasError ? (
-            <span className="text-text-muted">{parts.domain}</span>
-          ) : isAvailable ? (
-            <span className="flex items-center gap-4">
-              <span className="font-medium text-primary">{parts.domain}</span>
-              <LogoPreview parts={parts} />
-            </span>
-          ) : (
-            <a
-              href={`https://${parts.domain}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center text-text-muted hover:text-text hover:underline"
-            >
-              {parts.domain}
-              <ExternalLinkIcon className="ml-1 inline-block h-3 w-3 flex-shrink-0" />
-            </a>
-          )}
-        </div>
+        {isAvailable && (
+          <div className="pl-8 sm:pl-0">
+            <LogoPreview parts={parts} />
+          </div>
+        )}
       </div>
 
       {/* Right Column: Error, Price, or Broker Link */}
-      <div className="flex items-center justify-end">
+      <div className={`flex min-w-fit flex-col items-end justify-center gap-2 sm:gap-3`}>
         {loading && <div className="text-xs text-text-muted">Checking...</div>}
 
         {hasError && data?.status && (
@@ -117,7 +122,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
             {onRetry && (
               <button
                 onClick={onRetry}
-                className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-background transition duration-200 hover:bg-primary-dark"
+                className="rounded-md bg-primary px-2 py-1 text-xs font-medium text-background transition duration-200 hover:bg-primary-dark sm:px-3 sm:py-1.5"
               >
                 <RetryIcon />
                 Retry
@@ -127,7 +132,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
         )}
 
         {isAvailable && (
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:gap-4">
             {loadingPrice ? (
               <div className="text-xs text-text-muted">Loading price...</div>
             ) : price ? (
