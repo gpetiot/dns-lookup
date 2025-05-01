@@ -131,6 +131,7 @@ function App() {
                   data={domainResults[mainDomain.domain].data}
                   loading={domainResults[mainDomain.domain]?.loading}
                   onRetry={() => retryDomainCheck(mainDomain.domain)}
+                  showPrice={true}
                 />
               </div>
             )}

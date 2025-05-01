@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { DomainParts } from '@/utils/domainUtils';
+import type { DomainPrice } from '@/types/domain';
 import ExternalLinkIcon from './icons/ExternalLinkIcon';
 import LoadingIcon from './icons/LoadingIcon';
 import ErrorIcon from './icons/ErrorIcon';
@@ -8,17 +9,45 @@ import RegisteredIcon from './icons/RegisteredIcon';
 import RetryIcon from './icons/RetryIcon';
 import LogoPreview from './LogoPreview';
 import type { WhoIsResult } from 'whois-parsed';
+import { getDomainPrice } from '@/services/domainPriceService';
 
 interface DomainResultProps {
   parts: DomainParts;
   data?: WhoIsResult;
   loading: boolean;
   onRetry: () => void;
+  showPrice?: boolean;
 }
 
-const DomainResult: React.FC<DomainResultProps> = ({ parts, data, loading, onRetry }) => {
+const DomainResult: React.FC<DomainResultProps> = ({
+  parts,
+  data,
+  loading,
+  onRetry,
+  showPrice = false,
+}) => {
+  const [price, setPrice] = useState<DomainPrice | null>(null);
+  const [loadingPrice, setLoadingPrice] = useState(false);
   const hasError = false;
   const isAvailable = data?.isAvailable;
+
+  useEffect(() => {
+    const fetchPrice = async () => {
+      if (showPrice && isAvailable && !loading) {
+        setLoadingPrice(true);
+        try {
+          const priceData = await getDomainPrice(parts.domain);
+          setPrice(priceData);
+        } catch (error) {
+          console.error('Error fetching price:', error);
+        } finally {
+          setLoadingPrice(false);
+        }
+      }
+    };
+
+    fetchPrice();
+  }, [parts.domain, isAvailable, loading, showPrice]);
 
   // Apply neutral styling for loading state, otherwise use status-based colors
   const bgColorClass = loading
@@ -28,6 +57,13 @@ const DomainResult: React.FC<DomainResultProps> = ({ parts, data, loading, onRet
       : hasError
         ? 'bg-background'
         : 'bg-background-lighter/30';
+
+  const formatPrice = (amount: number, currency: string) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency,
+    }).format(amount);
+  };
 
   return (
     <div
@@ -71,7 +107,7 @@ const DomainResult: React.FC<DomainResultProps> = ({ parts, data, loading, onRet
         </div>
       </div>
 
-      {/* Right Column: Error or Broker Link */}
+      {/* Right Column: Error, Price, or Broker Link */}
       <div className="flex items-center justify-end">
         {loading && <div className="text-xs text-text-muted">Checking...</div>}
 
@@ -91,15 +127,38 @@ const DomainResult: React.FC<DomainResultProps> = ({ parts, data, loading, onRet
         )}
 
         {isAvailable && (
-          <a
-            href={`https://porkbun.com/checkout/search?q=${parts.domain}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center rounded-md border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary transition-colors duration-200 hover:border-primary/30 hover:bg-primary/10"
-          >
-            Porkbun
-            <ExternalLinkIcon className="ml-1.5 h-3 w-3" />
-          </a>
+          <div className="flex items-center gap-4">
+            {loadingPrice ? (
+              <div className="text-xs text-text-muted">Loading price...</div>
+            ) : price ? (
+              <div className="flex flex-col items-end">
+                <div className="flex items-center gap-1">
+                  <span
+                    className={`text-sm font-medium ${price.isPremium ? 'text-amber-500' : 'text-primary'}`}
+                  >
+                    {formatPrice(price.registration, price.currency)}
+                  </span>
+                  {price.isPremium && (
+                    <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-500">
+                      Premium
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs text-text-muted">
+                  Renewal: {formatPrice(price.renewal, price.currency)}/yr
+                </div>
+              </div>
+            ) : null}
+            <a
+              href={`https://porkbun.com/checkout/search?q=${parts.domain}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center rounded-md border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary transition-colors duration-200 hover:border-primary/30 hover:bg-primary/10"
+            >
+              Porkbun
+              <ExternalLinkIcon className="ml-1.5 h-3 w-3" />
+            </a>
+          </div>
         )}
       </div>
     </div>

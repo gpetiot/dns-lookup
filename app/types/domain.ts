@@ -1,5 +1,13 @@
 import type { WhoIsResult } from 'whois-parsed';
 
+export interface DomainPrice {
+  registration: number;
+  renewal: number;
+  transfer: number;
+  isPremium: boolean;
+  currency: string;
+}
+
 export interface DomainParts {
   domain: string;
   prefix?: string;
