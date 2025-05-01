@@ -67,12 +67,12 @@ const DomainResult: React.FC<DomainResultProps> = ({
 
   return (
     <div
-      className={`flex flex-row items-start justify-between rounded-lg border px-3 py-2 sm:px-4 sm:py-3 ${bgColorClass} relative shadow-sm`}
+      className={`flex flex-row items-start justify-between rounded-lg border px-2.5 py-2 sm:px-4 sm:py-3 ${bgColorClass} relative gap-3 shadow-sm`}
     >
       {/* Left Column: Status Icon + Domain */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:flex-row sm:gap-3">
         <div className="flex items-center">
-          <div className="mr-2 w-6 flex-shrink-0 sm:mr-3 sm:w-8">
+          <div className="mr-2 w-5 flex-shrink-0 sm:mr-3 sm:w-8">
             {loading ? (
               <LoadingIcon />
             ) : hasError ? (
@@ -84,7 +84,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
             )}
           </div>
 
-          <div className="sm:text-md text-sm font-medium">
+          <div className="sm:text-md truncate text-sm font-medium">
             {loading ? (
               <span className="text-text-muted">{parts.domain}</span>
             ) : hasError ? (
@@ -106,14 +106,14 @@ const DomainResult: React.FC<DomainResultProps> = ({
         </div>
 
         {isAvailable && (
-          <div className="pl-8 sm:pl-0">
+          <div className="pl-7 sm:pl-0">
             <LogoPreview parts={parts} />
           </div>
         )}
       </div>
 
       {/* Right Column: Error, Price, or Broker Link */}
-      <div className={`flex min-w-fit flex-col items-end justify-center gap-2 sm:gap-3`}>
+      <div className={`flex min-w-fit flex-col items-end justify-center gap-1.5 sm:gap-3`}>
         {loading && <div className="text-xs text-text-muted">Checking...</div>}
 
         {hasError && data?.status && (
@@ -132,7 +132,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
         )}
 
         {isAvailable && (
-          <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:gap-4">
+          <div className="flex flex-col items-end gap-1.5 sm:flex-row sm:items-center sm:gap-4">
             {loadingPrice ? (
               <div className="text-xs text-text-muted">Loading price...</div>
             ) : price ? (
@@ -144,7 +144,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
                     {formatPrice(price.registration, price.currency)}
                   </span>
                   {price.isPremium && (
-                    <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-500">
+                    <span className="rounded-full bg-amber-500/10 px-1.5 py-0.5 text-xs font-medium text-amber-500">
                       Premium
                     </span>
                   )}
@@ -158,7 +158,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
               href={`https://porkbun.com/checkout/search?q=${parts.domain}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center rounded-md border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary transition-colors duration-200 hover:border-primary/30 hover:bg-primary/10"
+              className="inline-flex items-center rounded-md border border-primary/20 bg-primary/5 px-2.5 py-1 text-xs font-medium text-primary transition-colors duration-200 hover:border-primary/30 hover:bg-primary/10 sm:px-3 sm:py-1.5"
             >
               Porkbun
               <ExternalLinkIcon className="ml-1.5 h-3 w-3" />
