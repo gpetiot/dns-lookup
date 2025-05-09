@@ -24,7 +24,7 @@ const AISuggestionsResults: React.FC<AISuggestionsResultsProps> = ({
   return (
     <div className="w-full">
       <div className="mb-4 flex items-center gap-3 border-b pb-2">
-        <h2 className="text-xl font-semibold text-gray-800">AI-Generated Suggestions</h2>
+        <h2 className="text-xl font-semibold text-gray-800">AI Suggestions</h2>
         <GenerateAIButton isGenerating={isGeneratingAI} onClick={onGenerateAI} />
       </div>
       {aiSuggestions.length > 0 ? (
