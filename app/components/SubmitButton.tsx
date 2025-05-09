@@ -14,7 +14,7 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({ loading }) => {
     >
       {loading ? (
         <span className="flex items-center gap-2">
-          Checking
+          <span className="hidden sm:inline">Checking</span>
           <LoadingIcon />
         </span>
       ) : (
