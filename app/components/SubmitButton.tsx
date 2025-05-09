@@ -18,12 +18,12 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({ loading }) => {
           <LoadingIcon />
         </span>
       ) : (
-        <>
-          Check
-          <span className="ml-2 inline-block rounded border border-background/20 px-1 text-sm">
+        <span className="flex items-center">
+          <span>Check</span>
+          <span className="hidden rounded border border-background/20 px-1 text-sm sm:ml-2 sm:inline-block">
             ↵
           </span>
-        </>
+        </span>
       )}
     </button>
   );
