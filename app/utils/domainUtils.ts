@@ -3,26 +3,26 @@ import { AIService, AIProvider, DEFAULT_PROVIDER } from '../services/AIService';
 const aiService = new AIService(DEFAULT_PROVIDER);
 
 // Common TLDs for domain variations
-export const commonTlds = [
-  '.com', // Most common, used as default
-  '.net',
-  '.org',
-  '.io',
-  '.co',
-  '.app',
-  '.dev',
-  '.ai',
-  '.me',
-  '.info',
-  // '.pro',  // Temporarily disabled
-  '.cc',
-  '.tech',
-  '.site',
-  '.xyz',
-  '.online',
-  // '.store',  // Temporarily disabled
-  '.blog',
-  // '.cloud',  // Temporarily disabled
+const commonTlds = [
+  'com', // Most common, used as default
+  'net',
+  'org',
+  'io',
+  'co',
+  'app',
+  'dev',
+  'ai',
+  'me',
+  'info',
+  // 'pro',  // Temporarily disabled
+  'cc',
+  'tech',
+  'site',
+  'xyz',
+  'online',
+  // 'store',  // Temporarily disabled
+  'blog',
+  // 'cloud',  // Temporarily disabled
 ];
 
 // Prefixes for domain variations
@@ -71,7 +71,7 @@ export const generateDomainVariations = (baseName: string, userInput: string): D
   commonTlds.forEach(tld => {
     variations.push({
       base: nameOnly,
-      ext: tld.slice(1), // remove the dot
+      ext: tld,
       domain: `${nameOnly}${tld}`,
       input: userInput,
     });
