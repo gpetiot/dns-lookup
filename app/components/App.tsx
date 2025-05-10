@@ -90,7 +90,7 @@ function App() {
                   isMainDomainAvailable
                     ? 'border-green-600/20 font-medium text-green-600 ring-green-600/20 focus:border-green-600 focus:ring-green-600'
                     : isMainDomainUnavailable
-                      ? 'border-red-600/50 text-red-600 line-through ring-red-600/20 focus:border-red-600 focus:ring-red-600'
+                      ? 'border-red-600/50 text-red-600 ring-red-600/20 focus:border-red-600 focus:ring-red-600'
                       : 'text-text'
                 }`}
               />
