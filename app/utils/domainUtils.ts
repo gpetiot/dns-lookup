@@ -18,6 +18,7 @@ const commonTlds = [
   'cc',
   'tech',
   'site',
+  'studio',
   'xyz',
   'online',
   // 'store',  // Temporarily disabled
@@ -69,12 +70,23 @@ export const generateDomainVariations = (baseName: string, userInput: string): D
 
   // Add all TLD variations
   commonTlds.forEach(tld => {
-    variations.push({
-      base: nameOnly,
-      ext: tld,
-      domain: `${nameOnly}${tld}`,
-      input: userInput,
-    });
+    if (nameOnly.endsWith(tld)) {
+      const base = nameOnly.slice(0, -tld.length);
+      const userInputWithoutTld = userInput.slice(0, -tld.length);
+      variations.push({
+        base,
+        ext: tld,
+        domain: `${base}.${tld}`,
+        input: userInputWithoutTld,
+      });
+    } else {
+      variations.push({
+        base: nameOnly,
+        ext: tld,
+        domain: `${nameOnly}.${tld}`,
+        input: userInput,
+      });
+    }
   });
 
   // Add prefixed variations with .com
