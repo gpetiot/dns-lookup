@@ -40,6 +40,18 @@ const LogoPreview: React.FC<LogoPreviewProps> = ({ parts }) => {
       .join('');
   };
 
+  const substitute = (text: string) => {
+    const substitutions = [
+      {
+        subText: 'and',
+        replacement: '&',
+      },
+    ];
+    return substitutions.reduce((acc, substitution) => {
+      return acc.replace(substitution.subText, substitution.replacement);
+    }, text);
+  };
+
   const baseStyle = "font-['Syne'] text-gray-800";
   const getHighlightStyle = (text: string) => `font-['Work_Sans'] ${getColorForText(text)}`;
   const input = parts.input.split('.')[0];
@@ -49,16 +61,16 @@ const LogoPreview: React.FC<LogoPreviewProps> = ({ parts }) => {
       {parts.prefix ? (
         <>
           <span className={getHighlightStyle(parts.prefix)}>{capitalizeWords(parts.prefix)}</span>
-          <span className={baseStyle}>{capitalizeWords(input)}</span>
+          <span className={baseStyle}>{capitalizeWords(substitute(input))}</span>
         </>
       ) : parts.suffix ? (
         <>
-          <span className={baseStyle}>{capitalizeWords(input)}</span>
+          <span className={baseStyle}>{capitalizeWords(substitute(input))}</span>
           <span className={getHighlightStyle(parts.suffix)}>{capitalizeWords(parts.suffix)}</span>
         </>
       ) : (
         <>
-          <span className={baseStyle}>{capitalizeWords(input)}</span>
+          <span className={baseStyle}>{capitalizeWords(substitute(input))}</span>
           <span className={getHighlightStyle(parts.ext)}>{capitalizeWords(parts.ext)}</span>
         </>
       )}
