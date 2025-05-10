@@ -17,6 +17,8 @@ import { useAISuggestions } from '@/hooks/useAISuggestions';
 import { useFilters } from '@/hooks/useFilters';
 import { useFavicon } from '@/hooks/useFavicon';
 import { categorizeResults } from '@/utils/domainHelpers';
+import AvailableIcon from './icons/AvailableIcon';
+import RegisteredIcon from './icons/RegisteredIcon';
 
 function App() {
   const [
@@ -77,7 +79,13 @@ function App() {
           <form onSubmit={handleSubmit} className="w-full">
             <div className="relative flex items-center">
               <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">
-                <SearchIcon />
+                {isMainDomainAvailable ? (
+                  <AvailableIcon />
+                ) : isMainDomainUnavailable ? (
+                  <RegisteredIcon />
+                ) : (
+                  <SearchIcon />
+                )}
               </span>
               <input
                 type="text"
