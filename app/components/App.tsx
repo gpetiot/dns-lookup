@@ -19,6 +19,7 @@ import { useFavicon } from '@/hooks/useFavicon';
 import { categorizeResults } from '@/utils/domainHelpers';
 import AvailableIcon from './icons/AvailableIcon';
 import RegisteredIcon from './icons/RegisteredIcon';
+import LoadingIcon from './icons/LoadingIcon';
 
 function App() {
   const [
@@ -79,7 +80,9 @@ function App() {
           <form onSubmit={handleSubmit} className="w-full">
             <div className="relative flex items-center">
               <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">
-                {isMainDomainAvailable ? (
+                {mainDomainResult?.loading ? (
+                  <LoadingIcon />
+                ) : isMainDomainAvailable ? (
                   <AvailableIcon />
                 ) : isMainDomainUnavailable ? (
                   <RegisteredIcon />
