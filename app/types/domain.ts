@@ -15,6 +15,7 @@ export interface DomainParts {
   base: string;
   ext: string;
   input: string;
+  isFeatured?: boolean;
 }
 
 export interface DomainResult {

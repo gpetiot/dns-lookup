@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { checkDomain } from '@/services/whoisService';
 import { generateDomainVariations, sanitizeDomain } from '@/utils/domainUtils';
 import type { DomainParts, DomainResults } from '@/types/domain';
+import { parseFeaturedDomain } from '@/utils/domainHelpers';
+import { featuredDomains } from '../../data/featured';
 
 export interface DomainState {
   domain: string;
@@ -28,6 +30,32 @@ export function useDomainState(): [DomainState, DomainStateActions] {
   const [domainResults, setDomainResults] = useState<DomainResults>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Effect to check featured domains on initial load
+  useEffect(() => {
+    const checkFeaturedDomains = async () => {
+      const featuredVariations = featuredDomains.map(domain => parseFeaturedDomain(domain));
+
+      // Set initial variations with featured domains
+      setDomainVariations(featuredVariations);
+
+      // Initialize results for featured domains
+      const initialResults: DomainResults = {};
+      featuredVariations.forEach(variation => {
+        initialResults[variation.domain] = { loading: true };
+      });
+      setDomainResults(initialResults);
+
+      // Check each featured domain
+      featuredVariations.forEach((variation, index) => {
+        setTimeout(() => {
+          checkSingleDomain(variation.domain);
+        }, index * 300);
+      });
+    };
+
+    checkFeaturedDomains();
+  }, []);
 
   // Effect to read query parameter on initial load
   useEffect(() => {
@@ -113,23 +141,28 @@ export function useDomainState(): [DomainState, DomainStateActions] {
     setLoading(true);
     setError(null);
 
-    const variations = generateDomainVariations(sanitizedDomain, domain);
-    setDomainVariations(variations);
+    // Generate new variations and combine with featured domains
+    const searchVariations = generateDomainVariations(sanitizedDomain, domain);
+    const featuredVariations = featuredDomains.map(domain => parseFeaturedDomain(domain));
+    const allVariations = [...searchVariations, ...featuredVariations];
+    setDomainVariations(allVariations);
 
+    // Initialize results for new domains only
     const initialResults: DomainResults = {};
-    variations.forEach(variation => {
+    searchVariations.forEach(variation => {
       initialResults[variation.domain] = { loading: true };
     });
-    setDomainResults(initialResults);
+    setDomainResults(prev => ({ ...prev, ...initialResults }));
 
     try {
       let completedCount = 0;
+      const totalToCheck = searchVariations.length;
 
-      variations.forEach((variation, index) => {
+      searchVariations.forEach((variation, index) => {
         setTimeout(() => {
           checkSingleDomain(variation.domain).finally(() => {
             completedCount++;
-            if (completedCount === variations.length) {
+            if (completedCount === totalToCheck) {
               setLoading(false);
             }
           });
@@ -147,7 +180,7 @@ export function useDomainState(): [DomainState, DomainStateActions] {
             setLoading(false);
           }
         },
-        variations.length * 300 + 5000
+        searchVariations.length * 300 + 5000
       );
     }
   };

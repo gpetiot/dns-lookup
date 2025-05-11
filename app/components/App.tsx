@@ -20,6 +20,7 @@ import { categorizeResults } from '@/utils/domainHelpers';
 import AvailableIcon from './icons/AvailableIcon';
 import RegisteredIcon from './icons/RegisteredIcon';
 import LoadingIcon from './icons/LoadingIcon';
+import FeaturedResults from './FeaturedResults';
 
 function App() {
   const [
@@ -36,10 +37,8 @@ function App() {
     setDomain(e.target.value);
   };
 
-  const { mainDomain, alternativeExtensions, alternativeSuggestions } = categorizeResults(
-    domainVariations,
-    displayDomain
-  );
+  const { mainDomain, alternativeExtensions, alternativeSuggestions, featuredDomains } =
+    categorizeResults(domainVariations, displayDomain);
 
   // Filter the domain lists based on the current filters
   const filteredAlternativeExtensions = alternativeExtensions.filter(variation =>
@@ -50,6 +49,9 @@ function App() {
   );
   const filteredAiSuggestions = aiSuggestions.filter(variation =>
     checkDomainAgainstFilters(variation.domain, domainResults)
+  );
+  const filteredFeaturedDomains = featuredDomains.filter(domain =>
+    checkDomainAgainstFilters(domain.domain, domainResults)
   );
 
   const mainDomainResult = domainResults[displayDomain];
@@ -146,6 +148,14 @@ function App() {
                 />
               </div>
             )}
+
+            {/* Featured Domains */}
+            <FeaturedResults
+              featuredDomains={featuredDomains}
+              filteredFeaturedDomains={filteredFeaturedDomains}
+              domainResults={domainResults}
+              retryDomainCheck={retryDomainCheck}
+            />
 
             {/* AI Suggestions */}
             <AISuggestionsResults

@@ -1,4 +1,5 @@
 import { AIService, AIProvider, DEFAULT_PROVIDER } from '../services/AIService';
+import { DomainParts } from '../types/domain';
 
 const aiService = new AIService(DEFAULT_PROVIDER);
 
@@ -48,15 +49,6 @@ export const suffixes: string[] = [
   'pro',
   'base',
 ];
-
-export interface DomainParts {
-  prefix?: string;
-  base: string;
-  suffix?: string;
-  ext: string;
-  domain: string;
-  input: string; // Original user input before sanitization
-}
 
 /**
  * Generate domain variations based on a base name
