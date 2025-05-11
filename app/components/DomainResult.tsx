@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { DomainParts } from '@/utils/domainUtils';
-import type { DomainPrice } from '@/types/domain';
+import type { DomainParts, DomainPrice } from '@/types/domain';
 import ExternalLinkIcon from './icons/ExternalLinkIcon';
 import LoadingIcon from './icons/LoadingIcon';
 import ErrorIcon from './icons/ErrorIcon';

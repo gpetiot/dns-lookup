@@ -1,5 +1,5 @@
 import React from 'react';
-import { DomainParts } from '@/utils/domainUtils';
+import type { DomainParts } from '@/types/domain';
 
 interface LogoPreviewProps {
   parts: DomainParts;

@@ -1,5 +1,5 @@
-import { AIService, AIProvider, DEFAULT_PROVIDER } from '../services/AIService';
-import { DomainParts } from '../types/domain';
+import { AIService, DEFAULT_PROVIDER } from '@/services/AIService';
+import type { DomainParts } from '@/types/domain';
 
 const aiService = new AIService(DEFAULT_PROVIDER);
 
