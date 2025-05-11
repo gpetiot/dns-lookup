@@ -1,5 +1,6 @@
 import React from 'react';
 import type { DomainParts } from '@/types/domain';
+import { suffixes } from '@/utils/domainUtils';
 
 interface LogoPreviewProps {
   parts: DomainParts;
@@ -68,11 +69,13 @@ const LogoPreview: React.FC<LogoPreviewProps> = ({ parts }) => {
           <span className={baseStyle}>{capitalizeWords(substitute(input))}</span>
           <span className={getHighlightStyle(parts.suffix)}>{capitalizeWords(parts.suffix)}</span>
         </>
-      ) : (
+      ) : suffixes.includes(parts.ext) ? (
         <>
           <span className={baseStyle}>{capitalizeWords(substitute(input))}</span>
           <span className={getHighlightStyle(parts.ext)}>{capitalizeWords(parts.ext)}</span>
         </>
+      ) : (
+        <span className={baseStyle}>{capitalizeWords(substitute(input))}</span>
       )}
     </div>
   );
