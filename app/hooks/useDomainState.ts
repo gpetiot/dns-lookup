@@ -67,7 +67,7 @@ export function useDomainState(): [DomainState, DomainStateActions] {
               onComplete();
             }
           });
-        }, index * 300);
+        }, index * 100);
       });
     },
     [checkSingleDomain]
