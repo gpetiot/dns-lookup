@@ -4,4 +4,5 @@ export const featuredDomains = [
   'Hemilio',
   'Foundig',
   'Kampuzz',
+  'Draw Next'
 ];
