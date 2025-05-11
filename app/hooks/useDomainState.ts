@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { checkDomain } from '@/services/whoisService';
 import { generateDomainVariations, sanitizeDomain } from '@/utils/domainUtils';
 import type { DomainParts, DomainResults } from '@/types/domain';
@@ -31,31 +31,61 @@ export function useDomainState(): [DomainState, DomainStateActions] {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Effect to check featured domains on initial load
-  useEffect(() => {
-    const checkFeaturedDomains = async () => {
-      const featuredVariations = featuredDomains.map(domain => parseFeaturedDomain(domain));
+  // Memoize the checkSingleDomain function to prevent recreating it on every render
+  const checkSingleDomain = useCallback(async (domainToCheck: string) => {
+    try {
+      const result = await checkDomain(domainToCheck);
+      setDomainResults(prev => ({
+        ...prev,
+        [domainToCheck]: { loading: false, data: result.data },
+      }));
+      return result;
+    } catch (err: any) {
+      console.error(`Error checking ${domainToCheck}:`, err);
+      setDomainResults(prev => ({
+        ...prev,
+        [domainToCheck]: {
+          loading: false,
+          data: {
+            domainName: domainToCheck,
+            isAvailable: false,
+            status: err.message,
+          },
+        },
+      }));
+      throw err;
+    }
+  }, []);
 
-      // Set initial variations with featured domains
-      setDomainVariations(featuredVariations);
-
-      // Initialize results for featured domains
-      const initialResults: DomainResults = {};
-      featuredVariations.forEach(variation => {
-        initialResults[variation.domain] = { loading: true };
-      });
-      setDomainResults(initialResults);
-
-      // Check each featured domain
-      featuredVariations.forEach((variation, index) => {
+  // Helper function to check multiple domains with delay
+  const checkDomainsWithDelay = useCallback(
+    (variations: DomainParts[], onComplete?: () => void) => {
+      variations.forEach((variation, index) => {
         setTimeout(() => {
-          checkSingleDomain(variation.domain);
+          checkSingleDomain(variation.domain).finally(() => {
+            if (index === variations.length - 1 && onComplete) {
+              onComplete();
+            }
+          });
         }, index * 300);
       });
-    };
+    },
+    [checkSingleDomain]
+  );
 
-    checkFeaturedDomains();
-  }, []);
+  // Effect to check featured domains on initial load
+  useEffect(() => {
+    const featuredVariations = featuredDomains.map(parseFeaturedDomain);
+    setDomainVariations(featuredVariations);
+
+    const initialResults: DomainResults = {};
+    featuredVariations.forEach(variation => {
+      initialResults[variation.domain] = { loading: true };
+    });
+    setDomainResults(initialResults);
+
+    checkDomainsWithDelay(featuredVariations);
+  }, [checkDomainsWithDelay]);
 
   // Effect to read query parameter on initial load
   useEffect(() => {
@@ -82,48 +112,26 @@ export function useDomainState(): [DomainState, DomainStateActions] {
     return () => clearTimeout(timer);
   }, [sanitizedDomain, displayDomain]);
 
-  const handleDomainChange = (value: string) => {
+  const handleDomainChange = useCallback((value: string) => {
     setDomain(value);
     setSanitizedDomain(sanitizeDomain(value));
-  };
+  }, []);
 
-  const checkSingleDomain = async (domainToCheck: string) => {
-    try {
-      const result = await checkDomain(domainToCheck);
+  const retryDomainCheck = useCallback(
+    async (domainToRetry: string) => {
       setDomainResults(prev => ({
         ...prev,
-        [domainToCheck]: { loading: false, data: result.data },
+        [domainToRetry]: { loading: true },
       }));
-      return result;
-    } catch (err: any) {
-      console.error(`Error checking ${domainToCheck}:`, err);
-      setDomainResults(prev => ({
-        ...prev,
-        [domainToCheck]: {
-          loading: false,
-          data: {
-            domainName: domainToCheck,
-            isAvailable: false,
-            status: err.message,
-          },
-        },
-      }));
-      throw err;
-    }
-  };
 
-  const retryDomainCheck = async (domainToRetry: string) => {
-    setDomainResults(prev => ({
-      ...prev,
-      [domainToRetry]: { loading: true },
-    }));
-
-    try {
-      await checkSingleDomain(domainToRetry);
-    } catch (err) {
-      // Error already handled in checkSingleDomain
-    }
-  };
+      try {
+        await checkSingleDomain(domainToRetry);
+      } catch (err) {
+        // Error already handled in checkSingleDomain
+      }
+    },
+    [checkSingleDomain]
+  );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -143,7 +151,7 @@ export function useDomainState(): [DomainState, DomainStateActions] {
 
     // Generate new variations and combine with featured domains
     const searchVariations = generateDomainVariations(sanitizedDomain, domain);
-    const featuredVariations = featuredDomains.map(domain => parseFeaturedDomain(domain));
+    const featuredVariations = featuredDomains.map(parseFeaturedDomain);
     const allVariations = [...searchVariations, ...featuredVariations];
     setDomainVariations(allVariations);
 
@@ -155,24 +163,13 @@ export function useDomainState(): [DomainState, DomainStateActions] {
     setDomainResults(prev => ({ ...prev, ...initialResults }));
 
     try {
-      let completedCount = 0;
-      const totalToCheck = searchVariations.length;
-
-      searchVariations.forEach((variation, index) => {
-        setTimeout(() => {
-          checkSingleDomain(variation.domain).finally(() => {
-            completedCount++;
-            if (completedCount === totalToCheck) {
-              setLoading(false);
-            }
-          });
-        }, index * 300);
-      });
+      checkDomainsWithDelay(searchVariations, () => setLoading(false));
     } catch (err) {
       console.error('Error processing domain check:', err);
       setError('An error occurred while checking domains. Please try again later.');
       setLoading(false);
     } finally {
+      // Backup loading state reset
       setTimeout(
         () => {
           if (loading) {
