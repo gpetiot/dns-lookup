@@ -5,7 +5,7 @@ const aiService = new AIService(DEFAULT_PROVIDER);
 
 // Common TLDs for domain variations
 const commonTlds = [
-  'com', // Most common, used as default
+  'com',
   'net',
   'org',
   'io',
@@ -14,21 +14,30 @@ const commonTlds = [
   'dev',
   'ai',
   'me',
-  'info',
-  // 'pro',  // Temporarily disabled
+  //'info',
+  //'pro',
   'cc',
   'tech',
-  'site',
+  //'site',
   'studio',
   'xyz',
-  'online',
-  // 'store',  // Temporarily disabled
-  'blog',
-  // 'cloud',  // Temporarily disabled
+  //'online',
+  //'store',
+  //'blog',
+  //'cloud',
 ];
 
 // Prefixes for domain variations
-export const prefixes: string[] = ['get', 'try', 'use', 'hey', 'join', 'go', 'the', 'my'];
+export const prefixes: string[] = [
+  'get',
+  'try',
+  'use',
+  //'hey',
+  'join',
+  //'go',
+  //'the',
+  //'my',
+];
 
 // Suffixes for domain variations
 export const suffixes: string[] = [
@@ -37,16 +46,16 @@ export const suffixes: string[] = [
   'hub',
   'studio',
   'labs',
-  'way',
-  'me',
-  'tools',
-  'kit',
-  'tech',
-  'cloud',
-  'works',
-  'space',
-  'plus',
-  'pro',
+  //'way',
+  //'me',
+  //'tools',
+  //'kit',
+  //'tech',
+  //'cloud',
+  //'works',
+  //'space',
+  //'plus',
+  //'pro',
   'base',
 ];
 
