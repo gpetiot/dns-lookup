@@ -32,36 +32,39 @@ const LogoPreview: React.FC<LogoPreviewProps> = ({ parts }) => {
     // List of distinctly different sans-serif fonts optimized for logos
     const fonts = [
       {
-        font: "font-['Montserrat']",  // Geometric sans-serif, very popular in tech
-        spacing: 'tracking-normal'
+        font: "font-['Montserrat']", // Geometric sans-serif, very popular in tech
+        spacing: 'tracking-normal',
       },
       {
-        font: "font-['Oswald']",      // Condensed sans-serif, strong presence
-        spacing: 'tracking-wider'
+        font: "font-['Oswald']", // Condensed sans-serif, strong presence
+        spacing: 'tracking-wider',
       },
       {
-        font: "font-['Poppins']",     // Geometric with personality, startup favorite
-        spacing: 'tracking-normal'
+        font: "font-['Poppins']", // Geometric with personality, startup favorite
+        spacing: 'tracking-normal',
       },
       {
-        font: "font-['DM_Sans']",     // Modern with unique character, tech-friendly
-        spacing: 'tracking-normal'
+        font: "font-['DM_Sans']", // Modern with unique character, tech-friendly
+        spacing: 'tracking-normal',
       },
       {
-        font: "font-['Open_Sans']",   // Humanist sans-serif, highly readable
-        spacing: 'tracking-tight'      // Naturally wide spacing, can be tightened
+        font: "font-['Open_Sans']", // Humanist sans-serif, highly readable
+        spacing: 'tracking-tight', // Naturally wide spacing, can be tightened
       },
       {
-        font: "font-['Roboto']",      // Clean and neutral, versatile
-        spacing: 'tracking-normal'
-      }
+        font: "font-['Roboto']", // Clean and neutral, versatile
+        spacing: 'tracking-normal',
+      },
     ];
 
     // Use the full domain to generate a consistent random index
     const fullDomain = parts.domain;
-    const randomIndex = Math.abs(fullDomain.split('').reduce((acc, char) => {
-      return ((acc << 5) - acc) + char.charCodeAt(0);
-    }, 0)) % fonts.length;
+    const randomIndex =
+      Math.abs(
+        fullDomain.split('').reduce((acc, char) => {
+          return (acc << 5) - acc + char.charCodeAt(0);
+        }, 0)
+      ) % fonts.length;
 
     const selectedFont = fonts[randomIndex];
     return `${selectedFont.font} ${selectedFont.spacing}`;
