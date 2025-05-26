@@ -144,7 +144,8 @@ function App() {
                   data={domainResults[mainDomain.domain].data}
                   loading={domainResults[mainDomain.domain]?.loading}
                   onRetry={() => retryDomainCheck(mainDomain.domain)}
-                  showPrice={true}
+                  // Disable price check API to save resources
+                  showPrice={false}
                 />
               </div>
             )}
