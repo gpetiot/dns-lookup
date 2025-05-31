@@ -3,6 +3,11 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   output: 'standalone',
+  experimental: {
+    optimizeCss: true,
+  },
+  poweredByHeader: false,
+  compress: true,
 }
 
 module.exports = nextConfig 
