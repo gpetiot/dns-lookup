@@ -7,7 +7,6 @@ import AvailableIcon from './icons/AvailableIcon';
 import RegisteredIcon from './icons/RegisteredIcon';
 import RetryIcon from './icons/RetryIcon';
 import WarningIcon from './icons/WarningIcon';
-import LogoPreview from './LogoPreview';
 import type { WhoIsResult } from '@/types/domain';
 import { getDomainPrice } from '@/services/domainPriceService';
 
@@ -115,12 +114,6 @@ const DomainResult: React.FC<DomainResultProps> = ({
             <div className="text-xs font-medium text-amber-500">{data.status}</div>
           </div>
         )}
-
-        {isAvailable && (
-          <div className="pl-7">
-            <LogoPreview parts={parts} />
-          </div>
-        )}
       </div>
 
       {/* Right Column: Retry Button, Price, or Broker Link */}
@@ -145,7 +138,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
               <div className="flex flex-col items-end">
                 <div className="flex items-center gap-1">
                   <span
-                    className={`text-sm font-semibold ${price.isPremium ? 'text-amber-500' : 'text-primary'}`}
+                    className={`text-sm font-semibold ${price.isPremium ? 'text-amber-500' : 'text-green-700'}`}
                   >
                     {formatPrice(price.registration, price.currency)}
                   </span>
