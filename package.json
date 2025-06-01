@@ -31,6 +31,7 @@
     "@types/react-dom": "^18.2.19",
     "@types/whois-parsed": "^1.0.3",
     "autoprefixer": "^10.4.17",
+    "critters": "^0.0.23",
     "postcss": "^8.4.35",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.11",
