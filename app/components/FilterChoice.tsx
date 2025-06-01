@@ -12,10 +12,10 @@ const FilterChoice: React.FC<FilterChoiceProps> = ({ value, isSelected, onClick,
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-200 ${
+      className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200 ${
         isSelected
-          ? 'bg-primary text-background shadow-sm'
-          : 'bg-background-lighter text-text-muted hover:bg-background-lighter hover:text-text'
+          ? 'bg-primary text-white shadow-sm'
+          : 'bg-background-lighter text-text-muted hover:bg-background-lighter/80 hover:text-text'
       }`}
     >
       {text}

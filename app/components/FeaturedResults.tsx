@@ -22,14 +22,16 @@ const FeaturedResults: React.FC<FeaturedResultsProps> = ({
 
   return (
     <div className="relative mb-8 w-full">
-      <div className="absolute -inset-1 -z-10 rounded-xl bg-yellow-400/20 blur-lg" />
+      <div className="absolute -inset-1 -z-10 rounded-xl bg-primary/5 blur-lg" />
 
-      <div className="rounded-xl bg-background/80 backdrop-blur-sm">
-        <h2 className="mb-4 border-b pb-2 text-xl font-semibold text-text">Random Gems</h2>
+      <div className="rounded-xl border border-background-lighter bg-background/95 p-4 backdrop-blur-sm">
+        <h2 className="mb-4 border-b border-background-lighter pb-3 text-xl font-semibold text-text">
+          Random Gems
+        </h2>
 
         {filteredFeaturedDomains.length > 0 ? (
           <>
-            <p className="mb-4 text-sm text-text-muted">
+            <p className="mb-4 text-sm font-medium text-text-muted">
               {featuredDomains.length > 0 ? (
                 <>
                   Found {featuredDomains.length} cool{' '}
@@ -56,7 +58,7 @@ const FeaturedResults: React.FC<FeaturedResultsProps> = ({
             </div>
           </>
         ) : (
-          <div className="text-center text-sm italic text-gray-500">
+          <div className="text-center text-sm font-medium italic text-text-muted">
             No random gems match the current filter.
           </div>
         )}

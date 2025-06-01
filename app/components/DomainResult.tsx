@@ -51,12 +51,12 @@ const DomainResult: React.FC<DomainResultProps> = ({
 
   // Apply neutral styling for loading state, otherwise use status-based colors
   const bgColorClass = loading
-    ? 'bg-background border-background-lighter'
+    ? 'bg-background-light border-background-lighter'
     : isAvailable
-      ? 'bg-primary/5 border-primary/10'
+      ? 'bg-primary/10 border-primary/20'
       : hasError
-        ? 'bg-amber-500/5 border-amber-500/10'
-        : 'bg-background-lighter/30';
+        ? 'bg-amber-500/10 border-amber-500/20'
+        : 'bg-background-lighter/50';
 
   const formatPrice = (amount: number, currency: string) => {
     return new Intl.NumberFormat('en-US', {
@@ -67,12 +67,12 @@ const DomainResult: React.FC<DomainResultProps> = ({
 
   return (
     <div
-      className={`flex flex-row items-start justify-between rounded-lg border px-2.5 py-2 sm:px-4 sm:py-3 ${bgColorClass} relative gap-3 shadow-sm`}
+      className={`flex flex-row items-start justify-between rounded-lg border px-3 py-2.5 ${bgColorClass} relative gap-3`}
     >
       {/* Left Column: Status Icon + Domain */}
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <div className="flex items-center">
-          <div className="mr-2 w-5 flex-shrink-0 sm:mr-3 sm:w-8">
+          <div className="mr-2.5 w-5 flex-shrink-0">
             {loading ? (
               <LoadingIcon />
             ) : data?.isRateLimited ? (
@@ -86,7 +86,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
             )}
           </div>
 
-          <div className="sm:text-md truncate text-sm font-medium">
+          <div className="truncate text-base font-medium">
             {loading ? (
               <span className="text-text-muted">{parts.domain}</span>
             ) : data?.isRateLimited ? (
@@ -94,7 +94,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
             ) : hasError ? (
               <span className="text-text-muted">{parts.domain}</span>
             ) : isAvailable ? (
-              <span className="font-medium text-primary">{parts.domain}</span>
+              <span className="font-semibold text-primary">{parts.domain}</span>
             ) : (
               <a
                 href={`https://${parts.domain}`}
@@ -111,13 +111,13 @@ const DomainResult: React.FC<DomainResultProps> = ({
 
         {/* Error message */}
         {(hasError || data?.isRateLimited) && data?.status && (
-          <div className="pl-7 sm:pl-11">
-            <div className="text-xs text-amber-500">{data.status}</div>
+          <div className="pl-7">
+            <div className="text-xs font-medium text-amber-500">{data.status}</div>
           </div>
         )}
 
         {isAvailable && (
-          <div className="pl-7 sm:pl-11">
+          <div className="pl-7">
             <LogoPreview parts={parts} />
           </div>
         )}
@@ -140,22 +140,22 @@ const DomainResult: React.FC<DomainResultProps> = ({
         {isAvailable && (
           <div className="flex flex-col items-end gap-1.5 sm:flex-row sm:items-center sm:gap-4">
             {loadingPrice ? (
-              <div className="text-xs text-text-muted">Loading price...</div>
+              <div className="text-xs font-medium text-text-muted">Loading price...</div>
             ) : price ? (
               <div className="flex flex-col items-end">
                 <div className="flex items-center gap-1">
                   <span
-                    className={`text-sm font-medium ${price.isPremium ? 'text-amber-500' : 'text-primary'}`}
+                    className={`text-sm font-semibold ${price.isPremium ? 'text-amber-500' : 'text-primary'}`}
                   >
                     {formatPrice(price.registration, price.currency)}
                   </span>
                   {price.isPremium && (
-                    <span className="rounded-full bg-amber-500/10 px-1.5 py-0.5 text-xs font-medium text-amber-500">
+                    <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-500">
                       Premium
                     </span>
                   )}
                 </div>
-                <div className="text-xs text-text-muted">
+                <div className="text-xs font-medium text-text-muted">
                   Renewal: {formatPrice(price.renewal, price.currency)}/yr
                 </div>
               </div>
@@ -164,7 +164,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
               href={`https://porkbun.com/checkout/search?q=${parts.domain}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center rounded-md border border-primary/20 bg-primary/5 px-2.5 py-1 text-xs font-medium text-primary transition-colors duration-200 hover:border-primary/30 hover:bg-primary/10 sm:px-3 sm:py-1.5"
+              className="inline-flex items-center rounded-md border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors duration-200 hover:border-primary/30 hover:bg-primary/15"
             >
               Porkbun
               <ExternalLinkIcon className="ml-1.5 h-3 w-3" />
