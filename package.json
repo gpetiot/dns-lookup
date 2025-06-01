@@ -15,6 +15,7 @@
     "@heroicons/react": "^2.1.1",
     "axios": "^1.6.7",
     "clsx": "^2.1.0",
+    "express-rate-limit": "^7.5.0",
     "net": "^1.0.2",
     "next": "14.1.0",
     "react": "^18.2.0",
@@ -24,6 +25,7 @@
     "whois-parser": "^1.0.3"
   },
   "devDependencies": {
+    "@types/next": "^8.0.7",
     "@types/node": "^20.11.19",
     "@types/react": "^18.2.57",
     "@types/react-dom": "^18.2.19",
