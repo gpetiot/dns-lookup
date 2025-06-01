@@ -96,8 +96,10 @@ const LogoPreview: React.FC<LogoPreviewProps> = ({ parts }) => {
     }, text);
   };
 
-  const input = parts.input.split('.')[0];
-  const selectedFont = getFontForText(parts.input);
+  // Use input if available, otherwise fall back to base
+  const displayText = parts.input || parts.base;
+  const baseName = displayText.split('.')[0];
+  const selectedFont = getFontForText(displayText);
   const baseStyle = `${selectedFont} text-gray-800`;
   const getHighlightStyle = (text: string) => `${selectedFont} ${getColorForText(text)}`;
 
@@ -106,20 +108,20 @@ const LogoPreview: React.FC<LogoPreviewProps> = ({ parts }) => {
       {parts.prefix ? (
         <>
           <span className={getHighlightStyle(parts.prefix)}>{capitalizeWords(parts.prefix)}</span>
-          <span className={baseStyle}>{capitalizeWords(substitute(input))}</span>
+          <span className={baseStyle}>{capitalizeWords(substitute(baseName))}</span>
         </>
       ) : parts.suffix ? (
         <>
-          <span className={baseStyle}>{capitalizeWords(substitute(input))}</span>
+          <span className={baseStyle}>{capitalizeWords(substitute(baseName))}</span>
           <span className={getHighlightStyle(parts.suffix)}>{capitalizeWords(parts.suffix)}</span>
         </>
       ) : suffixes.includes(parts.ext) ? (
         <>
-          <span className={baseStyle}>{capitalizeWords(substitute(input))}</span>
+          <span className={baseStyle}>{capitalizeWords(substitute(baseName))}</span>
           <span className={getHighlightStyle(parts.ext)}>{capitalizeWords(parts.ext)}</span>
         </>
       ) : (
-        <span className={baseStyle}>{capitalizeWords(substitute(input))}</span>
+        <span className={baseStyle}>{capitalizeWords(substitute(baseName))}</span>
       )}
     </div>
   );

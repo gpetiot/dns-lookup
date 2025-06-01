@@ -15,9 +15,12 @@ export interface DomainPrice {
 
 export interface DomainParts {
   domain: string;
-  name: string;
-  tld: string;
-  type: 'original' | 'alternative' | 'featured' | 'ai';
+  base: string;
+  ext: string;
+  type?: 'original' | 'alternative' | 'featured' | 'ai';
+  prefix?: string;
+  suffix?: string;
+  input?: string;
 }
 
 export interface DomainResult {
