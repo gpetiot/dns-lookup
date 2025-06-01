@@ -1,4 +1,4 @@
-import type { WhoIsResult } from 'whois-parsed';
+import type { WhoIsResult } from '@/types/domain';
 
 interface ApiResponse {
   domain: string;
