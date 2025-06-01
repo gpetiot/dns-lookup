@@ -1,42 +1,51 @@
 import whois from 'whois-parsed';
 import { NextResponse } from 'next/server';
-import rateLimit from 'express-rate-limit';
+import { headers } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
-// Create limiter instance
-const limiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour window
-  max: 100, // limit each IP to 100 requests per window
-  message: 'Too many requests from this IP, please try again after an hour',
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  skipFailedRequests: false, // Don't count failed requests
-});
+// Simple in-memory store for rate limiting
+const rateLimitMap = new Map<string, { count: number; timestamp: number }>();
+const WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const MAX_REQUESTS = 100;
 
-// Wrapper for the rate limiter to work with Next.js Edge API routes
-const applyRateLimit = (request: Request) =>
-  new Promise((resolve, reject) => {
-    const res = new NextResponse();
-    limiter(
-      Object.assign(request, {
-        headers: Object.fromEntries(request.headers.entries()),
-      }),
-      res,
-      (result: unknown) => {
-        if (res.status === 429) {
-          reject(res);
-        } else {
-          resolve(result);
-        }
-      }
-    );
-  });
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+
+  if (!record) {
+    rateLimitMap.set(ip, { count: 1, timestamp: now });
+    return false;
+  }
+
+  if (now - record.timestamp > WINDOW_MS) {
+    // Reset window
+    rateLimitMap.set(ip, { count: 1, timestamp: now });
+    return false;
+  }
+
+  if (record.count >= MAX_REQUESTS) {
+    return true;
+  }
+
+  record.count++;
+  return false;
+}
 
 export async function GET(request: Request): Promise<NextResponse> {
   try {
-    // Apply rate limiting
-    await applyRateLimit(request);
+    // Get client IP
+    const headersList = headers();
+    const forwardedFor = headersList.get('x-forwarded-for');
+    const ip = forwardedFor ? forwardedFor.split(',')[0] : 'unknown';
+
+    // Check rate limit
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
 
     const { searchParams } = new URL(request.url);
     const domain = searchParams.get('domain');
@@ -52,16 +61,11 @@ export async function GET(request: Request): Promise<NextResponse> {
       data: result,
     });
   } catch (err: any) {
-    if (err instanceof NextResponse && err.status === 429) {
-      return err;
-    }
-
-    const domain = new URL(request.url).searchParams.get('domain');
-    console.error(`Error checking ${domain}:`, err);
+    console.error(`Error checking ${new URL(request.url).searchParams.get('domain')}:`, err);
     return NextResponse.json({
-      domain,
+      domain: new URL(request.url).searchParams.get('domain'),
       data: {
-        domainName: domain,
+        domainName: new URL(request.url).searchParams.get('domain'),
         isAvailable: false,
         status: err.message,
       },
