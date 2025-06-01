@@ -93,7 +93,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
             ) : hasError ? (
               <span className="text-text-muted">{parts.domain}</span>
             ) : isAvailable ? (
-              <span className="font-semibold text-green-700">{parts.domain}</span>
+              <span className="text-green-700">{parts.domain}</span>
             ) : (
               <a
                 href={`https://${parts.domain}`}
