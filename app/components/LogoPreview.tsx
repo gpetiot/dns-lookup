@@ -29,30 +29,26 @@ const LogoPreview: React.FC<LogoPreviewProps> = ({ parts }) => {
 
   // Get a consistent font for a given text
   const getFontForText = (text: string) => {
-    // List of distinctly different sans-serif fonts optimized for logos
+    // List of highly readable sans-serif fonts optimized for logos
     const fonts = [
       {
-        font: "font-['Montserrat']", // Geometric sans-serif, very popular in tech
+        font: "font-['Inter']", // Modern, highly readable, tech-friendly
         spacing: 'tracking-normal',
       },
       {
-        font: "font-['Oswald']", // Condensed sans-serif, strong presence
-        spacing: 'tracking-wider',
-      },
-      {
-        font: "font-['Poppins']", // Geometric with personality, startup favorite
+        font: "font-['Poppins']", // Clean, modern, great readability
         spacing: 'tracking-normal',
       },
       {
-        font: "font-['DM_Sans']", // Modern with unique character, tech-friendly
+        font: "font-['DM_Sans']", // Modern, balanced, excellent legibility
         spacing: 'tracking-normal',
       },
       {
-        font: "font-['Open_Sans']", // Humanist sans-serif, highly readable
-        spacing: 'tracking-tight', // Naturally wide spacing, can be tightened
+        font: "font-['Roboto']", // Clean, neutral, highly readable
+        spacing: 'tracking-normal',
       },
       {
-        font: "font-['Roboto']", // Clean and neutral, versatile
+        font: "font-['Open_Sans']", // Humanist sans-serif, optimized for screens
         spacing: 'tracking-normal',
       },
     ];
