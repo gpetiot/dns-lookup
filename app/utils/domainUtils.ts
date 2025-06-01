@@ -29,11 +29,11 @@ const commonTlds = [
 
 // Prefixes for domain variations
 export const prefixes: string[] = [
-  'get',
-  'try',
-  'use',
+  //'get',
+  //'try',
+  //'use',
   //'hey',
-  'join',
+  //'join',
   //'go',
   //'the',
   //'my',
@@ -43,7 +43,7 @@ export const prefixes: string[] = [
 export const suffixes: string[] = [
   'app',
   'hq',
-  'hub',
+  //'hub',
   'studio',
   'labs',
   //'way',
@@ -56,7 +56,7 @@ export const suffixes: string[] = [
   //'space',
   //'plus',
   //'pro',
-  'base',
+  //'base',
 ];
 
 /**
