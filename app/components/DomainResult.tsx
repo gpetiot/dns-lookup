@@ -53,10 +53,10 @@ const DomainResult: React.FC<DomainResultProps> = ({
   const bgColorClass = loading
     ? 'bg-background-light border-background-lighter'
     : isAvailable
-      ? 'bg-primary/10 border-primary/20'
+      ? 'bg-green-600/10 border-green-600/20'
       : hasError
         ? 'bg-amber-500/10 border-amber-500/20'
-        : 'bg-background-lighter/50';
+        : 'bg-red-600/10 border-red-600/20';
 
   const formatPrice = (amount: number, currency: string) => {
     return new Intl.NumberFormat('en-US', {
@@ -80,9 +80,9 @@ const DomainResult: React.FC<DomainResultProps> = ({
             ) : hasError ? (
               <ErrorIcon />
             ) : isAvailable ? (
-              <AvailableIcon />
+              <AvailableIcon className="text-green-600" />
             ) : (
-              <RegisteredIcon />
+              <RegisteredIcon className="text-red-600" />
             )}
           </div>
 
@@ -94,13 +94,13 @@ const DomainResult: React.FC<DomainResultProps> = ({
             ) : hasError ? (
               <span className="text-text-muted">{parts.domain}</span>
             ) : isAvailable ? (
-              <span className="font-semibold text-primary">{parts.domain}</span>
+              <span className="font-semibold text-green-700">{parts.domain}</span>
             ) : (
               <a
                 href={`https://${parts.domain}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center text-text-muted hover:text-text hover:underline"
+                className="flex items-center text-red-700 hover:text-red-800 hover:underline"
               >
                 {parts.domain}
                 <ExternalLinkIcon className="ml-1 inline-block h-3 w-3 flex-shrink-0" />
@@ -164,7 +164,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
               href={`https://porkbun.com/checkout/search?q=${parts.domain}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center rounded-md border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors duration-200 hover:border-primary/30 hover:bg-primary/15"
+              className="inline-flex items-center rounded-md border border-green-600/20 bg-green-600/10 px-3 py-1.5 text-xs font-medium text-green-700 transition-colors duration-200 hover:border-green-600/30 hover:bg-green-600/15"
             >
               Porkbun
               <ExternalLinkIcon className="ml-1.5 h-3 w-3" />
