@@ -6,8 +6,9 @@ import ErrorIcon from './icons/ErrorIcon';
 import AvailableIcon from './icons/AvailableIcon';
 import RegisteredIcon from './icons/RegisteredIcon';
 import RetryIcon from './icons/RetryIcon';
+import WarningIcon from './icons/WarningIcon';
 import LogoPreview from './LogoPreview';
-import type { WhoIsResult } from 'whois-parsed';
+import type { WhoIsResult } from '@/types/domain';
 import { getDomainPrice } from '@/services/domainPriceService';
 
 interface DomainResultProps {
@@ -27,7 +28,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
 }) => {
   const [price, setPrice] = useState<DomainPrice | null>(null);
   const [loadingPrice, setLoadingPrice] = useState(false);
-  const hasError = false;
+  const hasError = data?.isRateLimited || false;
   const isAvailable = data?.isAvailable;
 
   useEffect(() => {
@@ -54,7 +55,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
     : isAvailable
       ? 'bg-primary/5 border-primary/10'
       : hasError
-        ? 'bg-background'
+        ? 'bg-amber-500/5 border-amber-500/10'
         : 'bg-background-lighter/30';
 
   const formatPrice = (amount: number, currency: string) => {
@@ -74,6 +75,8 @@ const DomainResult: React.FC<DomainResultProps> = ({
           <div className="mr-2 w-5 flex-shrink-0 sm:mr-3 sm:w-8">
             {loading ? (
               <LoadingIcon />
+            ) : data?.isRateLimited ? (
+              <WarningIcon />
             ) : hasError ? (
               <ErrorIcon />
             ) : isAvailable ? (
@@ -85,6 +88,8 @@ const DomainResult: React.FC<DomainResultProps> = ({
 
           <div className="sm:text-md truncate text-sm font-medium">
             {loading ? (
+              <span className="text-text-muted">{parts.domain}</span>
+            ) : data?.isRateLimited ? (
               <span className="text-text-muted">{parts.domain}</span>
             ) : hasError ? (
               <span className="text-text-muted">{parts.domain}</span>
@@ -115,13 +120,13 @@ const DomainResult: React.FC<DomainResultProps> = ({
       <div className={`flex min-w-fit flex-col items-end justify-center gap-1.5 sm:gap-3`}>
         {loading && <div className="text-xs text-text-muted">Checking...</div>}
 
-        {hasError && data?.status && (
+        {(hasError || data?.isRateLimited) && data?.status && (
           <div className="flex items-center">
-            <div className="mr-2 max-w-xs truncate text-xs text-text-muted">{data.status}</div>
+            <div className="mr-2 max-w-xs truncate text-xs text-amber-500">{data.status}</div>
             {onRetry && (
               <button
                 onClick={onRetry}
-                className="rounded-md bg-primary px-2 py-1 text-xs font-medium text-background transition duration-200 hover:bg-primary-dark sm:px-3 sm:py-1.5"
+                className="rounded-md bg-amber-500 px-2 py-1 text-xs font-medium text-white transition duration-200 hover:bg-amber-600 sm:px-3 sm:py-1.5"
               >
                 <RetryIcon />
                 Retry

@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 // Simple in-memory store for rate limiting
 const rateLimitMap = new Map<string, { count: number; timestamp: number }>();
 const WINDOW_MS = 60 * 60 * 1000; // 1 hour
-const MAX_REQUESTS = 100;
+const MAX_REQUESTS = 50;
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();

@@ -17,6 +17,10 @@ export const checkDomain = async (domainToCheck: string): Promise<ApiResponse> =
     const response = await fetch(`/api/check-domain?domain=${encodeURIComponent(domainToCheck)}`);
 
     if (!response.ok) {
+      const errorData = await response.json();
+      if (response.status === 429) {
+        throw new Error(`Rate limit exceeded: ${errorData.error}`);
+      }
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
 
@@ -30,6 +34,7 @@ export const checkDomain = async (domainToCheck: string): Promise<ApiResponse> =
         domainName: domainToCheck,
         isAvailable: false,
         status: err.message,
+        isRateLimited: err.message.includes('Rate limit exceeded'),
       },
     };
   }

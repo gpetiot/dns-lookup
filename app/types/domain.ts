@@ -1,4 +1,9 @@
-import type { WhoIsResult } from 'whois-parsed';
+import type { WhoIsResult as BaseWhoIsResult } from 'whois-parsed';
+
+// Extend the WhoIsResult type to include our custom properties
+export interface WhoIsResult extends BaseWhoIsResult {
+  isRateLimited?: boolean;
+}
 
 export interface DomainPrice {
   registration: number;
@@ -10,12 +15,9 @@ export interface DomainPrice {
 
 export interface DomainParts {
   domain: string;
-  prefix?: string;
-  suffix?: string;
-  base: string;
-  ext: string;
-  input: string;
-  isFeatured?: boolean;
+  name: string;
+  tld: string;
+  type: 'original' | 'alternative' | 'featured' | 'ai';
 }
 
 export interface DomainResult {
