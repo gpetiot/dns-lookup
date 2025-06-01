@@ -70,7 +70,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
       className={`flex flex-row items-start justify-between rounded-lg border px-2.5 py-2 sm:px-4 sm:py-3 ${bgColorClass} relative gap-3 shadow-sm`}
     >
       {/* Left Column: Status Icon + Domain */}
-      <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:flex-row sm:gap-3">
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <div className="flex items-center">
           <div className="mr-2 w-5 flex-shrink-0 sm:mr-3 sm:w-8">
             {loading ? (
@@ -90,7 +90,7 @@ const DomainResult: React.FC<DomainResultProps> = ({
             {loading ? (
               <span className="text-text-muted">{parts.domain}</span>
             ) : data?.isRateLimited ? (
-              <span className="text-text-muted">{parts.domain}</span>
+              <span className="text-amber-500">{parts.domain}</span>
             ) : hasError ? (
               <span className="text-text-muted">{parts.domain}</span>
             ) : isAvailable ? (
@@ -109,30 +109,32 @@ const DomainResult: React.FC<DomainResultProps> = ({
           </div>
         </div>
 
+        {/* Error message */}
+        {(hasError || data?.isRateLimited) && data?.status && (
+          <div className="pl-7 sm:pl-11">
+            <div className="text-xs text-amber-500">{data.status}</div>
+          </div>
+        )}
+
         {isAvailable && (
-          <div className="pl-7 sm:pl-0">
+          <div className="pl-7 sm:pl-11">
             <LogoPreview parts={parts} />
           </div>
         )}
       </div>
 
-      {/* Right Column: Error, Price, or Broker Link */}
+      {/* Right Column: Retry Button, Price, or Broker Link */}
       <div className={`flex min-w-fit flex-col items-end justify-center gap-1.5 sm:gap-3`}>
         {loading && <div className="text-xs text-text-muted">Checking...</div>}
 
-        {(hasError || data?.isRateLimited) && data?.status && (
-          <div className="flex items-center">
-            <div className="mr-2 max-w-xs truncate text-xs text-amber-500">{data.status}</div>
-            {onRetry && (
-              <button
-                onClick={onRetry}
-                className="rounded-md bg-amber-500 px-2 py-1 text-xs font-medium text-white transition duration-200 hover:bg-amber-600 sm:px-3 sm:py-1.5"
-              >
-                <RetryIcon />
-                Retry
-              </button>
-            )}
-          </div>
+        {(hasError || data?.isRateLimited) && onRetry && (
+          <button
+            onClick={onRetry}
+            className="inline-flex items-center gap-1 whitespace-nowrap rounded-md bg-amber-500 px-2 py-1 text-xs font-medium text-white transition duration-200 hover:bg-amber-600 sm:px-3 sm:py-1.5"
+          >
+            <RetryIcon />
+            <span>Retry</span>
+          </button>
         )}
 
         {isAvailable && (
