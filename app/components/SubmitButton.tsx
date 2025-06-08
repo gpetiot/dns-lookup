@@ -10,17 +10,16 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({ loading }) => {
     <button
       type="submit"
       disabled={loading}
-      className="flex h-full items-center rounded-md border border-primary bg-primary px-4 font-medium text-background transition-all duration-200 hover:border-primary-dark hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+      className="flex h-full items-center rounded-full border border-blue-500 bg-blue-500 px-6 font-medium text-white transition-all duration-200 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:border-gray-300 disabled:bg-gray-300"
     >
       {loading ? (
         <span className="flex items-center gap-2">
-          <span className="hidden sm:inline">Checking</span>
-          <LoadingIcon />
+          <LoadingIcon className="h-5 w-5 text-white" />
         </span>
       ) : (
-        <span className="flex items-center">
+        <span className="flex items-center gap-2">
           <span>Check</span>
-          <span className="hidden rounded border border-background/20 px-1 text-sm sm:ml-2 sm:inline-block">
+          <span className="hidden rounded bg-white/20 px-1.5 py-0.5 text-sm font-normal text-white sm:inline-block">
             ↵
           </span>
         </span>

@@ -61,128 +61,132 @@ function App() {
     mainDomainResult && !mainDomainResult.loading && mainDomainResult.data?.isAvailable === false;
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-background p-3 sm:p-4">
-      <div className="w-full max-w-7xl">
+    <div className="flex min-h-screen flex-col items-center bg-white">
+      <div className="w-full max-w-3xl px-4 sm:px-6 lg:px-8">
         {/* Header and Search Form */}
-        <div className="mb-8">
-          <h1 className="mb-6 mt-12 text-center font-display text-4xl font-semibold tracking-tight text-text sm:mb-8 sm:mt-16 sm:text-5xl">
-            <span className="relative inline-block">
-              <span className="absolute inset-0 -z-10 translate-y-3 bg-primary/10 blur-2xl"></span>
-              Sup'
-            </span>{' '}
-            <span className="relative inline-block bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              <span className="absolute inset-0 -z-10 translate-y-3 bg-secondary/10 blur-2xl"></span>
-              Domain
-            </span>
-          </h1>
-          <p className="mb-8 text-center text-base font-medium text-text-muted sm:text-lg">
+        <div className="flex flex-col items-center justify-center pt-16 sm:pt-24">
+          <h1 className="mb-8 font-display text-3xl font-medium text-gray-900">Sup' Domain</h1>
+
+          <p className="mb-12 max-w-lg text-center text-lg text-gray-600">
             Search domains safely. No sneaky snatching.
           </p>
 
           <form onSubmit={handleSubmit} className="w-full">
-            <div className="relative flex items-center">
-              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">
-                {mainDomainResult?.loading ? (
-                  <LoadingIcon />
-                ) : isMainDomainAvailable ? (
-                  <AvailableIcon />
-                ) : isMainDomainUnavailable ? (
-                  <RegisteredIcon />
-                ) : (
-                  <SearchIcon />
-                )}
-              </span>
-              <input
-                type="text"
-                name="domain"
-                id="domain"
-                placeholder="Search for a domain name here..."
-                value={domain}
-                onChange={handleDomainChange}
-                className={`w-full rounded-xl border-2 bg-background py-3.5 pl-12 pr-[130px] text-base shadow-sm transition-all duration-200 focus:outline-none ${
-                  isMainDomainAvailable
-                    ? 'border-green-600/30 font-medium text-green-700 ring-green-600/20 focus:border-green-600 focus:ring-2 focus:ring-green-600/20'
-                    : isMainDomainUnavailable
-                      ? 'border-red-600/30 text-red-700 ring-red-600/20 focus:border-red-600 focus:ring-2 focus:ring-red-600/20'
-                      : 'border-background-lighter text-text ring-primary/20 focus:border-primary focus:ring-2 focus:ring-primary/20'
-                }`}
-              />
-              <div className="absolute right-2 top-1/2 flex h-[calc(100%-16px)] -translate-y-1/2 items-center gap-1.5">
-                <ShareButton displayDomain={domain} />
-                <SubmitButton loading={loading} />
+            <div className="relative mb-6">
+              <div className="relative flex items-center">
+                <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  {mainDomainResult?.loading ? (
+                    <LoadingIcon className="h-5 w-5" />
+                  ) : isMainDomainAvailable ? (
+                    <AvailableIcon className="h-5 w-5 text-green-600" />
+                  ) : isMainDomainUnavailable ? (
+                    <RegisteredIcon className="h-5 w-5 text-red-600" />
+                  ) : (
+                    <SearchIcon className="h-5 w-5" />
+                  )}
+                </span>
+                <input
+                  type="text"
+                  name="domain"
+                  id="domain"
+                  placeholder="Search for a domain name here..."
+                  value={domain}
+                  onChange={handleDomainChange}
+                  className={`w-full rounded-full border-2 bg-white py-4 pl-12 pr-[130px] text-lg shadow-sm transition-all duration-200 focus:outline-none ${
+                    isMainDomainAvailable
+                      ? 'border-green-600/30 font-medium text-green-700 ring-green-600/20 focus:border-green-600 focus:ring-2 focus:ring-green-600/20'
+                      : isMainDomainUnavailable
+                        ? 'border-red-600/30 text-red-700 ring-red-600/20 focus:border-red-600 focus:ring-2 focus:ring-red-600/20'
+                        : 'border-gray-200 text-gray-900 hover:border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+                  }`}
+                />
+                <div className="absolute right-2 top-1/2 flex h-[calc(100%-16px)] -translate-y-1/2 items-center gap-1.5">
+                  <ShareButton displayDomain={domain} />
+                  <SubmitButton loading={loading} />
+                </div>
+
+                <ImplicitComSuffix domain={domain} />
               </div>
 
-              <ImplicitComSuffix domain={domain} />
+              {domain && <DomainScore domain={sanitizedDomain} />}
             </div>
 
-            {domain && <DomainScore domain={sanitizedDomain} />}
+            {error && (
+              <div className="mb-6 rounded-lg border-l-4 border-red-500 bg-red-50 p-4 text-red-700">
+                <p className="font-medium">{error}</p>
+              </div>
+            )}
           </form>
 
-          {error && (
-            <div className="mt-4 rounded-lg border-l-4 border-primary bg-primary/10 p-4 text-text">
-              <p className="font-medium">{error}</p>
-            </div>
-          )}
+          {/* Filter Controls */}
+          <div className="mb-8 w-full">
+            <FilterControls
+              availabilityFilter={filters.availabilityFilter}
+              tldFilter={filters.tldFilter}
+              onAvailabilityFilterChange={setAvailabilityFilter}
+              onTldFilterChange={setTldFilter}
+            />
+          </div>
         </div>
-
-        <FilterControls
-          availabilityFilter={filters.availabilityFilter}
-          tldFilter={filters.tldFilter}
-          onAvailabilityFilterChange={setAvailabilityFilter}
-          onTldFilterChange={setTldFilter}
-        />
 
         {/* Results Section */}
         {domainVariations.length > 0 ? (
-          <div className="mb-8 w-full space-y-8">
+          <div className="mb-16 space-y-8">
             {/* Original Domain */}
             {mainDomain && (
-              <div className="w-full">
+              <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:shadow-md">
                 <DomainResult
                   key={mainDomain.domain}
                   parts={mainDomain}
                   data={domainResults[mainDomain.domain].data}
                   loading={domainResults[mainDomain.domain]?.loading}
                   onRetry={() => retryDomainCheck(mainDomain.domain)}
-                  // Disable price check API to save resources
                   showPrice={false}
                 />
               </div>
             )}
 
             {/* Featured Domains */}
-            <FeaturedResults
-              featuredDomains={featuredDomains}
-              filteredFeaturedDomains={filteredFeaturedDomains}
-              domainResults={domainResults}
-              retryDomainCheck={retryDomainCheck}
-            />
+            <div className="space-y-4">
+              <FeaturedResults
+                featuredDomains={featuredDomains}
+                filteredFeaturedDomains={filteredFeaturedDomains}
+                domainResults={domainResults}
+                retryDomainCheck={retryDomainCheck}
+              />
+            </div>
 
             {/* AI Suggestions */}
-            <AISuggestionsResults
-              aiSuggestions={aiSuggestions}
-              filteredAiSuggestions={filteredAiSuggestions}
-              domainResults={domainResults}
-              isGeneratingAI={isGeneratingAI}
-              retryDomainCheck={retryDomainCheck}
-              onGenerateAI={() => handleGenerateAI(sanitizedDomain, checkSingleDomain)}
-            />
+            <div className="space-y-4">
+              <AISuggestionsResults
+                aiSuggestions={aiSuggestions}
+                filteredAiSuggestions={filteredAiSuggestions}
+                domainResults={domainResults}
+                isGeneratingAI={isGeneratingAI}
+                retryDomainCheck={retryDomainCheck}
+                onGenerateAI={() => handleGenerateAI(sanitizedDomain, checkSingleDomain)}
+              />
+            </div>
 
             {/* Alternative Extensions */}
-            <AlternativeExtensionsResults
-              alternativeExtensions={alternativeExtensions}
-              filteredAlternativeExtensions={filteredAlternativeExtensions}
-              domainResults={domainResults}
-              retryDomainCheck={retryDomainCheck}
-            />
+            <div className="space-y-4">
+              <AlternativeExtensionsResults
+                alternativeExtensions={alternativeExtensions}
+                filteredAlternativeExtensions={filteredAlternativeExtensions}
+                domainResults={domainResults}
+                retryDomainCheck={retryDomainCheck}
+              />
+            </div>
 
             {/* Alternative .com Suggestions */}
-            <AlternativeComResults
-              alternativeSuggestions={alternativeSuggestions}
-              filteredAlternativeSuggestions={filteredAlternativeSuggestions}
-              domainResults={domainResults}
-              retryDomainCheck={retryDomainCheck}
-            />
+            <div className="space-y-4">
+              <AlternativeComResults
+                alternativeSuggestions={alternativeSuggestions}
+                filteredAlternativeSuggestions={filteredAlternativeSuggestions}
+                domainResults={domainResults}
+                retryDomainCheck={retryDomainCheck}
+              />
+            </div>
           </div>
         ) : (
           <NoResultPlaceholder domain={domain} sanitizedDomain={sanitizedDomain} />

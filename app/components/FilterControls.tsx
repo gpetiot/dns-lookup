@@ -26,10 +26,11 @@ const FilterControls: React.FC<FilterControlsProps> = ({
   onTldFilterChange,
 }) => {
   return (
-    <div className="mb-6 flex flex-wrap items-center justify-start gap-x-6 gap-y-3 rounded-lg border border-background-lighter bg-background p-3 shadow-sm">
-      <div className="flex items-center gap-3">
-        <span className="text-sm font-medium text-text">Availability:</span>
-        <div className="flex gap-1.5">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center">
+      {/* Availability Filter */}
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-medium text-gray-500">Show:</span>
+        <div className="flex gap-1">
           {availabilityChoices.map(choice => (
             <FilterChoice
               key={choice.value}
@@ -41,9 +42,11 @@ const FilterControls: React.FC<FilterControlsProps> = ({
           ))}
         </div>
       </div>
-      <div className="flex items-center gap-3">
-        <span className="text-sm font-medium text-text">TLD:</span>
-        <div className="flex gap-1.5">
+
+      {/* TLD Filter */}
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-medium text-gray-500">TLD:</span>
+        <div className="flex gap-1">
           {tldChoices.map(choice => (
             <FilterChoice
               key={choice.value}
