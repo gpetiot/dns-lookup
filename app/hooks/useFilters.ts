@@ -1,36 +1,28 @@
 import { useState } from 'react';
-import type { AvailabilityFilter, TldFilter, DomainResults } from '@/types/domain';
-
-export interface FilterState {
-  availabilityFilter: AvailabilityFilter;
-  tldFilter: TldFilter;
-}
+import type { DomainResults } from '@/types/domain';
 
 export function useFilters() {
-  const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>('all');
-  const [tldFilter, setTldFilter] = useState<TldFilter>('all');
+  const [availableOnly, setAvailableOnly] = useState(false);
+  const [dotComOnly, setDotComOnly] = useState(false);
 
   const checkDomainAgainstFilters = (domainToCheck: string, results: DomainResults): boolean => {
-    // Availability Check
     const result = results[domainToCheck];
-    let isAvailableOk = true;
-    if (availabilityFilter === 'available') {
-      isAvailableOk = result && !result.loading && result.data?.isAvailable === true;
-    }
 
-    // TLD Check
-    let isTldOk = true;
-    if (tldFilter === 'com') {
-      isTldOk = domainToCheck.endsWith('.com');
-    }
+    // Skip filters if none are active
+    if (!availableOnly && !dotComOnly) return true;
 
-    return isAvailableOk && isTldOk;
+    // Check filters
+    const isAvailable =
+      !availableOnly || (result && !result.loading && result.data?.isAvailable === true);
+    const isDotCom = !dotComOnly || domainToCheck.endsWith('.com');
+
+    return isAvailable && isDotCom;
   };
 
   return {
-    filters: { availabilityFilter, tldFilter },
-    setAvailabilityFilter,
-    setTldFilter,
+    filters: { availableOnly, dotComOnly },
+    setAvailableOnly,
+    setDotComOnly,
     checkDomainAgainstFilters,
   };
 }

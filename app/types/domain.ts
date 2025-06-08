@@ -30,10 +30,7 @@ export interface DomainResult {
 
 export type DomainResults = Record<string, DomainResult>;
 
-export type AvailabilityFilter = 'all' | 'available';
-export type TldFilter = 'all' | 'com';
-
 export interface FilterState {
-  availabilityFilter: AvailabilityFilter;
-  tldFilter: TldFilter;
+  availableOnly: boolean;
+  dotComOnly: boolean;
 }

@@ -29,7 +29,7 @@ function App() {
   ] = useDomainState();
 
   const [{ aiSuggestions, isGeneratingAI }, { handleGenerateAI }] = useAISuggestions();
-  const { filters, setAvailabilityFilter, setTldFilter, checkDomainAgainstFilters } = useFilters();
+  const { filters, setAvailableOnly, setDotComOnly, checkDomainAgainstFilters } = useFilters();
 
   useFavicon(displayDomain, domainResults);
 
@@ -92,7 +92,7 @@ function App() {
                   placeholder="Search for a domain name here..."
                   value={domain}
                   onChange={handleDomainChange}
-                  className={`w-full rounded-full border-2 bg-white py-4 pl-12 pr-[130px] text-lg shadow-sm transition-all duration-200 focus:outline-none ${
+                  className={`w-full rounded-full border-2 bg-white py-4 pl-12 pr-[200px] text-lg shadow-sm transition-all duration-200 focus:outline-none ${
                     isMainDomainAvailable
                       ? 'border-green-600/30 font-medium text-green-700 ring-green-600/20 focus:border-green-600 focus:ring-2 focus:ring-green-600/20'
                       : isMainDomainUnavailable
@@ -101,6 +101,12 @@ function App() {
                   }`}
                 />
                 <div className="absolute right-2 top-1/2 flex h-[calc(100%-16px)] -translate-y-1/2 items-center gap-1.5">
+                  <FilterControls
+                    availableOnly={filters.availableOnly}
+                    dotComOnly={filters.dotComOnly}
+                    onAvailableOnlyChange={setAvailableOnly}
+                    onDotComOnlyChange={setDotComOnly}
+                  />
                   <ShareButton displayDomain={domain} />
                   <SubmitButton loading={loading} />
                 </div>
@@ -117,16 +123,6 @@ function App() {
               </div>
             )}
           </form>
-
-          {/* Filter Controls */}
-          <div className="mb-8 w-full">
-            <FilterControls
-              availabilityFilter={filters.availabilityFilter}
-              tldFilter={filters.tldFilter}
-              onAvailabilityFilterChange={setAvailabilityFilter}
-              onTldFilterChange={setTldFilter}
-            />
-          </div>
         </div>
 
         {/* Results Section */}
