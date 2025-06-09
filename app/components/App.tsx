@@ -3,7 +3,6 @@
 import React from 'react';
 import DomainResult from './DomainResult';
 import NoResultPlaceholder from './NoResultPlaceholder';
-import SearchIcon from './icons/SearchIcon';
 import FilterControls from './FilterControls';
 import SubmitButton from './SubmitButton';
 import ImplicitComSuffix from './ImplicitComSuffix';
@@ -80,7 +79,7 @@ function App() {
                   ) : isMainDomainUnavailable ? (
                     <RegisteredIcon className="h-5 w-5 text-red-600" />
                   ) : (
-                    <SearchIcon className="h-5 w-5" />
+                    <></>
                   )}
                 </span>
                 <input

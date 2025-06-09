@@ -1,5 +1,6 @@
 import React from 'react';
-import LoadingIcon from './icons/LoadingIcon';
+import LoadingIcon from '@/components/icons/LoadingIcon';
+import SearchIcon from '@/components/icons/SearchIcon';
 
 interface SubmitButtonProps {
   loading: boolean;
@@ -18,10 +19,7 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({ loading }) => {
         </span>
       ) : (
         <span className="flex items-center gap-2">
-          <span>Check</span>
-          <span className="hidden rounded bg-white/20 px-1.5 py-0.5 text-sm font-normal text-white sm:inline-block">
-            ↵
-          </span>
+          <SearchIcon className="h-5 w-5 text-white" />
         </span>
       )}
     </button>
