@@ -59,14 +59,8 @@ function App() {
   return (
     <div className="flex min-h-screen flex-col items-center bg-white">
       <div className="w-full max-w-3xl px-4 sm:px-6 lg:px-8">
-        {/* Header and Search Form */}
-        <div className="flex flex-col items-center justify-center pt-16 sm:pt-24">
-          <h1 className="mb-8 font-display text-3xl font-medium text-gray-900">Sup' Domain</h1>
-
-          <p className="mb-12 max-w-lg text-center text-lg text-gray-600">
-            Search domains safely. No sneaky snatching.
-          </p>
-
+        {/* Search Form */}
+        <div className="flex flex-col items-center justify-center">
           <form onSubmit={handleSubmit} className="w-full">
             <div className="relative mb-6">
               <div className="relative flex items-center">
@@ -120,7 +114,7 @@ function App() {
 
         {/* Results Section */}
         {domainVariations.length > 0 ? (
-          <div className="mb-16 space-y-8">
+          <div className="mb-8 space-y-8 sm:mb-12">
             {/* Original Domain */}
             {mainDomain && (
               <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:shadow-md">
@@ -178,7 +172,9 @@ function App() {
             </div>
           </div>
         ) : (
-          <></>
+          <div className="mb-8 text-center text-gray-500 sm:mb-12">
+            Enter a domain name to get started
+          </div>
         )}
       </div>
     </div>

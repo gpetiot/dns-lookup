@@ -2,6 +2,7 @@ import '@/styles/fonts.css';
 import '@/styles/globals.css';
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
+import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Script from 'next/script';
 
@@ -86,6 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </Script>
       </head>
       <body className={`${inter.className} flex min-h-full flex-col`}>
+        <Header />
         <main className="flex-grow">{children}</main>
         <Footer />
       </body>
