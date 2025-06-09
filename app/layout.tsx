@@ -86,7 +86,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           `}
         </Script>
       </head>
-      <body className={`${inter.className} flex h-full flex-col`}>
+      <body className={`${inter.className} flex h-full flex-col bg-white`}>
         <div className="flex min-h-screen flex-col">
           <Header />
           <main className="flex flex-1 flex-col justify-center">{children}</main>

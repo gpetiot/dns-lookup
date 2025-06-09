@@ -11,7 +11,7 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({ loading }) => {
     <button
       type="submit"
       disabled={loading}
-      className="flex h-full items-center rounded-full border border-blue-500 bg-blue-500 px-6 font-medium text-white transition-all duration-200 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:border-gray-300 disabled:bg-gray-300"
+      className="flex h-full items-center rounded-full border border-violet-500 bg-violet-500 px-6 font-medium text-white transition-all duration-200 hover:bg-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-500/20 disabled:border-gray-300 disabled:bg-gray-300"
     >
       {loading ? (
         <span className="flex items-center gap-2">

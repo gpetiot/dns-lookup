@@ -57,7 +57,7 @@ function App() {
     mainDomainResult && !mainDomainResult.loading && mainDomainResult.data?.isAvailable === false;
 
   return (
-    <div className="flex flex-col items-center bg-white py-4 sm:py-6">
+    <div className="flex flex-col items-center py-8 sm:py-12">
       <div className="w-full max-w-3xl px-4 sm:px-6 lg:px-8">
         {/* Search Form */}
         <div className="mb-6 flex flex-col items-center justify-center sm:mb-8">
@@ -68,9 +68,9 @@ function App() {
                   {mainDomainResult?.loading ? (
                     <LoadingIcon className="h-5 w-5" />
                   ) : isMainDomainAvailable ? (
-                    <AvailableIcon className="h-5 w-5 text-green-600" />
+                    <AvailableIcon className="h-5 w-5 text-emerald-600" />
                   ) : isMainDomainUnavailable ? (
-                    <RegisteredIcon className="h-5 w-5 text-red-600" />
+                    <RegisteredIcon className="h-5 w-5 text-rose-600" />
                   ) : (
                     <></>
                   )}
@@ -82,12 +82,12 @@ function App() {
                   placeholder="Search for a domain name here..."
                   value={domain}
                   onChange={handleDomainChange}
-                  className={`w-full rounded-full border-2 bg-white py-4 pl-12 pr-[200px] text-lg shadow-sm transition-all duration-200 focus:outline-none ${
+                  className={`w-full rounded-2xl border-2 bg-white py-4 pl-12 pr-[200px] text-lg shadow-md transition-all duration-200 focus:outline-none ${
                     isMainDomainAvailable
-                      ? 'border-green-600/30 font-medium text-green-700 ring-green-600/20 focus:border-green-600 focus:ring-2 focus:ring-green-600/20'
+                      ? 'border-emerald-400 font-medium text-emerald-700 ring-emerald-500/20 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20'
                       : isMainDomainUnavailable
-                        ? 'border-red-600/30 text-red-700 ring-red-600/20 focus:border-red-600 focus:ring-2 focus:ring-red-600/20'
-                        : 'border-gray-200 text-gray-900 hover:border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+                        ? 'border-rose-400 text-rose-700 ring-rose-500/20 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/20'
+                        : 'border-gray-200 text-gray-900 hover:border-gray-300 focus:border-violet-500 focus:ring-4 focus:ring-violet-500/20'
                   }`}
                 />
                 <div className="absolute right-2 top-1/2 flex h-[calc(100%-16px)] -translate-y-1/2 items-center gap-1.5">
@@ -104,7 +104,7 @@ function App() {
               </div>
 
               {error && (
-                <div className="mb-6 rounded-lg border-l-4 border-red-500 bg-red-50 p-4 text-red-700">
+                <div className="mb-6 rounded-2xl border-l-4 border-rose-500 bg-rose-50 p-4 text-rose-700">
                   <p className="font-medium">{error}</p>
                 </div>
               )}
@@ -117,7 +117,7 @@ function App() {
           <div className="space-y-6">
             {/* Original Domain */}
             {mainDomain && (
-              <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:shadow-md">
+              <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg transition-all duration-200 hover:border-gray-300 hover:shadow-xl">
                 <DomainResult
                   key={mainDomain.domain}
                   parts={mainDomain}
