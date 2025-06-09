@@ -4,7 +4,6 @@ import React from 'react';
 import DomainResult from './DomainResult';
 import NoResultPlaceholder from './NoResultPlaceholder';
 import SearchIcon from './icons/SearchIcon';
-import ShareButton from './ShareButton';
 import FilterControls from './FilterControls';
 import SubmitButton from './SubmitButton';
 import ImplicitComSuffix from './ImplicitComSuffix';
@@ -106,7 +105,6 @@ function App() {
                     onAvailableOnlyChange={setAvailableOnly}
                     onDotComOnlyChange={setDotComOnly}
                   />
-                  <ShareButton displayDomain={domain} />
                   <SubmitButton loading={loading} />
                 </div>
 
