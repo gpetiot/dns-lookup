@@ -19,7 +19,7 @@ const GenerateAIButton: React.FC<GenerateAIButtonProps> = ({ isGenerating, onCli
       <span className="relative z-10 inline-flex animate-pulse items-center text-yellow-200 transition-all duration-300 group-hover:scale-110 group-hover:text-yellow-300">
         <span>✨</span>
       </span>
-      <div className="absolute inset-0 -z-10 rounded-full bg-violet-500 opacity-0 blur-lg transition-all duration-300 group-hover:opacity-100" />
+      <div className="absolute inset-0 -z-10 rounded-full bg-violet-500 opacity-0 blur-md transition-all duration-300 group-hover:opacity-30" />
     </button>
   );
 };
