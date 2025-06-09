@@ -2,7 +2,6 @@
 
 import React from 'react';
 import DomainResult from './DomainResult';
-import NoResultPlaceholder from './NoResultPlaceholder';
 import FilterControls from './FilterControls';
 import SubmitButton from './SubmitButton';
 import ImplicitComSuffix from './ImplicitComSuffix';
@@ -179,7 +178,7 @@ function App() {
             </div>
           </div>
         ) : (
-          <NoResultPlaceholder domain={domain} sanitizedDomain={sanitizedDomain} />
+          <></>
         )}
       </div>
     </div>
