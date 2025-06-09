@@ -2,7 +2,6 @@
 
 import React from 'react';
 import DomainResult from './DomainResult';
-import DomainScore from './DomainScore';
 import NoResultPlaceholder from './NoResultPlaceholder';
 import SearchIcon from './icons/SearchIcon';
 import ShareButton from './ShareButton';
@@ -114,14 +113,12 @@ function App() {
                 <ImplicitComSuffix domain={domain} />
               </div>
 
-              {domain && <DomainScore domain={sanitizedDomain} />}
+              {error && (
+                <div className="mb-6 rounded-lg border-l-4 border-red-500 bg-red-50 p-4 text-red-700">
+                  <p className="font-medium">{error}</p>
+                </div>
+              )}
             </div>
-
-            {error && (
-              <div className="mb-6 rounded-lg border-l-4 border-red-500 bg-red-50 p-4 text-red-700">
-                <p className="font-medium">{error}</p>
-              </div>
-            )}
           </form>
         </div>
 
