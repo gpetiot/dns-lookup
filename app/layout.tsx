@@ -16,9 +16,9 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://supdomain.com'),
-  title: "Sup' Domain - Smart Domain Name Checker & Suggestions",
+  title: "Sup' Domain - Find available domains privately",
   description:
-    'Check domain availability instantly and get AI-powered domain suggestions. Find the perfect domain name with advanced scoring and alternatives.',
+    'Find your perfect domain name with AI-powered suggestions and instant availability checks.',
   keywords: [
     'domain checker',
     'domain search',
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   authors: [{ name: "Sup' Domain" }],
   openGraph: {
-    title: "Sup' Domain - Smart Domain Name Checker",
+    title: "Sup' Domain - Find available domains privately",
     description:
       'Find your perfect domain name with AI-powered suggestions and instant availability checks',
     type: 'website',
