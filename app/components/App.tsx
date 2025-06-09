@@ -57,10 +57,10 @@ function App() {
     mainDomainResult && !mainDomainResult.loading && mainDomainResult.data?.isAvailable === false;
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-white">
+    <div className="flex flex-col items-center bg-white py-4 sm:py-6">
       <div className="w-full max-w-3xl px-4 sm:px-6 lg:px-8">
         {/* Search Form */}
-        <div className="flex flex-col items-center justify-center">
+        <div className="mb-6 flex flex-col items-center justify-center sm:mb-8">
           <form onSubmit={handleSubmit} className="w-full">
             <div className="relative mb-6">
               <div className="relative flex items-center">
@@ -114,7 +114,7 @@ function App() {
 
         {/* Results Section */}
         {domainVariations.length > 0 ? (
-          <div className="mb-8 space-y-8 sm:mb-12">
+          <div className="space-y-6">
             {/* Original Domain */}
             {mainDomain && (
               <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:shadow-md">
@@ -172,9 +172,7 @@ function App() {
             </div>
           </div>
         ) : (
-          <div className="mb-8 text-center text-gray-500 sm:mb-12">
-            Enter a domain name to get started
-          </div>
+          <div className="py-8 text-center text-gray-500">Enter a domain name to get started</div>
         )}
       </div>
     </div>
