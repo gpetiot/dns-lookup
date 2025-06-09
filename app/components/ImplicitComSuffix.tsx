@@ -7,7 +7,7 @@ interface ImplicitComSuffixProps {
 const ImplicitComSuffix: React.FC<ImplicitComSuffixProps> = ({ domain }) => {
   const textMeasureRef = useRef<HTMLSpanElement>(null);
   const [showComSuffix, setShowComSuffix] = React.useState(false);
-  const [suffixLeft, setSuffixLeft] = React.useState(40);
+  const [suffixLeft, setSuffixLeft] = React.useState(48);
 
   // Effect to show/hide the (.com) suffix and calculate its position
   useEffect(() => {
@@ -16,12 +16,12 @@ const ImplicitComSuffix: React.FC<ImplicitComSuffixProps> = ({ domain }) => {
 
     if (shouldShow && textMeasureRef.current) {
       textMeasureRef.current.textContent = domain;
-      const inputPaddingLeftPx = 40;
+      const inputPaddingLeftPx = 48; // pl-12 = 3rem = 48px
       const gapPx = 4;
       const textWidthPx = textMeasureRef.current.offsetWidth;
       setSuffixLeft(inputPaddingLeftPx + textWidthPx + gapPx);
     } else if (!shouldShow) {
-      setSuffixLeft(40);
+      setSuffixLeft(48); // Match the input padding-left
     }
   }, [domain]);
 
