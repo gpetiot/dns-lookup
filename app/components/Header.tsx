@@ -14,7 +14,7 @@ export default function Header() {
           </h1>
         </div>
         <p className="mx-auto mb-6 max-w-lg text-base font-medium text-gray-600 sm:mb-8 sm:text-lg">
-          Search domains safely. No sneaky snatching.
+          Find available domains privately
         </p>
       </div>
     </header>
