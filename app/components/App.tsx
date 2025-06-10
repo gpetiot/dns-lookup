@@ -114,9 +114,9 @@ function App() {
     <div className="flex flex-col items-center py-8 sm:py-12">
       <div className="w-full max-w-3xl px-4 sm:px-6 lg:px-8">
         {/* Search Form */}
-        <div className="mb-6 flex flex-col items-center justify-center sm:mb-8">
+        <div className="mb-4 flex flex-col items-center justify-center sm:mb-6">
           <form onSubmit={handleSubmit} className="w-full">
-            <div className="relative mb-6">
+            <div className="relative">
               <div className="relative flex items-center">
                 <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                   {mainDomainResult?.loading ? (
@@ -171,7 +171,7 @@ function App() {
           <div className="space-y-6">
             {/* Original Domain */}
             {mainDomain && (
-              <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg transition-all duration-200 hover:border-gray-300 hover:shadow-xl">
+              <div className="mb-14 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg transition-all duration-200 hover:border-gray-300 hover:shadow-xl">
                 <DomainResult
                   key={mainDomain.domain}
                   parts={mainDomain}
