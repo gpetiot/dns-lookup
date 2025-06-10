@@ -11,6 +11,7 @@ interface AISuggestionsResultsProps {
   isGeneratingAI: boolean;
   retryDomainCheck: (domain: string) => void;
   onGenerateAI: () => void;
+  onToggle?: () => void;
 }
 
 const AISuggestionsResults: React.FC<AISuggestionsResultsProps> = ({
@@ -20,17 +21,27 @@ const AISuggestionsResults: React.FC<AISuggestionsResultsProps> = ({
   isGeneratingAI,
   retryDomainCheck,
   onGenerateAI,
+  onToggle,
 }) => {
   return (
     <div className="w-full">
-      <div className="mb-4 flex items-center gap-3 border-b pb-2">
-        <div className="flex items-center gap-2">
-          <h2 className="text-xl font-semibold text-text">AI Suggestions</h2>
+      <div className="mb-4 flex items-center justify-between border-b pb-2">
+        <div className="flex items-center gap-3">
+          <h2 className="text-xl font-semibold text-gray-800">AI Suggestions</h2>
           <span className="rounded-full border border-yellow-400/30 bg-yellow-400/10 px-2 py-0.5 text-xs font-medium text-yellow-600">
             Experimental
           </span>
+          <GenerateAIButton isGenerating={isGeneratingAI} onClick={onGenerateAI} />
         </div>
-        <GenerateAIButton isGenerating={isGeneratingAI} onClick={onGenerateAI} />
+        {onToggle && (
+          <button
+            onClick={onToggle}
+            className="text-gray-500 transition-colors hover:text-gray-700"
+            title="Collapse section"
+          >
+            <span className="text-xl">−</span>
+          </button>
+        )}
       </div>
       {aiSuggestions.length > 0 ? (
         filteredAiSuggestions.length > 0 ? (

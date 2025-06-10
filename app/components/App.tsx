@@ -23,6 +23,7 @@ function App() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [showExtensions, setShowExtensions] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showAI, setShowAI] = useState(false);
 
   const [
     { domain, sanitizedDomain, displayDomain, domainVariations, domainResults, loading, error },
@@ -45,6 +46,7 @@ function App() {
   useEffect(() => {
     setShowExtensions(false);
     setShowSuggestions(false);
+    setShowAI(false);
   }, [displayDomain]);
 
   // Effect to trigger confetti when main domain becomes available
@@ -79,6 +81,10 @@ function App() {
     } else {
       setShowSuggestions(false);
     }
+  };
+
+  const handleToggleAI = () => {
+    setShowAI(!showAI);
   };
 
   const { mainDomain, alternativeExtensions, alternativeSuggestions, featuredDomains } =
@@ -188,15 +194,38 @@ function App() {
             </div>
 
             {/* AI Suggestions */}
-            <div className="space-y-4">
-              <AISuggestionsResults
-                aiSuggestions={aiSuggestions}
-                filteredAiSuggestions={filteredAiSuggestions}
-                domainResults={domainResults}
-                isGeneratingAI={isGeneratingAI}
-                retryDomainCheck={retryDomainCheck}
-                onGenerateAI={() => handleGenerateAI(sanitizedDomain, checkSingleDomain)}
-              />
+            <div className="mt-8 space-y-4">
+              {!showAI ? (
+                <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-lg">
+                  <button
+                    onClick={handleToggleAI}
+                    className="flex w-full items-center justify-between text-left transition-colors hover:text-blue-600"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-semibold text-gray-900">AI Suggestions</h3>
+                        <span className="rounded-full border border-yellow-400/30 bg-yellow-400/10 px-2 py-0.5 text-xs font-medium text-yellow-600">
+                          Experimental
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        Get creative AI-generated domain suggestions
+                      </p>
+                    </div>
+                    <span className="text-2xl text-gray-400">+</span>
+                  </button>
+                </div>
+              ) : (
+                <AISuggestionsResults
+                  aiSuggestions={aiSuggestions}
+                  filteredAiSuggestions={filteredAiSuggestions}
+                  domainResults={domainResults}
+                  isGeneratingAI={isGeneratingAI}
+                  retryDomainCheck={retryDomainCheck}
+                  onGenerateAI={() => handleGenerateAI(sanitizedDomain, checkSingleDomain)}
+                  onToggle={handleToggleAI}
+                />
+              )}
             </div>
 
             {/* Alternative Extensions */}
