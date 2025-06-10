@@ -7,6 +7,7 @@ interface AlternativeComResultsProps {
   filteredAlternativeSuggestions: DomainParts[];
   domainResults: DomainResults;
   retryDomainCheck: (domain: string) => void;
+  onToggle?: () => void;
 }
 
 const AlternativeComResults: React.FC<AlternativeComResultsProps> = ({
@@ -14,6 +15,7 @@ const AlternativeComResults: React.FC<AlternativeComResultsProps> = ({
   filteredAlternativeSuggestions,
   domainResults,
   retryDomainCheck,
+  onToggle,
 }) => {
   if (alternativeSuggestions.length === 0) {
     return null;
@@ -21,9 +23,18 @@ const AlternativeComResults: React.FC<AlternativeComResultsProps> = ({
 
   return (
     <div className="w-full">
-      <h2 className="mb-4 border-b pb-2 text-xl font-semibold text-gray-800">
-        Alternative .com Suggestions
-      </h2>
+      <div className="mb-4 flex items-center justify-between border-b pb-2">
+        <h2 className="text-xl font-semibold text-gray-800">Alternative .com Suggestions</h2>
+        {onToggle && (
+          <button
+            onClick={onToggle}
+            className="text-gray-500 transition-colors hover:text-gray-700"
+            title="Collapse section"
+          >
+            <span className="text-xl">−</span>
+          </button>
+        )}
+      </div>
       {filteredAlternativeSuggestions.length > 0 ? (
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {filteredAlternativeSuggestions.map(variation => (

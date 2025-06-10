@@ -21,16 +21,31 @@ import FeaturedResults from './FeaturedResults';
 
 function App() {
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showExtensions, setShowExtensions] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const [
     { domain, sanitizedDomain, displayDomain, domainVariations, domainResults, loading, error },
-    { setDomain, handleSubmit, retryDomainCheck, checkSingleDomain },
+    {
+      setDomain,
+      handleSubmit,
+      retryDomainCheck,
+      checkSingleDomain,
+      loadAlternativeExtensions,
+      loadAlternativeSuggestions,
+    },
   ] = useDomainState();
 
   const [{ aiSuggestions, isGeneratingAI }, { handleGenerateAI }] = useAISuggestions();
   const { filters, setAvailableOnly, setDotComOnly, checkDomainAgainstFilters } = useFilters();
 
   useFavicon(displayDomain, domainResults);
+
+  // Reset toggle states when displayDomain changes (new search)
+  useEffect(() => {
+    setShowExtensions(false);
+    setShowSuggestions(false);
+  }, [displayDomain]);
 
   // Effect to trigger confetti when main domain becomes available
   useEffect(() => {
@@ -45,6 +60,25 @@ function App() {
 
   const handleDomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDomain(e.target.value);
+  };
+
+  // Handlers for loading alternatives
+  const handleLoadExtensions = async () => {
+    if (!showExtensions) {
+      setShowExtensions(true);
+      await loadAlternativeExtensions();
+    } else {
+      setShowExtensions(false);
+    }
+  };
+
+  const handleLoadSuggestions = async () => {
+    if (!showSuggestions) {
+      setShowSuggestions(true);
+      await loadAlternativeSuggestions();
+    } else {
+      setShowSuggestions(false);
+    }
   };
 
   const { mainDomain, alternativeExtensions, alternativeSuggestions, featuredDomains } =
@@ -167,22 +201,62 @@ function App() {
 
             {/* Alternative Extensions */}
             <div className="space-y-4">
-              <AlternativeExtensionsResults
-                alternativeExtensions={alternativeExtensions}
-                filteredAlternativeExtensions={filteredAlternativeExtensions}
-                domainResults={domainResults}
-                retryDomainCheck={retryDomainCheck}
-              />
+              {!showExtensions ? (
+                <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-lg">
+                  <button
+                    onClick={handleLoadExtensions}
+                    className="flex w-full items-center justify-between text-left transition-colors hover:text-blue-600"
+                  >
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Alternative Extensions Suggestions
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Try different extensions (.net, .org, .io, etc.)
+                      </p>
+                    </div>
+                    <span className="text-2xl text-gray-400">+</span>
+                  </button>
+                </div>
+              ) : (
+                <AlternativeExtensionsResults
+                  alternativeExtensions={alternativeExtensions}
+                  filteredAlternativeExtensions={filteredAlternativeExtensions}
+                  domainResults={domainResults}
+                  retryDomainCheck={retryDomainCheck}
+                  onToggle={handleLoadExtensions}
+                />
+              )}
             </div>
 
             {/* Alternative .com Suggestions */}
             <div className="space-y-4">
-              <AlternativeComResults
-                alternativeSuggestions={alternativeSuggestions}
-                filteredAlternativeSuggestions={filteredAlternativeSuggestions}
-                domainResults={domainResults}
-                retryDomainCheck={retryDomainCheck}
-              />
+              {!showSuggestions ? (
+                <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-lg">
+                  <button
+                    onClick={handleLoadSuggestions}
+                    className="flex w-full items-center justify-between text-left transition-colors hover:text-blue-600"
+                  >
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Alternative .com Suggestions
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Creative variations with prefixes and suffixes
+                      </p>
+                    </div>
+                    <span className="text-2xl text-gray-400">+</span>
+                  </button>
+                </div>
+              ) : (
+                <AlternativeComResults
+                  alternativeSuggestions={alternativeSuggestions}
+                  filteredAlternativeSuggestions={filteredAlternativeSuggestions}
+                  domainResults={domainResults}
+                  retryDomainCheck={retryDomainCheck}
+                  onToggle={handleLoadSuggestions}
+                />
+              )}
             </div>
           </div>
         ) : (

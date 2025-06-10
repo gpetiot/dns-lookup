@@ -1,6 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { checkDomain } from '@/services/whoisService';
-import { generateDomainVariations, sanitizeDomain } from '@/utils/domainUtils';
+import {
+  generateMainDomain,
+  generateAlternativeExtensions,
+  generateAlternativeSuggestions,
+  sanitizeDomain,
+} from '@/utils/domainUtils';
 import type { DomainParts, DomainResults } from '@/types/domain';
 import { parseFeaturedDomain } from '@/utils/domainHelpers';
 import { featuredDomains } from '../../data/featured';
@@ -20,6 +25,8 @@ export interface DomainStateActions {
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
   retryDomainCheck: (domainToRetry: string) => Promise<void>;
   checkSingleDomain: (domainToCheck: string) => Promise<any>;
+  loadAlternativeExtensions: () => Promise<void>;
+  loadAlternativeSuggestions: () => Promise<void>;
 }
 
 export function useDomainState(): [DomainState, DomainStateActions] {
@@ -149,21 +156,21 @@ export function useDomainState(): [DomainState, DomainStateActions] {
     setLoading(true);
     setError(null);
 
-    // Generate new variations and combine with featured domains
-    const searchVariations = generateDomainVariations(sanitizedDomain, domain);
+    // Generate only main domain initially, combine with featured domains
+    const mainDomainVariations = generateMainDomain(sanitizedDomain, domain);
     const featuredVariations = featuredDomains.map(parseFeaturedDomain);
-    const allVariations = [...searchVariations, ...featuredVariations];
+    const allVariations = [...mainDomainVariations, ...featuredVariations];
     setDomainVariations(allVariations);
 
-    // Initialize results for new domains only
+    // Initialize results for main domain only
     const initialResults: DomainResults = {};
-    searchVariations.forEach(variation => {
+    mainDomainVariations.forEach((variation: DomainParts) => {
       initialResults[variation.domain] = { loading: true };
     });
     setDomainResults(prev => ({ ...prev, ...initialResults }));
 
     try {
-      checkDomainsWithDelay(searchVariations, () => setLoading(false));
+      checkDomainsWithDelay(mainDomainVariations, () => setLoading(false));
     } catch (err) {
       console.error('Error processing domain check:', err);
       setError('An error occurred while checking domains. Please try again later.');
@@ -177,13 +184,78 @@ export function useDomainState(): [DomainState, DomainStateActions] {
             setLoading(false);
           }
         },
-        searchVariations.length * 300 + 5000
+        mainDomainVariations.length * 300 + 5000
       );
     }
   };
 
+  const loadAlternativeExtensions = useCallback(async () => {
+    if (!sanitizedDomain) return;
+
+    const extensionVariations = generateAlternativeExtensions(sanitizedDomain, domain);
+
+    // Check if these variations are already loaded
+    const newVariations = extensionVariations.filter(
+      variation => !domainVariations.some(existing => existing.domain === variation.domain)
+    );
+
+    if (newVariations.length === 0) {
+      // All variations already exist, no need to query again
+      return;
+    }
+
+    // Add only new domain variations
+    setDomainVariations(prev => [...prev, ...newVariations]);
+
+    // Initialize loading state for new domains only
+    const initialResults: DomainResults = {};
+    newVariations.forEach((variation: DomainParts) => {
+      initialResults[variation.domain] = { loading: true };
+    });
+    setDomainResults(prev => ({ ...prev, ...initialResults }));
+
+    // Check only the new domains
+    checkDomainsWithDelay(newVariations);
+  }, [sanitizedDomain, domain, domainVariations, checkDomainsWithDelay]);
+
+  const loadAlternativeSuggestions = useCallback(async () => {
+    if (!sanitizedDomain) return;
+
+    const suggestionVariations = generateAlternativeSuggestions(sanitizedDomain, domain);
+
+    // Check if these variations are already loaded
+    const newVariations = suggestionVariations.filter(
+      variation => !domainVariations.some(existing => existing.domain === variation.domain)
+    );
+
+    if (newVariations.length === 0) {
+      // All variations already exist, no need to query again
+      return;
+    }
+
+    // Add only new domain variations
+    setDomainVariations(prev => [...prev, ...newVariations]);
+
+    // Initialize loading state for new domains only
+    const initialResults: DomainResults = {};
+    newVariations.forEach((variation: DomainParts) => {
+      initialResults[variation.domain] = { loading: true };
+    });
+    setDomainResults(prev => ({ ...prev, ...initialResults }));
+
+    // Check only the new domains
+    checkDomainsWithDelay(newVariations);
+  }, [sanitizedDomain, domain, domainVariations, checkDomainsWithDelay]);
+
   return [
     { domain, sanitizedDomain, displayDomain, domainVariations, domainResults, loading, error },
-    { setDomain: handleDomainChange, handleSubmit, retryDomainCheck, checkSingleDomain },
+    {
+      setDomain: handleDomainChange,
+      handleSubmit,
+      retryDomainCheck,
+      checkSingleDomain,
+      loadAlternativeExtensions,
+      loadAlternativeSuggestions,
+    },
   ];
 }

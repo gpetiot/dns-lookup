@@ -60,64 +60,6 @@ export const suffixes: string[] = [
 ];
 
 /**
- * Generate domain variations based on a base name
- * @param {string} baseName - The base domain name
- * @param {string} userInput - The original user input before sanitization
- * @returns {DomainParts[]} Array of domain variations
- */
-export const generateDomainVariations = (baseName: string, userInput: string): DomainParts[] => {
-  const variations: DomainParts[] = [];
-  const nameOnly = baseName.split('.')[0];
-
-  // Add all TLD variations
-  commonTlds.forEach(tld => {
-    if (nameOnly.endsWith(tld)) {
-      const base = nameOnly.slice(0, -tld.length);
-      const userInputWithoutTld = userInput.slice(0, -tld.length);
-      variations.push({
-        base,
-        ext: tld,
-        domain: `${base}.${tld}`,
-        input: userInputWithoutTld,
-      });
-    } else {
-      variations.push({
-        base: nameOnly,
-        ext: tld,
-        domain: `${nameOnly}.${tld}`,
-        input: userInput,
-      });
-    }
-  });
-
-  // Add prefixed variations with .com
-  const sortedPrefixes = [...prefixes].sort();
-  sortedPrefixes.forEach(prefix => {
-    variations.push({
-      prefix,
-      base: nameOnly,
-      ext: 'com',
-      domain: `${prefix}${nameOnly}.com`,
-      input: userInput,
-    });
-  });
-
-  // Add suffixed variations with .com
-  const sortedSuffixes = [...suffixes].sort();
-  sortedSuffixes.forEach(suffix => {
-    variations.push({
-      base: nameOnly,
-      suffix,
-      ext: 'com',
-      domain: `${nameOnly}${suffix}.com`,
-      input: userInput,
-    });
-  });
-
-  return variations;
-};
-
-/**
  * Sanitize domain input
  * @param {string} input - Raw domain input
  * @returns {string} Sanitized domain
@@ -202,4 +144,101 @@ export const generateAIDomainSuggestions = async (
     console.error('Error generating AI suggestions:', error);
     return [];
   }
+};
+
+/**
+ * Generate only the main domain (user's input)
+ * @param {string} baseName - The base domain name
+ * @param {string} userInput - The original user input before sanitization
+ * @returns {DomainParts[]} Array containing only the main domain
+ */
+export const generateMainDomain = (baseName: string, userInput: string): DomainParts[] => {
+  return [
+    {
+      base: baseName.split('.')[0],
+      ext: baseName.split('.')[1] || 'com',
+      domain: baseName,
+      input: userInput,
+    },
+  ];
+};
+
+/**
+ * Generate alternative TLD extensions for the same domain name
+ * @param {string} baseName - The base domain name
+ * @param {string} userInput - The original user input before sanitization
+ * @returns {DomainParts[]} Array of alternative TLD variations
+ */
+export const generateAlternativeExtensions = (
+  baseName: string,
+  userInput: string
+): DomainParts[] => {
+  const variations: DomainParts[] = [];
+  const nameOnly = baseName.split('.')[0];
+
+  // Add all TLD variations except the original
+  commonTlds.forEach(tld => {
+    const targetDomain = `${nameOnly}.${tld}`;
+    if (targetDomain !== baseName) {
+      if (nameOnly.endsWith(tld)) {
+        const base = nameOnly.slice(0, -tld.length);
+        const userInputWithoutTld = userInput.slice(0, -tld.length);
+        variations.push({
+          base,
+          ext: tld,
+          domain: `${base}.${tld}`,
+          input: userInputWithoutTld,
+        });
+      } else {
+        variations.push({
+          base: nameOnly,
+          ext: tld,
+          domain: `${nameOnly}.${tld}`,
+          input: userInput,
+        });
+      }
+    }
+  });
+
+  return variations;
+};
+
+/**
+ * Generate prefix/suffix .com suggestions
+ * @param {string} baseName - The base domain name
+ * @param {string} userInput - The original user input before sanitization
+ * @returns {DomainParts[]} Array of prefix/suffix variations
+ */
+export const generateAlternativeSuggestions = (
+  baseName: string,
+  userInput: string
+): DomainParts[] => {
+  const variations: DomainParts[] = [];
+  const nameOnly = baseName.split('.')[0];
+
+  // Add prefixed variations with .com
+  const sortedPrefixes = [...prefixes].sort();
+  sortedPrefixes.forEach(prefix => {
+    variations.push({
+      prefix,
+      base: nameOnly,
+      ext: 'com',
+      domain: `${prefix}${nameOnly}.com`,
+      input: userInput,
+    });
+  });
+
+  // Add suffixed variations with .com
+  const sortedSuffixes = [...suffixes].sort();
+  sortedSuffixes.forEach(suffix => {
+    variations.push({
+      base: nameOnly,
+      suffix,
+      ext: 'com',
+      domain: `${nameOnly}${suffix}.com`,
+      input: userInput,
+    });
+  });
+
+  return variations;
 };

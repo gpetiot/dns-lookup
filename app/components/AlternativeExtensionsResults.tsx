@@ -7,6 +7,7 @@ interface AlternativeExtensionsResultsProps {
   filteredAlternativeExtensions: DomainParts[];
   domainResults: DomainResults;
   retryDomainCheck: (domain: string) => void;
+  onToggle?: () => void;
 }
 
 const AlternativeExtensionsResults: React.FC<AlternativeExtensionsResultsProps> = ({
@@ -14,6 +15,7 @@ const AlternativeExtensionsResults: React.FC<AlternativeExtensionsResultsProps> 
   filteredAlternativeExtensions,
   domainResults,
   retryDomainCheck,
+  onToggle,
 }) => {
   if (alternativeExtensions.length === 0) {
     return null;
@@ -21,9 +23,18 @@ const AlternativeExtensionsResults: React.FC<AlternativeExtensionsResultsProps> 
 
   return (
     <div className="w-full">
-      <h2 className="mb-4 border-b pb-2 text-xl font-semibold text-gray-800">
-        Alternative Extensions Suggestions
-      </h2>
+      <div className="mb-4 flex items-center justify-between border-b pb-2">
+        <h2 className="text-xl font-semibold text-gray-800">Alternative Extensions Suggestions</h2>
+        {onToggle && (
+          <button
+            onClick={onToggle}
+            className="text-gray-500 transition-colors hover:text-gray-700"
+            title="Collapse section"
+          >
+            <span className="text-xl">−</span>
+          </button>
+        )}
+      </div>
       {filteredAlternativeExtensions.length > 0 ? (
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {filteredAlternativeExtensions.map(variation => (
