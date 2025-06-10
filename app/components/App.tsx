@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Confetti from 'react-confetti';
 import DomainResult from './DomainResult';
 import FilterControls from './FilterControls';
 import SubmitButton from './SubmitButton';
@@ -19,6 +20,8 @@ import LoadingIcon from './icons/LoadingIcon';
 import FeaturedResults from './FeaturedResults';
 
 function App() {
+  const [showConfetti, setShowConfetti] = useState(false);
+
   const [
     { domain, sanitizedDomain, displayDomain, domainVariations, domainResults, loading, error },
     { setDomain, handleSubmit, retryDomainCheck, checkSingleDomain },
@@ -28,6 +31,17 @@ function App() {
   const { filters, setAvailableOnly, setDotComOnly, checkDomainAgainstFilters } = useFilters();
 
   useFavicon(displayDomain, domainResults);
+
+  // Effect to trigger confetti when main domain becomes available
+  useEffect(() => {
+    const mainDomainResult = domainResults[displayDomain];
+    const isMainDomainAvailable =
+      mainDomainResult && !mainDomainResult.loading && mainDomainResult.data?.isAvailable === true;
+
+    if (isMainDomainAvailable && displayDomain) {
+      setShowConfetti(true);
+    }
+  }, [domainResults, displayDomain]);
 
   const handleDomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDomain(e.target.value);
@@ -173,6 +187,18 @@ function App() {
           </div>
         ) : (
           <div className="py-8 text-center text-gray-500">Enter a domain name to get started</div>
+        )}
+
+        {/* Confetti Animation - Shown when main domain is available */}
+        {showConfetti && (
+          <div className="pointer-events-none fixed inset-0 z-50">
+            <Confetti
+              recycle={false}
+              numberOfPieces={200}
+              gravity={0.15}
+              colors={['#3b82f6', '#8b5cf6', '#ec4899', '#f43f5e', '#6366f1']}
+            />
+          </div>
         )}
       </div>
     </div>
