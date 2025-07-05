@@ -35,7 +35,7 @@ function isRateLimited(ip: string): boolean {
 export async function GET(request: Request): Promise<NextResponse> {
   try {
     // Get client IP
-    const headersList = headers();
+    const headersList = await headers();
     const forwardedFor = headersList.get('x-forwarded-for');
     const ip = forwardedFor ? forwardedFor.split(',')[0] : 'unknown';
 
