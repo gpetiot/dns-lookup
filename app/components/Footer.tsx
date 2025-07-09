@@ -8,6 +8,18 @@ const Footer: React.FC = () => {
       <div className="container mx-auto px-4">
         <p className="text-center text-sm text-text-muted">
           © {currentYear} Sup' Domain. All rights reserved.
+          <br />
+          <span>
+            View source on{' '}
+            <a
+              href="https://github.com/gpetiot/dns-lookup"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-primary"
+            >
+              GitHub
+            </a>
+          </span>
         </p>
       </div>
     </footer>
