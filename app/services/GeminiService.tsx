@@ -4,7 +4,7 @@ import { AIServiceInterface } from './AIService';
 export class GeminiService implements AIServiceInterface {
   private genAI: GoogleGenerativeAI;
   private defaultModel: string;
-  public static readonly DEFAULT_MODEL = 'gemini-2.0-flash';
+  public static readonly DEFAULT_MODEL = 'gemini-2.0-flash-lite';
 
   constructor(defaultModel: string = GeminiService.DEFAULT_MODEL) {
     const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
