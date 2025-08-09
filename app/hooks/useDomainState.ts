@@ -114,7 +114,7 @@ export function useDomainState(): [DomainState, DomainStateActions] {
         setDisplayDomain(sanitizedDomain);
         handleSubmit(new Event('submit') as any);
       }
-    }, 200);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, [sanitizedDomain, displayDomain]);
